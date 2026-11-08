@@ -3,6 +3,7 @@ import Link from 'next/link';
 import AdminShell, { AdminSignIn, adminEmail } from '../../AdminShell';
 import { rpc } from '@/lib/supabaseRpc';
 import { gate } from '@/lib/partners';
+import { confirmStatus } from '@/lib/lamplighters';
 
 export const metadata: Metadata = { title: 'Subscriber | Morning Lamp', robots: { index: false, follow: false } };
 export const dynamic = 'force-dynamic';
@@ -56,8 +57,15 @@ export default async function SubscriberView({ searchParams }: { searchParams: P
     );
   }
 
+  const confirmed = (await confirmStatus([s.email])).confirmed[s.email] === true;
   const paid = s.subscription && ['active', 'trialing', 'past_due'].includes(s.subscription.status);
-  const status = s.unsubscribed_at ? `Unsubscribed ${when(s.unsubscribed_at)}` : s.suspected_bot ? 'Flagged as spam or bot' : 'Active';
+  const status = s.unsubscribed_at
+    ? `Unsubscribed ${when(s.unsubscribed_at)}`
+    : s.suspected_bot
+      ? 'Flagged as spam or bot'
+      : confirmed
+        ? 'Active'
+        : 'Waiting for email confirmation';
 
   return (
     <AdminShell title={s.email} active="/admin/subscribers" email={admin}>
@@ -98,6 +106,10 @@ export default async function SubscriberView({ searchParams }: { searchParams: P
         </select>
         <label htmlFor="beta_until">Free Premium until (beta / comp). Leave blank for none.</label>
         <input id="beta_until" name="beta_until" type="date" defaultValue={dateOnly(s.beta_until)} />
+        <label className="partner-check">
+          <input type="checkbox" name="confirmed" defaultChecked={confirmed} />
+          <span>Email confirmed (only confirmed people get email)</span>
+        </label>
         <label className="partner-check">
           <input type="checkbox" name="unsubscribed" defaultChecked={!!s.unsubscribed_at} />
           <span>Unsubscribed (gets no email)</span>

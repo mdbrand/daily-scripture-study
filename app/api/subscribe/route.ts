@@ -1,23 +1,11 @@
 import { after, NextResponse } from 'next/server';
-import { dailySettings, sendWelcomes } from '@/lib/daily';
+import { looksLikeBot, signupAllowed, tooFast } from '@/lib/spam';
+import { sendConfirmation } from '@/lib/confirm';
 import { CONSENT_TEXT, normalizeEmail, normalizePlan, normalizeRef } from '@/lib/subscribe';
 import { checkEmail } from '@/lib/emailCheck';
 import { suggestEmail } from '@/lib/emailTypos';
 
 export const runtime = 'nodejs';
-
-// Best-effort limit per server instance: 5 signups per IP per 10 minutes.
-const WINDOW_MS = 10 * 60 * 1000;
-const MAX_PER_WINDOW = 5;
-const hits = new Map<string, number[]>();
-
-function rateLimited(ip: string): boolean {
-  const now = Date.now();
-  const recent = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
-  recent.push(now);
-  hits.set(ip, recent);
-  return recent.length > MAX_PER_WINDOW;
-}
 
 export async function POST(req: Request) {
   let body: Record<string, unknown>;
@@ -33,8 +21,10 @@ export async function POST(req: Request) {
   }
   const plan = normalizePlan(body.plan);
 
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-  if (rateLimited(ip)) {
+  // Spam layer 1: Vercel BotID. Bots get a normal-looking reply and nothing is saved.
+  if (await looksLikeBot()) return NextResponse.json({ ok: true, plan });
+  // Spam layer 2: rate limits shared across all servers.
+  if (!(await signupAllowed(req, 'subscribe'))) {
     return NextResponse.json({ error: 'Too many tries. Please wait a few minutes.' }, { status: 429 });
   }
 
@@ -65,7 +55,8 @@ export async function POST(req: Request) {
 
   // A hidden field real people never see. If it's filled, keep the row but flag it
   // instead of silently dropping it, so a real person is never lost.
-  const suspectedBot = typeof body.website === 'string' && body.website.trim() !== '';
+  // Spam layer 3: the hidden field, and forms submitted faster than a person can type.
+  const suspectedBot = (typeof body.website === 'string' && body.website.trim() !== '') || tooFast(body.t);
 
   const headers: Record<string, string> = { apikey: key, 'Content-Type': 'application/json' };
   if (key.startsWith('eyJ')) headers.Authorization = `Bearer ${key}`;
@@ -97,13 +88,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 502 });
   }
 
-  // Once daily sending is open, welcome new people right away (after the response goes back).
+  // Spam layer 4: confirm-your-email. Nothing else is sent until they tap the link.
   if (!suspectedBot && process.env.DSS_DB_GATE) {
     after(async () => {
       try {
-        if ((await dailySettings()).send_open) await sendWelcomes(10);
+        await sendConfirmation(email, { origin: new URL(req.url).origin });
       } catch (e) {
-        console.error('subscribe: welcome email', e);
+        console.error('subscribe: confirmation email', e);
       }
     });
   }

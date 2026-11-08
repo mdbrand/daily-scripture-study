@@ -479,3 +479,23 @@ export function renderLamplighterFeedback(o: { footer: MailFooter; weekIndex: nu
     }),
   };
 }
+
+// ---------- Confirm your email (double opt-in) ----------
+export function renderConfirmEmail(o: { link: string; lamplighter?: boolean }): { subject: string; html: string; text: string } {
+  const lines = o.lamplighter
+    ? [
+        'Thank you for applying to be a Lamplighter. Please confirm your email so we can reach you. We read every application and will write back within a few days.',
+        'Confirming also starts your free daily study: one passage, the history behind it, and a voice from history, at 5 AM your time.',
+      ]
+    : [
+        'Tap the button to confirm your email and start your free daily study: one passage, the history behind it, and a voice from history, at 5 AM your time.',
+      ];
+  const r = simpleEmail({
+    kicker: o.lamplighter ? 'Lamplighters' : 'One quick step',
+    title: 'Confirm your email',
+    preheader: 'Tap to confirm and start your daily study.',
+    lines: [...lines, 'If you didn’t sign up, you can ignore this email. You won’t hear from us again.'],
+    button: { label: 'Confirm my email', url: o.link },
+  });
+  return { subject: o.lamplighter ? 'Confirm your email for Lamplighters' : 'Confirm your email for Morning Lamp', ...r };
+}

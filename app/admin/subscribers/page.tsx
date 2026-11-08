@@ -3,6 +3,7 @@ import Link from 'next/link';
 import AdminShell, { AdminSignIn, adminEmail } from '../AdminShell';
 import { rpc } from '@/lib/supabaseRpc';
 import { gate } from '@/lib/partners';
+import { confirmStatus } from '@/lib/lamplighters';
 
 export const metadata: Metadata = { title: 'Subscribers | Morning Lamp', robots: { index: false, follow: false } };
 export const dynamic = 'force-dynamic';
@@ -58,6 +59,7 @@ export default async function Subscribers({ searchParams }: { searchParams: Prom
     p_limit: PAGE,
     p_offset: (n - 1) * PAGE,
   });
+  const conf = await confirmStatus(data.rows.map((r) => r.email));
   const pages = Math.max(1, Math.ceil(data.total / PAGE));
   const link = (o: { filter?: string; page?: number }) => {
     const sp = new URLSearchParams();
@@ -92,7 +94,7 @@ export default async function Subscribers({ searchParams }: { searchParams: Prom
       </p>
       <p className="form-note">
         {data.total} {data.total === 1 ? 'person' : 'people'}
-        {q ? ` matching “${q}”` : ''}. Newest first.
+        {q ? ` matching “${q}”` : ''}. Newest first. {conf.unconfirmed_total} still need to confirm their email before they get anything.
       </p>
       {data.rows.length === 0 ? (
         <p>No one matches that.</p>
@@ -113,7 +115,7 @@ export default async function Subscribers({ searchParams }: { searchParams: Prom
                   <td><Link href={`/admin/subscribers/view?email=${encodeURIComponent(r.email)}`}>{r.email}</Link></td>
                   <td>{date(r.created_at)}</td>
                   <td>{r.premium_status ? PREMIUM[r.premium_status] ?? r.premium_status : r.plan_interest === 'premium' ? 'Interested' : 'Free'}</td>
-                  <td>{status(r)}</td>
+                  <td>{!r.unsubscribed_at && !r.suspected_bot && conf.confirmed[r.email] === false ? 'Waiting for email confirmation' : status(r)}</td>
                   <td>{r.timezone ?? 'Pacific (default)'}</td>
                   <td>{[r.source, r.referred_by && `partner: ${r.referred_by}`].filter(Boolean).join(', ') || '–'}</td>
                   <td>{r.studies_received}</td>

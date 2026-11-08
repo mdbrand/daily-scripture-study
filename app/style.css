@@ -583,3 +583,10 @@ details p { color: var(--muted); font-size: 19px; margin: -4px 0 24px; max-width
   .mail { margin: 0 auto; }
   .promises { flex-direction: column; align-items: center; text-align: center; gap: 10px; }
 }
+
+/* Premium during the beta: one call to action, pointing to Lamplighters */
+.beta-cta { text-align: center; border-top: 1px solid rgba(217, 192, 143, 0.35); padding-top: 48px; margin-top: 8px; }
+.beta-cta-title { font-family: var(--book); font-size: 30px; color: #f6efe1; margin: 0 0 10px; }
+.beta-cta p { color: var(--on-dark-muted); font-size: 19px; margin: 0 0 26px; }
+.button.gold { background: var(--brass-light); color: var(--navy); }
+.button.gold:hover { background: #e6d2a8; }

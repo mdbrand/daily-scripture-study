@@ -30,6 +30,7 @@ export default function SignupForm({
   const [message, setMessage] = useState('');
   const [ref, setRef] = useState('');
   const [suggestion, setSuggestion] = useState<string | null>(null);
+  const [shownAt] = useState(() => Date.now()); // spam check: real people take a few seconds
 
   // Remember a partner link (?ref=code) so the signup is credited even if they browse first.
   useEffect(() => {
@@ -71,7 +72,7 @@ export default function SignupForm({
       const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, plan, source, website, ref, timezone: browserTimeZone() }),
+        body: JSON.stringify({ email, plan, source, website, ref, timezone: browserTimeZone(), t: shownAt }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -92,14 +93,14 @@ export default function SignupForm({
   if (state === 'done') {
     return (
       <div className={`signup-done ${tone}`} role="status">
-        <p className="done-title">You’re on the list.</p>
+        <p className="done-title">Almost there.</p>
         {plan === 'premium' ? (
           <p>
-            You picked <strong>Premium</strong>. We’ll email you before it opens. Nothing is charged
-            today, and you can still choose the free email instead.
+            Check your inbox and tap “Confirm my email.” You picked <strong>Premium</strong>; we’ll email you before it
+            opens. Nothing is charged today.
           </p>
         ) : (
-          <p>We’ll email you when the first study is ready. Unsubscribe any time.</p>
+          <p>Check your inbox and tap “Confirm my email” to start. If it’s not there in a minute, look in Promotions or Spam.</p>
         )}
       </div>
     );

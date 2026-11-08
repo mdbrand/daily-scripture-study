@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import AdminShell, { AdminSignIn, adminEmail } from '../AdminShell';
-import { lamplighterStats, listApplications } from '@/lib/lamplighters';
+import { confirmStatus, lamplighterStats, listApplications } from '@/lib/lamplighters';
 
 export const metadata: Metadata = { title: 'Lamplighters | Morning Lamp', robots: { index: false, follow: false } };
 export const dynamic = 'force-dynamic';
@@ -38,6 +38,7 @@ export default async function Lamplighters({ searchParams }: { searchParams: Pro
   const { msg } = await searchParams;
   const [stats, apps] = await Promise.all([lamplighterStats(), listApplications()]);
   const waiting = apps.filter((a) => a.status === 'applied');
+  const conf = await confirmStatus(apps.map((a) => a.email));
 
   return (
     <AdminShell title="Lamplighters" active="/admin/lamplighters" email={email}>
@@ -64,7 +65,11 @@ export default async function Lamplighters({ searchParams }: { searchParams: Pro
             <tbody>
               {apps.map((a) => (
                 <tr key={a.email}>
-                  <td>{a.email}</td>
+                  <td>
+                    {a.email}
+                    <br />
+                    <span className="form-note">{conf.confirmed[a.email] ? 'Email confirmed' : 'Hasn’t confirmed email yet'}</span>
+                  </td>
                   <td style={{ maxWidth: 360 }}>{a.why}</td>
                   <td>{date(a.created_at)}</td>
                   <td>

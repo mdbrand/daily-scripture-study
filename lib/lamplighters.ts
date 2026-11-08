@@ -59,3 +59,11 @@ export async function sendWeeklyFeedback() {
   }
   return active.length;
 }
+
+// Which emails have confirmed their address (double opt-in).
+export async function confirmStatus(emails: string[]) {
+  return rpc<{ confirmed: Record<string, boolean>; unconfirmed_total: number }>('dss_admin_confirm_status', {
+    p_gate: gate(),
+    p_emails: emails,
+  });
+}

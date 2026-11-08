@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.6.0",
+    "botid": "^1.5.12",
     "disposable-email-domains": "^1.0.62",
     "next": "^15.3.0",
     "react": "^19.0.0",

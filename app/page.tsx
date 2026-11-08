@@ -7,6 +7,7 @@ import LamplighterForm from './LamplighterForm';
 import { SiteFooter } from './LegalShell';
 import { anatomy, faqs, lampSteps, promises, voices } from './content';
 import { lamplighterStats } from '@/lib/lamplighters';
+import { premiumCheckoutOpen } from '@/lib/premium';
 
 export const revalidate = 300; // refresh the Lamplighter spots count every few minutes
 
@@ -48,7 +49,7 @@ function EmailPreview() {
 }
 
 export default async function Home() {
-  const spots = await lamplighterStats();
+  const [spots, checkoutOpen] = await Promise.all([lamplighterStats(), premiumCheckoutOpen().catch(() => false)]);
 
   return (
     <main>
@@ -120,7 +121,7 @@ export default async function Home() {
       <section className="chapter chapel" id="premium">
         <div className="container">
           <header className="chapter-head on-dark">
-            <p className="kicker">Premium · $7 a month or $47 a year</p>
+            <p className="kicker">Premium · $7 a month or $47 a year{checkoutOpen ? '' : ' after the beta'}</p>
             <h2>Last Night’s Lamp: a study written for your day.</h2>
           </header>
 
@@ -154,8 +155,23 @@ export default async function Home() {
 
           {/* Founders appears only when switched on in the database (dss_config.founders_open). */}
           <FoundersOffer />
-          <PremiumPlans />
-          <p className="fine on-dark-fine">Includes everything in the free study.</p>
+          {checkoutOpen ? (
+            <>
+              <PremiumPlans />
+              <p className="fine on-dark-fine">Includes everything in the free study.</p>
+            </>
+          ) : (
+            // During the beta, Premium is free for the first 100 Lamplighters instead of a paid waitlist.
+            <div className="beta-cta">
+              <p className="beta-cta-title">Try Premium free during the beta.</p>
+              <p>
+                The first 100 Lamplighters get Premium free for 90 days. {spots.left} of {spots.spots} spots left.
+              </p>
+              <a className="button gold" href="#lamplighters">
+                Apply to be a Lamplighter
+              </a>
+            </div>
+          )}
         </div>
       </section>
 

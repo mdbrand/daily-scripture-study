@@ -4,11 +4,11 @@ import { newLoginToken } from '@/lib/session';
 import { rpc } from '@/lib/supabaseRpc';
 import { sendEmail } from '@/lib/email/send';
 import { LEGAL } from '@/lib/legal';
+import { looksLikeBot, underLimit, clientIp } from '@/lib/spam';
 
 export const runtime = 'nodejs';
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://morninglamp.study';
-const hits = new Map<string, number[]>();
 
 // Emails a one-time sign-in link (valid 30 minutes). Always answers the same way,
 // so it never reveals whether an address is subscribed.
@@ -17,10 +17,12 @@ export async function POST(req: Request) {
   const email = normalizeEmail((body as Record<string, unknown>).email);
   if (!email) return NextResponse.json({ error: 'Please enter a valid email address.' }, { status: 400 });
 
-  const now = Date.now();
-  const recent = (hits.get(email) ?? []).filter((t) => now - t < 15 * 60 * 1000);
-  if (recent.length >= 3) return NextResponse.json({ ok: true });
-  hits.set(email, [...recent, now]);
+  if (await looksLikeBot()) return NextResponse.json({ ok: true });
+  const [perEmail, perIp] = await Promise.all([
+    underLimit('signin:email', email, 900, 3),
+    underLimit('signin:ip', clientIp(req), 900, 10),
+  ]);
+  if (!perEmail || !perIp) return NextResponse.json({ ok: true });
 
   const gate = process.env.DSS_DB_GATE;
   if (!gate) return NextResponse.json({ error: 'Sign-in is unavailable right now.' }, { status: 503 });

@@ -31,6 +31,9 @@ export async function POST(req: Request) {
         p_email: email,
         p_patch: patch,
       });
+      if (r.ok) {
+        await rpc('dss_admin_set_confirmed', { p_gate: gate(), p_email: r.email ?? email, p_confirmed: form.get('confirmed') === 'on' });
+      }
       return go(req, view(r.email ?? email, r.ok ? 'saved' : r.error || 'error'));
     }
 

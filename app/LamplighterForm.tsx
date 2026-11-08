@@ -10,6 +10,7 @@ export default function LamplighterForm({ open }: { open: boolean }) {
   const [website, setWebsite] = useState('');
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
   const [message, setMessage] = useState('');
+  const [shownAt] = useState(() => Date.now());
 
   if (!open) {
     return <p className="lamp-note">All 100 spots are taken. You can still start the free daily study above.</p>;
@@ -17,8 +18,8 @@ export default function LamplighterForm({ open }: { open: boolean }) {
   if (state === 'done') {
     return (
       <p className="lamp-done" role="status">
-        Thank you. We read every application and will email you within a few days. You’re also on the list for the free
-        daily study.
+        Thank you. Check your inbox and tap “Confirm my email” so we can reach you. We read every application and will
+        write back within a few days.
       </p>
     );
   }
@@ -35,7 +36,7 @@ export default function LamplighterForm({ open }: { open: boolean }) {
     const res = await fetch('/api/lamplighters/apply', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, why, website, timezone }),
+      body: JSON.stringify({ email, why, website, timezone, t: shownAt }),
     }).catch(() => null);
     const body = res ? await res.json().catch(() => ({})) : {};
     if (res?.ok) {

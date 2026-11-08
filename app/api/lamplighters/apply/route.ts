@@ -4,24 +4,24 @@ import { checkEmail } from '@/lib/emailCheck';
 import { suggestEmail } from '@/lib/emailTypos';
 import { rpc } from '@/lib/supabaseRpc';
 import { sendEmail } from '@/lib/email/send';
-import { renderLamplighterReceived } from '@/lib/email/templates';
 import { lamplighterStats } from '@/lib/lamplighters';
+import { looksLikeBot, signupAllowed, tooFast } from '@/lib/spam';
+import { sendConfirmation } from '@/lib/confirm';
 
 export const runtime = 'nodejs';
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://morninglamp.study';
-const hits = new Map<string, number[]>();
 
 // Lamplighter application: email + one line on why. Also joins the free daily list.
 export async function POST(req: Request) {
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-  const now = Date.now();
-  const recent = (hits.get(ip) ?? []).filter((t) => now - t < 10 * 60 * 1000);
-  if (recent.length >= 5) return NextResponse.json({ error: 'Too many tries. Please wait a few minutes.' }, { status: 429 });
-  hits.set(ip, [...recent, now]);
+  if (await looksLikeBot()) return NextResponse.json({ ok: true, status: 'applied' });
+  if (!(await signupAllowed(req, 'lamplighter'))) {
+    return NextResponse.json({ error: 'Too many tries. Please wait a few minutes.' }, { status: 429 });
+  }
 
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
-  if (typeof body.website === 'string' && body.website.trim()) return NextResponse.json({ ok: true }); // bot trap
+  // Bot traps: the hidden field, or submitted faster than a person can type.
+  if ((typeof body.website === 'string' && body.website.trim()) || tooFast(body.t)) return NextResponse.json({ ok: true, status: 'applied' });
   const email = normalizeEmail(body.email);
   if (!email) return NextResponse.json({ error: 'Please enter a valid email address.' }, { status: 400 });
   const why = typeof body.why === 'string' ? body.why.trim().slice(0, 500) : '';
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
   if (result.status === 'applied') {
     after(async () => {
       try {
-        await sendEmail({ to: email, ...renderLamplighterReceived() });
+        await sendConfirmation(email, { lamplighter: true, origin: new URL(req.url).origin });
         const admins = (process.env.ADMIN_EMAILS || '').split(',').map((s) => s.trim()).filter(Boolean);
         if (admins.length) {
           const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
