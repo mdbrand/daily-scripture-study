@@ -99,7 +99,7 @@ export default async function Home() {
       {/* Why it's different */}
       <section className="chapter">
         <div className="container">
-          <h2 className="center">Not a verse of the day. The world behind it.</h2>
+          <h2 className="center">Not just a verse of the day… It’s the world behind it.</h2>
           <ol className="ages" aria-label="Voices you’ll meet">
             {voices.map((v) => (
               <li key={v.name}>
