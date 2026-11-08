@@ -90,8 +90,8 @@ export default function Home() {
             <h2>A peek inside</h2>
             <p>
               Here’s a shortened example of a morning study. Every email carries the same parts:
-              the passage, the history behind it, a voice from the past, and a second verse to
-              carry with you.
+              the passage, the history behind it, a voice from history, and a place to ask your own
+              questions.
             </p>
             <p className="aside">Scripture is quoted from the NIV, so it reads the way people speak today.</p>
           </div>

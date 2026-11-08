@@ -15,7 +15,9 @@ export type DailyStudy = {
   detail: string;
   voices: Voice[];
   readMore: Link[];
-  verseForLife: Passage & { note: string };
+  // Premium only: a second passage chosen for the reader's season. Free emails show the Premium teaser instead.
+  verseForLife?: Passage & { note: string };
+  premiumUrl?: string; // where the free email's Upgrade button points
   yesterday?: { reply: string; passage: Passage; body: string[] }; // Premium only
   isTest?: boolean;
 };
@@ -40,6 +42,8 @@ const C = {
   muted: '#5d6b72',
   line: '#e2dacb',
 };
+export const PREMIUM_URL = 'https://morninglamp.study/?utm_source=email&utm_medium=free-daily&utm_campaign=premium-teaser#premium';
+
 const SERIF = "Georgia, 'Times New Roman', serif";
 const SANS = 'Arial, Helvetica, sans-serif';
 
@@ -139,13 +143,29 @@ export function renderDailyEmail(s: DailyStudy): { subject: string; html: string
       </td></tr>`
     : '';
 
-  const verse = `<tr><td style="background:${C.page};padding:18px 0 0;">
+  const premiumUrl = s.premiumUrl ?? PREMIUM_URL;
+  const verseOrTeaser = s.verseForLife
+    ? `<tr><td style="background:${C.page};padding:18px 0 0;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border:2px solid ${C.navy};border-radius:12px;"><tr><td style="padding:26px 30px 10px;">
       ${label('A Verse for Your Life')}
       ${quote(s.verseForLife, false)}
       ${p(rich(s.verseForLife.note), 'font-size:16px;')}
     </td></tr></table>
-  </td></tr>
+  </td></tr>`
+    : `<tr><td style="background:${C.page};padding:18px 0 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${C.navy};border-radius:12px;"><tr><td style="padding:28px 30px;text-align:center;">
+      <p style="margin:0 0 8px;font-family:${SANS};font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:bold;color:${C.gold};">Premium</p>
+      <p style="margin:0 0 10px;font-family:${SERIF};font-size:22px;line-height:1.35;color:#f6efe1;">A Verse for Your Life, chosen for your season</p>
+      <p style="margin:0 0 22px;font-family:${SANS};font-size:15px;line-height:1.6;color:#c9c2b3;">Premium adds a second passage picked for where you are: single, newly married, raising kids, grieving, or starting over. Plus a study shaped by what happened yesterday.</p>
+      <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto;"><tr>
+        <td style="background:${C.gold};border-radius:8px;">
+          <a href="${esc(premiumUrl)}" style="display:inline-block;padding:14px 28px;font-family:${SANS};font-size:16px;font-weight:bold;color:${C.navy};text-decoration:none;">Get Premium for $7 a month</a>
+        </td>
+      </tr></table>
+      <p style="margin:14px 0 0;font-family:${SANS};font-size:13px;color:#9fb0b8;">About 23 cents a day. Cancel anytime.</p>
+    </td></tr></table>
+  </td></tr>`;
+  const verse = `${verseOrTeaser}
   <tr><td style="background:${C.page};padding:18px 0 0;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${C.ivory};border-radius:12px;border:1px solid ${C.line};"><tr><td style="padding:20px 30px;text-align:center;">
       <p style="margin:0 0 4px;font-family:${SERIF};font-size:19px;color:${C.navy};">Have a Bible question?</p>
@@ -178,10 +198,14 @@ export function renderDailyEmail(s: DailyStudy): { subject: string; html: string
     ...(s.yesterday
       ? ['YESTERDAY, THROUGH THE LENS OF SCRIPTURE', `You wrote: "${s.yesterday.reply}"`, `"${s.yesterday.passage.text}" (${s.yesterday.passage.ref})`, ...s.yesterday.body, '']
       : []),
-    'A VERSE FOR YOUR LIFE',
-    `"${s.verseForLife.text}" (${s.verseForLife.ref})`,
-    s.verseForLife.note,
-    '',
+    ...(s.verseForLife
+      ? ['A VERSE FOR YOUR LIFE', `"${s.verseForLife.text}" (${s.verseForLife.ref})`, s.verseForLife.note, '']
+      : [
+          'PREMIUM: A VERSE FOR YOUR LIFE, CHOSEN FOR YOUR SEASON',
+          'Premium adds a second passage picked for where you are, plus a study shaped by what happened yesterday.',
+          `Get Premium for $7 a month: ${s.premiumUrl ?? PREMIUM_URL}`,
+          '',
+        ]),
     'Have a Bible question? Just hit reply and ask, one question a day.',
     '',
     'Scripture quotations are from the Holy Bible, New International Version (NIV).',

@@ -35,12 +35,6 @@ export const sampleFreeStudy: DailyStudy = {
     { label: 'The siege of Jerusalem in 701 BC: 2 Kings 18–19 (NIV)', url: 'https://www.biblegateway.com/passage/?search=2%20Kings%2018-19&version=NIV' },
     { label: 'Martin Luther’s hymn “A Mighty Fortress Is Our God”' },
   ],
-  verseForLife: {
-    text: 'Come to me, all you who are weary and burdened, and I will give you rest.',
-    ref: 'Matthew 11:28 (NIV)',
-    note:
-      'Jesus said this in Galilee, right after warning towns that had seen his miracles and still did not change (Matthew 11:20–24). The invitation that follows is not addressed to the impressive or the put-together. It is addressed to the tired.',
-  },
 };
 
 export const sampleAnswer: AnswerEmail = {
