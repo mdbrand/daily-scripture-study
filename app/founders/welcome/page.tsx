@@ -70,8 +70,8 @@ export default async function FoundersWelcome({
           everyone they refer. We’ll send your partner link soon.
         </li>
         <li>
-          Changed your mind? You can get a full refund anytime before Premium launches and within 30
-          days after. Just email <a href={`mailto:${LEGAL.email}`}>{LEGAL.email}</a>.
+          Questions about your membership? Just email{' '}
+          <a href={`mailto:${LEGAL.email}`}>{LEGAL.email}</a>.
         </li>
       </ul>
     </LegalShell>

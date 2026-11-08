@@ -72,7 +72,7 @@ export default function FoundersOffer() {
           <li>Every Premium feature, for as long as Premium exists</li>
           <li>Your price never changes, no monthly bill</li>
           <li>Join the partner program and earn 30%</li>
-          <li>Full refund anytime before launch and within 30 days after</li>
+          <li>Ask two Bible questions a day, every day</li>
         </ul>
       </div>
       <form className="signup-form light founders-form" onSubmit={onSubmit} noValidate>
@@ -113,7 +113,7 @@ export default function FoundersOffer() {
           </p>
         )}
         <p className="form-note">
-          Secure checkout by Stripe. Premium begins when it launches. By continuing, you agree to our{' '}
+          Secure checkout by Stripe. All sales are final. By continuing, you agree to our{' '}
           <a className="linklike" href="/terms">Terms</a>.
         </p>
       </form>

@@ -74,13 +74,13 @@ export default function TermsPage() {
           It is not transferable.
         </li>
         <li>
-          Premium begins when it launches. You can get a full refund anytime before launch and within
-          30 days after launch by emailing us. If Premium never launches, every Founder will be
-          refunded in full.
+          <strong>All sales are final.</strong> The Founders Membership is a digital product, and its
+          payment is non-refundable, except where the law requires a refund. If you were charged in
+          error, contact us and we will make it right.
         </li>
         <li>
           Founders can join the partner program. Commissions on Founders sales are 30% of the payment,
-          earned once, after the 30-day refund window.
+          earned once, after a 30-day hold.
         </li>
       </ul>
 

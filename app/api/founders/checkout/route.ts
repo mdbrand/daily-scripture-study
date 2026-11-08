@@ -48,7 +48,7 @@ export async function POST(req: Request) {
             product_data: {
               name: 'Morning Lamp Founders Membership',
               description:
-                'Lifetime Morning Lamp Premium for as long as Premium is offered. Starts when Premium launches. Full refund anytime before launch and within 30 days after.',
+                'Lifetime Morning Lamp Premium for as long as Premium is offered. One payment, no monthly bill. All sales are final.',
             },
           },
         },
