@@ -1,11 +1,13 @@
 import SignupForm from './SignupForm';
 import Crest from './Crest';
 import BackToTop from './BackToTop';
+import FoundersOffer from './FoundersOffer';
 import { SiteFooter } from './LegalShell';
 import {
   compare,
   earnings,
   faqs,
+  foundersFaqQ,
   partnerSteps,
   premiumFeatures,
   premiumSteps,
@@ -209,12 +211,16 @@ export default function Home() {
             </table>
           </div>
 
+          {/* Shown only once Stripe is connected (STRIPE_SECRET_KEY set at build time). */}
+          {process.env.STRIPE_SECRET_KEY ? <FoundersOffer /> : null}
+
           <div className="enroll">
             <div className="enroll-price">
+              <p className="enroll-label">Prefer monthly?</p>
               <p className="amount">
                 $7<span>/month</span>
               </p>
-              <p>About 23 cents a day. Cancel any time. No payment today.</p>
+              <p>Join the list now. No payment today; we’ll email you when monthly Premium opens.</p>
             </div>
             <div className="enroll-form">
               <SignupForm source="premium" defaultPlan="premium" tone="light" buttonLabel="Get early access" />
@@ -288,7 +294,7 @@ export default function Home() {
             <p>Anything else? Once you’re subscribed, just reply to any email.</p>
           </header>
           <div className="faq">
-            {faqs.map((f) => (
+            {faqs.filter((f) => process.env.STRIPE_SECRET_KEY || f.q !== foundersFaqQ).map((f) => (
               <details key={f.q}>
                 <summary>{f.q}</summary>
                 <p>{f.a}</p>

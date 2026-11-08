@@ -110,6 +110,8 @@ export const earnings = [
   { people: 1000, monthly: '$2,100', note: 'A following' },
 ];
 
+export const foundersFaqQ = 'What is the Founders Membership?';
+
 export const faqs = [
   {
     q: 'Do I need to know a lot about the Bible?',
@@ -129,7 +131,11 @@ export const faqs = [
   },
   {
     q: 'What does it cost?',
-    a: 'The daily email is free. Premium is $7 a month, about 23 cents a day, and you can cancel any time. Nothing is charged when you join the list.',
+    a: 'The daily email is free. Premium will be $7 a month, about 23 cents a day, and you can cancel any time. Joining the monthly list costs nothing today.',
+  },
+  {
+    q: 'What is the Founders Membership?',
+    a: 'A one-time payment for lifetime Premium, limited to 1,000 people: $37 for the first 250, then $67. It covers every Premium feature for as long as Premium is offered, with no monthly bill. Premium begins when it launches, and you can get a full refund anytime before launch and within 30 days after.',
   },
   {
     q: 'How does the partner program work?',

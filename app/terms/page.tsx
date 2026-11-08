@@ -61,6 +61,29 @@ export default function TermsPage() {
         <li>Joining the Premium early-access list does not charge you anything.</li>
       </ul>
 
+      <h2>3a. Founders Membership</h2>
+      <ul>
+        <li>
+          The Founders Membership is a one-time payment for lifetime Premium, limited to 1,000
+          memberships: $37 for the first 250 and $67 for the rest. The price shown at checkout is the
+          price you pay.
+        </li>
+        <li>
+          “Lifetime” means Premium for as long as Morning Lamp offers Premium, for one person, with the
+          same features and fair-use limits as monthly Premium (including two Bible questions a day).
+          It is not transferable.
+        </li>
+        <li>
+          Premium begins when it launches. You can get a full refund anytime before launch and within
+          30 days after launch by emailing us. If Premium never launches, every Founder will be
+          refunded in full.
+        </li>
+        <li>
+          Founders can join the partner program. Commissions on Founders sales are 30% of the payment,
+          earned once, after the 30-day refund window.
+        </li>
+      </ul>
+
       <h2>4. Bible questions</h2>
       <p>
         Subscribers may ask Bible questions by replying to our emails: up to one question per day on
@@ -93,14 +116,15 @@ export default function TermsPage() {
       <h2>7. Partner program</h2>
       <ul>
         <li>
-          <strong>Eligibility.</strong> Partners must have an active Premium membership and agree to
-          these terms. We may approve, decline, or remove partners.
+          <strong>Eligibility.</strong> Partners must have an active Premium or Founders membership
+          and agree to these terms. We may approve, decline, or remove partners.
         </li>
         <li>
-          <strong>Commission.</strong> Partners earn 30% of each Premium subscription payment we
-          actually receive from a member they referred, not counting taxes, refunds, or chargebacks.
-          Commissions recur for as long as the referred member keeps paying and the partner remains
-          an active Premium member in good standing.
+          <strong>Commission.</strong> Partners earn 30% of each Premium payment we actually receive
+          from a member they referred, not counting taxes, refunds, or chargebacks. For monthly
+          Premium, commissions recur for as long as the referred member keeps paying and the partner
+          remains an active Premium member in good standing. For a Founders Membership, the 30% is
+          earned once.
         </li>
         <li>
           <strong>When it’s earned (net 30).</strong> A commission is earned only after the referred
