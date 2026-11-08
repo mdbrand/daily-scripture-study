@@ -603,3 +603,4 @@ details p { color: var(--muted); font-size: 19px; margin: -4px 0 24px; max-width
 .premium-center .reply { border-radius: 16px; }
 .beta-cta .beta-price { font-family: var(--ui); font-size: 13px; letter-spacing: 0.01em; color: #8d9aa1; margin: 18px 0 0; }
 .signup-form .form-note { font-size: 12px; line-height: 1.5; margin-top: 10px; }
+.beta-cta .beta-cta-title { font-family: var(--book); font-size: 30px; color: #f6efe1; margin: 0 0 10px; }
