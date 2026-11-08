@@ -64,9 +64,9 @@ export default function TermsPage() {
       <h2>3a. Founders Membership</h2>
       <ul>
         <li>
-          The Founders Membership is a one-time payment for lifetime Premium, limited to 1,000
-          memberships: $37 for the first 250 and $67 for the rest. The price shown at checkout is the
-          price you pay.
+          The Founders Membership is a one-time payment for lifetime Premium. The Founders price is
+          set by us and may change at any time; the price shown at checkout is the price you pay, and
+          a later price change never affects a membership you already bought.
         </li>
         <li>
           “Lifetime” means Premium for as long as Morning Lamp offers Premium, for one person, with the

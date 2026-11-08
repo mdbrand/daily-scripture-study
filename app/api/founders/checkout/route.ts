@@ -3,7 +3,7 @@ import { normalizeEmail, normalizeRef } from '@/lib/subscribe';
 import { checkEmail } from '@/lib/emailCheck';
 import { stripe } from '@/lib/stripe';
 import { getFounderStats } from '@/lib/supabaseRpc';
-import { currentTier } from '@/lib/founders';
+import { tierFor } from '@/lib/founders';
 
 export const runtime = 'nodejs';
 
@@ -26,14 +26,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Founders checkout opens very soon. Please check back.' }, { status: 503 });
   }
 
-  const { sold } = await getFounderStats();
-  const tier = currentTier(sold);
-  if (tier.soldOut) {
-    return NextResponse.json(
-      { error: 'All 1,000 Founders spots are taken. Premium monthly is coming soon.' },
-      { status: 409 },
-    );
-  }
+  const { price_cents } = await getFounderStats();
+  const tier = { tier: tierFor(price_cents), cents: price_cents };
 
   const ref = normalizeRef(body.ref);
   const reqOrigin = new URL(req.url).origin;
@@ -52,7 +46,7 @@ export async function POST(req: Request) {
             currency: 'usd',
             unit_amount: tier.cents,
             product_data: {
-              name: `Morning Lamp Founders Membership${tier.tier === 1 ? ' (first 250)' : ''}`,
+              name: 'Morning Lamp Founders Membership',
               description:
                 'Lifetime Morning Lamp Premium for as long as Premium is offered. Starts when Premium launches. Full refund anytime before launch and within 30 days after.',
             },

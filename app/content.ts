@@ -135,7 +135,7 @@ export const faqs = [
   },
   {
     q: 'What is the Founders Membership?',
-    a: 'A one-time payment for lifetime Premium, limited to 1,000 people: $37 for the first 250, then $67. It covers every Premium feature for as long as Premium is offered, with no monthly bill. Premium begins when it launches, and you can get a full refund anytime before launch and within 30 days after.',
+    a: 'A single payment for lifetime Premium, instead of paying monthly. It covers every Premium feature for as long as Premium is offered, with no monthly bill. The Founders price may go up later, but whatever you pay is yours for life. Premium begins when it launches, and you can get a full refund anytime before launch and within 30 days after.',
   },
   {
     q: 'How does the partner program work?',

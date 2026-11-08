@@ -4,11 +4,11 @@ import { useEffect, useId, useState } from 'react';
 import { suggestEmail } from '@/lib/emailTypos';
 import { track } from '@/lib/track';
 
-type Stats = { sold: number; cap: number; tier1_limit: number; tier: 1 | 2; cents: number; leftAtPrice: number; soldOut: boolean };
+type Stats = { price_cents: number };
 
 const money = (c: number) => `$${Math.round(c / 100)}`;
 
-// Lifetime Founders offer: live spots-left counter + email → Stripe Checkout.
+// Lifetime Founders offer (open, no cap): current price + email → Stripe Checkout.
 export default function FoundersOffer() {
   const id = useId();
   const [stats, setStats] = useState<Stats | null>(null);
@@ -24,8 +24,7 @@ export default function FoundersOffer() {
       .catch(() => {});
   }, []);
 
-  const price = stats ? stats.cents : 3700;
-  const tier1 = !stats || stats.tier === 1;
+  const price = stats ? stats.price_cents : 3700;
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -60,33 +59,15 @@ export default function FoundersOffer() {
     }
   }
 
-  if (stats?.soldOut) {
-    return (
-      <div className="founders sold-out" id="founders">
-        <p className="founders-kicker">Founders Membership</p>
-        <h3>All 1,000 Founders spots are taken.</h3>
-        <p>Thank you. Premium monthly is coming soon; join the list below to hear first.</p>
-      </div>
-    );
-  }
-
   return (
     <div className="founders" id="founders">
       <div className="founders-head">
-        <p className="founders-kicker">Founders Membership, limited to 1,000</p>
+        <p className="founders-kicker">Founders Membership</p>
         <h3>Premium for life, one payment.</h3>
         <p className="founders-price">
           <span className="amount">{money(price)}</span>
           <span className="once">one time</span>
-          {tier1 && <span className="then">then $67 after the first 250</span>}
         </p>
-        {stats && (
-          <p className="founders-count" aria-live="polite">
-            <strong>{stats.leftAtPrice.toLocaleString('en-US')}</strong> of{' '}
-            {(tier1 ? stats.tier1_limit : stats.cap - stats.tier1_limit).toLocaleString('en-US')} left at{' '}
-            {money(price)}
-          </p>
-        )}
         <ul className="founders-points">
           <li>Every Premium feature, for as long as Premium exists</li>
           <li>Your price never changes, no monthly bill</li>

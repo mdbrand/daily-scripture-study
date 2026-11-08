@@ -17,5 +17,5 @@ export async function rpc<T = unknown>(fn: string, args: Record<string, unknown>
 }
 
 export async function getFounderStats() {
-  return rpc<{ sold: number; tier1_limit: number; cap: number }>('dss_founders_stats');
+  return rpc<{ sold: number; price_cents: number }>('dss_founders_stats');
 }
