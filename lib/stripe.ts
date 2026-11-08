@@ -1,6 +1,7 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 
 // Minimal Stripe REST client (form-encoded), no SDK needed.
+export const STRIPE_VERSION = '2024-06-20';
 function encode(obj: Record<string, unknown>, prefix = ''): string[] {
   const out: string[] = [];
   for (const [k, v] of Object.entries(obj)) {
@@ -35,6 +36,8 @@ export async function stripe<T = Record<string, unknown>>(
     headers: {
       Authorization: `Bearer ${key}`,
       'Content-Type': 'application/x-www-form-urlencoded',
+      // Pin a modern API version (the account default is 2014) so object shapes are predictable.
+      'Stripe-Version': STRIPE_VERSION,
       ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
     },
     body: method === 'POST' ? body : undefined,
