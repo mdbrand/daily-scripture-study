@@ -60,7 +60,8 @@ export default async function AdminStudies({ searchParams }: { searchParams: Pro
       </dl>
       <p className="form-note">
         Each morning around 7 AM Pacific, tomorrow’s study is written and you get an email to review it. The next day it
-        reaches each reader at 5 AM in their own time zone, unless you put it on hold first.
+        reaches each reader at 5 AM in their own time zone, unless you put it on hold first. Premium readers also get a
+        short check-in at 8 PM their time; their reply shapes the Yesterday section of their next study.
       </p>
       {settings.send_open ? (
         <Action action="sending-off" label="Turn daily sending off" kind="link-button" />
@@ -82,6 +83,7 @@ export default async function AdminStudies({ searchParams }: { searchParams: Pro
           {study.sent_count === 0 && <Action action="write" date={date} label="Rewrite it" kind="link-button" />}
           <Action action="test-free" date={date} label="Email me the free version" kind="link-button" />
           <Action action="test-premium" date={date} label="Email me the Premium version" kind="link-button" />
+          <Action action="test-checkin" label="Email me the evening check-in" kind="link-button" />
           <p className="admin-filters" style={{ marginTop: 8 }}>
             <Link href={`/admin/studies?date=${date}`} aria-current={!premiumView ? 'page' : undefined}>Free version</Link>
             <Link href={`/admin/studies?date=${date}&edition=premium`} aria-current={premiumView ? 'page' : undefined}>Premium version</Link>

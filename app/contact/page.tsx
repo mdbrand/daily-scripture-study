@@ -30,8 +30,8 @@ export default function ContactPage() {
 
       <h2>Already a subscriber?</h2>
       <p>
-        Just reply to any Morning Lamp email. That’s also how you ask a Bible question: one a day on
-        the free edition, two a day on Premium.
+        Just reply to any Morning Lamp email. That’s also how you ask a Bible question: one question a day,
+        on the free edition and Premium alike.
       </p>
 
       <h2>Privacy and account requests</h2>

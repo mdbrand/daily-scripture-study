@@ -64,7 +64,7 @@ export default async function FoundersWelcome({
       </div>
       <h2>While you wait</h2>
       <ul>
-        <li>Reply to any Morning Lamp email with a Bible question. As a Founder you can ask two a day.</li>
+        <li>Reply to any Morning Lamp email with a Bible question, one a day.</li>
         <li>
           Know someone who would love this? <Link href="/partners">Join the partner program</Link> and
           earn 30% on everyone you refer.

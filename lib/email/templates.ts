@@ -47,9 +47,8 @@ const C = {
 export const PREMIUM_URL = 'https://morninglamp.study/?utm_source=email&utm_medium=free-daily&utm_campaign=premium-teaser#premium';
 
 const YESTERDAY_INVITE =
-  'Hit reply and tell us about your day in a sentence or two: something you’re grateful for, something weighing on you, a conversation you keep thinking about.';
-const YESTERDAY_INVITE_2 =
-  'Tomorrow morning, this space will hold a passage chosen for what you shared and a short reflection on it.';
+  'Each evening around 8 PM your time, we’ll send a short check-in. Reply with a line or two about your day, and the next morning this space becomes a study written for what you shared.';
+const YESTERDAY_INVITE_2 = 'You can also reply to this email anytime today.';
 
 function shorten(s: string, n: number): string {
   const t = s.replace(/\s+/g, ' ').trim();
@@ -348,7 +347,7 @@ export function renderWelcomeEmail(o: { premium: boolean; footer: MailFooter }):
     'Each morning you’ll get one short Bible study: a passage, the history behind it, one detail most people miss, and voices from church history. It takes about five minutes.',
     'Your first study arrives at 5 AM your time. If you don’t see it, check your Promotions or Spam folder and move it to your inbox, so the rest find you.',
     o.premium
-      ? 'As a Premium member, you can reply to any study with a Bible question, up to two a day, and you’ll get a careful answer with sources.'
+      ? 'Each evening around 8 PM, we’ll check in to ask how your day went. Reply with a line or two, and the next morning’s study includes a short study written for what you shared.'
       : 'Have a Bible question? Reply to any study and ask, one question a day.',
   ];
   const verse: Passage = { text: 'Your word is a lamp for my feet, a light on my path.', ref: 'Psalm 119:105 (NIV)' };
@@ -362,5 +361,34 @@ export function renderWelcomeEmail(o: { premium: boolean; footer: MailFooter }):
     subject: 'Welcome to Morning Lamp',
     html: shell(inner, 'Your first study arrives at 5 AM your time.', false, footerHtml(o.footer), o.premium ? 'premium' : 'free'),
     text: ['Welcome to Morning Lamp', '', ...lines.flatMap((l) => [l, '']), `"${verse.text}" (${verse.ref})`, '', 'Grace and peace,', 'Morning Lamp', ...footerText(o.footer)].join('\n'),
+  };
+}
+
+// Premium evening check-in. The reply becomes tomorrow's "Yesterday, through the lens of Scripture."
+const CHECKIN_SUBJECTS = [
+  'How did today go?',
+  'Before you rest: how was today?',
+  'One line about your day?',
+  'How was today, really?',
+];
+export function renderCheckinEmail(o: { footer: MailFooter; dayIndex: number; isTest?: boolean }): { subject: string; html: string; text: string } {
+  const subject = CHECKIN_SUBJECTS[((o.dayIndex % CHECKIN_SUBJECTS.length) + CHECKIN_SUBJECTS.length) % CHECKIN_SUBJECTS.length];
+  const lines = [
+    'Hit reply and tell us in a sentence or two. A win, a worry, a hard conversation, something you’re grateful for.',
+    'Tomorrow at 5 AM, the Yesterday section of your study will be written for what you share: a passage for how you felt, the story behind it, and a voice from Christian history who walked through the same thing.',
+  ];
+  const quiet = 'No need to reply if today was quiet. Your study will be there in the morning either way.';
+  const verse: Passage = { text: 'In peace I will lie down and sleep, for you alone, LORD, make me dwell in safety.', ref: 'Psalm 4:8 (NIV)' };
+  const inner = `<tr><td style="background:${C.ivory};padding:30px 32px 18px;">
+    <h1 style="margin:0 0 18px;font-family:${SERIF};font-size:28px;line-height:1.25;color:${C.navy};">${esc(subject)}</h1>
+    ${lines.map((l) => p(esc(l))).join('')}
+    ${p(esc(quiet), `color:${C.muted};font-size:16px;`)}
+    ${quote(verse, false)}
+    ${p('Rest well,<br>Morning Lamp')}
+  </td></tr>`;
+  return {
+    subject: o.isTest ? `[Preview] ${subject}` : subject,
+    html: shell(inner, 'Reply with a line about your day. Tomorrow’s study will be written for it.', o.isTest, footerHtml(o.footer), 'premium'),
+    text: [subject, '', ...lines.flatMap((l) => [l, '']), quiet, '', `"${verse.text}" (${verse.ref})`, '', 'Rest well,', 'Morning Lamp', ...footerText(o.footer)].join('\n'),
   };
 }

@@ -1,7 +1,7 @@
 import { rpc } from './supabaseRpc';
 import { gate } from './partners';
 import { resendKey } from './email/send';
-import { renderDailyEmail, renderWelcomeEmail, type DailyStudy, type MailFooter } from './email/templates';
+import { renderCheckinEmail, renderDailyEmail, renderWelcomeEmail, type DailyStudy, type MailFooter } from './email/templates';
 import { PILLARS, writeStudy, type RecentStudy, type StudyContent } from './studyWriter';
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://morninglamp.study';
@@ -147,6 +147,40 @@ export async function sendDue(budgetMs = 240_000) {
     await new Promise((r) => setTimeout(r, 600)); // stay under Resend's default 2 requests/second
   }
   return { sent, done: false, reason: 'time budget used; the next hourly run continues' };
+}
+
+// Evening check-ins for Premium readers (8 PM their time). Their reply shapes tomorrow's study.
+export async function sendCheckins(budgetMs = 60_000) {
+  const postal = postalAddress();
+  if (!postal) return 0;
+  const started = Date.now();
+  let sent = 0;
+  while (Date.now() - started < budgetMs) {
+    const batch = await rpc<{ email: string; unsub_token: string; local_date: string }[]>('dss_due_checkins', {
+      p_gate: gate(),
+      p_limit: 100,
+    });
+    if (batch.length === 0) break;
+    const emails = batch.map((r) => {
+      const footer = footerFor(r.unsub_token, postal);
+      const dayIndex = Math.floor(new Date(`${r.local_date}T12:00:00Z`).getTime() / 86400000);
+      return { to: r.email, ...renderCheckinEmail({ footer, dayIndex }), unsubscribeUrl: oneClickUrl(r.unsub_token) };
+    });
+    const ids = await sendBatch(emails);
+    await rpc('dss_record_checkins', {
+      p_gate: gate(),
+      p_rows: batch.map((r, i) => ({ email: r.email, local_date: r.local_date, resend_id: ids[i] ?? null })),
+    });
+    sent += batch.length;
+    await new Promise((r) => setTimeout(r, 600));
+  }
+  return sent;
+}
+
+export async function sendCheckinPreview(to: string) {
+  const footer = footerFor('preview', postalAddress() ?? '(mailing address not set yet)');
+  const dayIndex = Math.floor(Date.now() / 86400000);
+  await sendBatch([{ to, ...renderCheckinEmail({ footer, dayIndex, isTest: true }), unsubscribeUrl: footer.unsubscribeUrl }]);
 }
 
 // Welcome emails for people who joined but haven't been welcomed yet.

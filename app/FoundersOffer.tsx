@@ -75,7 +75,7 @@ export default function FoundersOffer() {
           <li>Every Premium feature, for as long as Premium exists</li>
           <li>Your price never changes, no monthly bill</li>
           <li>Join the partner program and earn 30%</li>
-          <li>Ask two Bible questions a day, every day</li>
+          <li>A study written for your own day, every morning</li>
         </ul>
       </div>
       <form className="signup-form light founders-form" onSubmit={onSubmit} noValidate>

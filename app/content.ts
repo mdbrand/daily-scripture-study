@@ -80,7 +80,7 @@ export const compare: [string, boolean | string, true | string][] = [
   ['A daily Bible study in plain language', true, true],
   ['The story behind the verse', true, true],
   ['Voices from Christian history, with sources', true, true],
-  ['Ask any Bible question', '1 a day', '2 a day'],
+  ['Ask any Bible question', '1 a day', '1 a day'],
   ['Yesterday, through the lens of Scripture', false, true],
   ['Remembers what you share and follows up', false, true],
   ['Private Scripture journal + a recap every 30 days', false, true],
@@ -126,7 +126,7 @@ export const faqs = [
   },
   {
     q: 'How many Bible questions can I ask?',
-    a: 'Free members can ask one question a day, and Premium members can ask two. Ask a second one on the free plan and we will answer it the next day. Each answer is 400 to 600 words, about a three-minute read. The limits keep every answer careful and well sourced.',
+    a: 'Everyone can ask one question a day, on the free edition and Premium alike. Ask a second one and we will answer it the next day. Each answer is 400 to 600 words, about a three-minute read. The limits keep every answer careful and well sourced.',
   },
   {
     q: 'What does it cost?',

@@ -70,7 +70,7 @@ export default function TermsPage() {
         </li>
         <li>
           “Lifetime” means Premium for as long as Morning Lamp offers Premium, for one person, with the
-          same features and fair-use limits as monthly Premium (including two Bible questions a day).
+          same features and fair-use limits as monthly Premium (including one Bible question a day).
           It is not transferable.
         </li>
         <li>
@@ -86,8 +86,8 @@ export default function TermsPage() {
 
       <h2>4. Bible questions</h2>
       <p>
-        Subscribers may ask Bible questions by replying to our emails: up to one question per day on
-        the free edition and two per day on Premium. We may answer extra questions on a later day,
+        Subscribers may ask Bible questions by replying to our emails: up to one question per day, on
+        both the free edition and Premium. We may answer extra questions on a later day,
         combine similar questions, or decline questions that are abusive or outside the purpose of
         Morning Lamp.
       </p>

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSessionEmail, isAdmin } from '@/lib/session';
 import { rpc } from '@/lib/supabaseRpc';
 import { gate } from '@/lib/partners';
-import { generateStudy, postalAddress, sendPreview } from '@/lib/daily';
+import { generateStudy, postalAddress, sendCheckinPreview, sendPreview } from '@/lib/daily';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
@@ -34,6 +34,9 @@ export async function POST(req: Request) {
       case 'test-premium':
         if (!DATE.test(date)) return back('bad-date');
         await sendPreview(date, email!, action === 'test-premium');
+        return back('test-sent');
+      case 'test-checkin':
+        await sendCheckinPreview(email!);
         return back('test-sent');
       case 'sending-on':
         if (!postalAddress()) return back('need-address');

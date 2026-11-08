@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { dailySettings, generateStudy, getStudy, pacificDate, sendDue } from '@/lib/daily';
+import { dailySettings, generateStudy, getStudy, pacificDate, sendCheckins, sendDue } from '@/lib/daily';
 import { anthropicKey } from '@/lib/studyWriter';
 import { sendEmail } from '@/lib/email/send';
 
@@ -8,7 +8,8 @@ export const maxDuration = 300;
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://morninglamp.study';
 
-// Every hour (Vercel Cron, see vercel.json): send the study to everyone for whom it's now 5 AM.
+// Every hour (Vercel Cron, see vercel.json): send the study to everyone for whom it's now 5 AM,
+// and the evening check-in to Premium readers for whom it's now 8 PM.
 // Does nothing until sending is switched on (dss_config.daily_send_open = 'true').
 export async function GET(req: Request) {
   const secret = process.env.CRON_SECRET;
@@ -24,7 +25,12 @@ export async function GET(req: Request) {
     if (anthropicKey() && !(await getStudy(today))) await generateStudy(today).catch((e) => console.error('fallback writer', e));
     const result = await sendDue();
     if (!result.done) await alert(`The ${new Date().toISOString().slice(11, 13)}:00 UTC send didn’t finish: ${result.reason}. Sent ${result.sent}.`);
-    return NextResponse.json({ ok: true, ...result });
+    // Premium readers for whom it's now 8 PM get tonight's check-in.
+    const checkins = await sendCheckins().catch((e) => {
+      console.error('checkins', e);
+      return 0;
+    });
+    return NextResponse.json({ ok: true, ...result, checkins });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error('daily send', e);
