@@ -113,7 +113,7 @@ export default function TermsPage() {
         that you don’t have the right to share.
       </p>
 
-      <h2>7. Partner program</h2>
+      <h2 id="partners">7. Partner program</h2>
       <ul>
         <li>
           <strong>Eligibility.</strong> Partners must have an active Premium or Founders membership

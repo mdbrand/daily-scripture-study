@@ -66,8 +66,8 @@ export default async function FoundersWelcome({
       <ul>
         <li>Reply to any Morning Lamp email with a Bible question. As a Founder you can ask two a day.</li>
         <li>
-          Know someone who would love this? Founders can join the partner program and earn 30% on
-          everyone they refer. We’ll send your partner link soon.
+          Know someone who would love this? <Link href="/partners">Join the partner program</Link> and
+          earn 30% on everyone you refer.
         </li>
         <li>
           Questions about your membership? Just email{' '}

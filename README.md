@@ -69,3 +69,11 @@ Length: every answer is **400–600 words** (short answer + body + voices; `answ
   `dataLayer.push({event: 'sign_up', method: 'email', plan, form_location})`; GTM sends it to GA4 as `sign_up`.
 - **Search Console:** Domain property `morninglamp.study` (DNS TXT at Namecheap); sitemap `/sitemap.xml` submitted.
 
+
+## Partner program
+
+- `/partners`: email sign-in link (30 min, one use) → join (Premium only, pick a link name, accept terms) → dashboard with link, visits, sign-ups, pending/ready/paid commissions, and Stripe payout setup.
+- Payouts use Stripe Connect Express. Connect must be turned on in the Stripe dashboard first.
+- `/api/cron/daily` (Vercel Cron, 15:00 UTC): moves commissions older than 30 days to "earned". On the 1st it pays earned balances of $25+ by Stripe transfer, emails each partner a statement, and emails `ADMIN_EMAILS` a summary. Failed transfers are logged and retried next month.
+- `/admin/partners`: report for addresses in `ADMIN_EMAILS` (sign in at /partners first).
+- Commissions only go to active partners who are Premium themselves, and never for their own purchases.

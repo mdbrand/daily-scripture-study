@@ -273,6 +273,9 @@ export default function Home() {
           <a className="button" href="#premium">
             Join Premium to become a partner
           </a>
+          <p className="fine">
+            Already a Premium member? <a href="/partners">Get your partner link</a>.
+          </p>
         </div>
       </section>
 

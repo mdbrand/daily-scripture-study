@@ -35,7 +35,21 @@ export default function SignupForm({
   useEffect(() => {
     try {
       const fromUrl = new URLSearchParams(window.location.search).get('ref');
-      if (fromUrl) window.localStorage.setItem('dss_ref', fromUrl);
+      if (fromUrl) {
+        window.localStorage.setItem('dss_ref', fromUrl);
+        // Count one visit per partner link per browser per day (only the hero form reports it).
+        const day = new Date().toISOString().slice(0, 10);
+        const seen = `dss_click_${fromUrl}_${day}`;
+        if (source === 'hero' && !window.localStorage.getItem(seen)) {
+          window.localStorage.setItem(seen, '1');
+          fetch('/api/partners/click', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: fromUrl }),
+            keepalive: true,
+          }).catch(() => {});
+        }
+      }
       setRef(fromUrl || window.localStorage.getItem('dss_ref') || '');
     } catch {
       // Storage can be blocked (private mode); the URL value still works for this visit.

@@ -65,8 +65,8 @@ export default async function PremiumWelcome({ searchParams }: { searchParams: P
         <li>We’ll be in touch by email shortly to set up studies written for your season of life.</li>
         <li>Reply to any Morning Lamp email with a Bible question. Premium members can ask two a day.</li>
         <li>
-          Know someone who would love this? Premium members can join the partner program and earn 30%
-          on every friend who subscribes.
+          Know someone who would love this? <Link href="/partners">Join the partner program</Link> and earn
+          30% of every payment from friends who subscribe.
         </li>
         <li>
           You can cancel anytime; your plan stays active until the end of the period you paid for. Email{' '}
