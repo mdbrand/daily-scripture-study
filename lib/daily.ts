@@ -65,7 +65,7 @@ export async function generateStudy(date: string): Promise<StudyContent> {
 const gatewayUrl = (ref: string) =>
   `https://www.biblegateway.com/passage/?search=${encodeURIComponent(ref.replace(/\s*\(NIV\)\s*$/i, ''))}&version=NIV`;
 
-export function toDailyStudy(date: string, c: StudyContent, premium: boolean): DailyStudy {
+export function toDailyStudy(date: string, c: StudyContent, premium: boolean, yesterday?: DailyStudy['yesterday'] | null): DailyStudy {
   return {
     dateLabel: dateLabel(date),
     subject: c.subject,
@@ -79,6 +79,7 @@ export function toDailyStudy(date: string, c: StudyContent, premium: boolean): D
     readMore: c.readMore.map((l) => ({ label: l.label, url: l.passage_ref ? gatewayUrl(l.passage_ref) : undefined })),
     verseForLife: premium ? c.verseForLife : undefined,
     edition: premium ? 'premium' : 'free',
+    yesterday: premium && yesterday ? yesterday : undefined,
   };
 }
 
@@ -112,7 +113,7 @@ async function sendBatch(emails: Outgoing[]): Promise<string[]> {
 }
 
 type Recipient = { email: string; unsub_token: string; premium: boolean };
-type DueRecipient = Recipient & { study_date: string };
+type DueRecipient = Recipient & { study_date: string; yesterday: DailyStudy['yesterday'] | null };
 
 // Sends each reader the study for their local date once it's 5 AM where they live.
 // Runs every hour; the database decides who is due (5:00–7:59 AM local, not yet sent).
@@ -131,7 +132,7 @@ export async function sendDue(budgetMs = 240_000) {
     const emails = batch.map((r) => {
       const study = studies.get(r.study_date)!;
       const footer = footerFor(r.unsub_token, postal);
-      const m = renderDailyEmail(toDailyStudy(r.study_date, study.content, r.premium), footer);
+      const m = renderDailyEmail(toDailyStudy(r.study_date, study.content, r.premium, r.yesterday), footer);
       return { to: r.email, ...m, unsubscribeUrl: oneClickUrl(r.unsub_token) };
     });
     const ids = await sendBatch(emails);
@@ -164,11 +165,25 @@ export async function sendWelcomes(limit = 100) {
   return pending.length;
 }
 
+// What a Premium reader sees after replying with a note about their day (used only in previews).
+export const SAMPLE_YESTERDAY: NonNullable<DailyStudy['yesterday']> = {
+  reply: '(Sample) Long day at work, and I snapped at my kids when I got home. I felt awful about it all night.',
+  passage: {
+    text: 'Because of the LORD’s great love we are not consumed, for his compassions never fail. They are new every morning; great is your faithfulness.',
+    ref: 'Lamentations 3:22–23 (NIV)',
+  },
+  body: [
+    'These words were written in the rubble of Jerusalem, by someone who had every reason to give up. In the middle of real grief, he remembers one thing: God’s mercy does not run out overnight. It is new every morning.',
+    'A hard evening doesn’t get the last word on you as a parent. This morning is a fresh start, and the same mercy God shows you is the mercy you can show your kids. A simple “I’m sorry I was short with you last night” teaches them more about grace than a perfect day would.',
+    'Today, you might ask God for patience before you walk in the door this evening.',
+  ],
+};
+
 // A single preview copy (admin test sends). Not logged as a subscriber send.
 export async function sendPreview(date: string, to: string, premium: boolean) {
   const study = await getStudy(date);
   if (!study) throw new Error('No study for that date yet.');
   const footer = footerFor('preview', postalAddress() ?? '(mailing address not set yet)');
-  const m = renderDailyEmail({ ...toDailyStudy(date, study.content, premium), isTest: true }, footer);
+  const m = renderDailyEmail({ ...toDailyStudy(date, study.content, premium, premium ? SAMPLE_YESTERDAY : null), isTest: true }, footer);
   await sendBatch([{ to, ...m, subject: `[Preview · ${premium ? 'Premium' : 'Free'}] ${m.subject}`, unsubscribeUrl: footer.unsubscribeUrl }]);
 }

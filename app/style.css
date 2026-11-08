@@ -499,3 +499,17 @@ details p { color: var(--muted); font-size: 19px; margin: -4px 0 24px; max-width
   .partner-table { font-size: 14px; }
 }
 .legal .form-note { text-align: left; }
+
+/* Admin portal */
+.admin-nav { display: flex; flex-wrap: wrap; gap: 6px 22px; align-items: center; font-family: var(--ui); font-size: 15px; border-bottom: 1px solid var(--rule); padding: 0 0 14px; margin: 0 0 8px; }
+.admin-nav a { color: var(--ink); text-decoration: none; padding: 4px 0; border-bottom: 2px solid transparent; }
+.admin-nav a[aria-current='page'] { color: var(--navy); font-weight: 600; border-bottom-color: var(--brass); }
+.admin-nav a:hover { color: var(--brass-dark); }
+.admin-who { margin-left: auto; display: flex; gap: 10px; align-items: center; color: var(--muted); font-size: 14px; }
+.admin-filters { display: flex; flex-wrap: wrap; gap: 8px; font-family: var(--ui); font-size: 14px !important; }
+.admin-filters a { text-decoration: none; color: var(--ink); border: 1px solid var(--rule); border-radius: 999px; padding: 5px 12px; }
+.admin-filters a[aria-current='page'] { background: var(--navy); border-color: var(--navy); color: var(--linen); }
+.admin-two { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.partner-stats dd a { color: inherit; text-decoration: none; }
+.partner-stats dd a:hover { color: var(--brass-dark); }
+@media (max-width: 720px) { .admin-two { grid-template-columns: 1fr; } .admin-who { margin-left: 0; width: 100%; } }

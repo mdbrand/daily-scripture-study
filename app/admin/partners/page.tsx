@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import LegalShell from '../../LegalShell';
-import { getSessionEmail, isAdmin } from '@/lib/session';
+import AdminShell, { AdminSignIn, adminEmail } from '../AdminShell';
 import { rpc } from '@/lib/supabaseRpc';
 import { gate, money } from '@/lib/partners';
 
@@ -22,23 +21,14 @@ type Row = {
 };
 
 export default async function AdminPartners() {
-  const email = await getSessionEmail();
-  if (!isAdmin(email)) {
-    return (
-      <LegalShell title="Partner report">
-        <p>
-          This page is for Morning Lamp staff. <Link href="/partners">Sign in</Link> with an admin email address,
-          then come back here.
-        </p>
-      </LegalShell>
-    );
-  }
+  const email = await adminEmail();
+  if (!email) return <AdminSignIn next="/admin/partners" />;
 
   const rows = await rpc<Row[]>('dss_partner_list', { p_gate: gate() });
   const sum = (k: keyof Row) => rows.reduce((n, r) => n + Number(r[k] || 0), 0);
 
   return (
-    <LegalShell title="Partner report">
+    <AdminShell title="Partners" active="/admin/partners" email={email}>
       <dl className="partner-stats">
         <div><dt>Partners</dt><dd>{rows.length}</dd></div>
         <div><dt>Payouts set up</dt><dd>{rows.filter((r) => r.payouts_enabled).length}</dd></div>
@@ -79,6 +69,6 @@ export default async function AdminPartners() {
           </table>
         </div>
       )}
-    </LegalShell>
+    </AdminShell>
   );
 }

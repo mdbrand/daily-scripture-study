@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import LegalShell from '../../LegalShell';
-import { getSessionEmail, isAdmin } from '@/lib/session';
-import { dailySettings, dateLabel, footerFor, getStudy, listStudies, pacificDate, postalAddress, toDailyStudy } from '@/lib/daily';
+import AdminShell, { AdminSignIn, adminEmail } from '../AdminShell';
+import { dailySettings, dateLabel, footerFor, getStudy, listStudies, pacificDate, postalAddress, SAMPLE_YESTERDAY, toDailyStudy } from '@/lib/daily';
 import { renderDailyEmail } from '@/lib/email/templates';
 
 export const metadata: Metadata = { title: 'Daily studies | Morning Lamp', robots: { index: false, follow: false } };
@@ -33,30 +32,25 @@ function Action({ action, date, label, kind = 'button' }: { action: string; date
   );
 }
 
-export default async function AdminStudies({ searchParams }: { searchParams: Promise<{ date?: string; msg?: string }> }) {
-  const email = await getSessionEmail();
-  if (!isAdmin(email)) {
-    return (
-      <LegalShell title="Daily studies">
-        <p>
-          This page is for Morning Lamp staff. <Link href="/partners">Sign in</Link> with an admin email address, then
-          come back here.
-        </p>
-      </LegalShell>
-    );
-  }
+export default async function AdminStudies({ searchParams }: { searchParams: Promise<{ date?: string; msg?: string; edition?: string }> }) {
+  const email = await adminEmail();
+  if (!email) return <AdminSignIn next="/admin/studies" />;
 
-  const { date: qDate, msg } = await searchParams;
+  const { date: qDate, msg, edition } = await searchParams;
+  const premiumView = edition === 'premium';
   const tomorrow = pacificDate(1);
   const date = qDate && /^\d{4}-\d{2}-\d{2}$/.test(qDate) ? qDate : tomorrow;
   const [settings, list, study] = await Promise.all([dailySettings(), listStudies(30), getStudy(date)]);
   const address = postalAddress();
   const preview = study
-    ? renderDailyEmail(toDailyStudy(date, study.content, false), footerFor('preview', address ?? '(mailing address not set)'))
+    ? renderDailyEmail(
+        toDailyStudy(date, study.content, premiumView, premiumView ? SAMPLE_YESTERDAY : null),
+        footerFor('preview', address ?? '(mailing address not set)'),
+      )
     : null;
 
   return (
-    <LegalShell title="Daily studies">
+    <AdminShell title="Daily studies" active="/admin/studies" email={email}>
       {msg && messages[msg] && <p className="partner-notice" role="status">{messages[msg]}</p>}
 
       <dl className="partner-stats">
@@ -88,6 +82,13 @@ export default async function AdminStudies({ searchParams }: { searchParams: Pro
           {study.sent_count === 0 && <Action action="write" date={date} label="Rewrite it" kind="link-button" />}
           <Action action="test-free" date={date} label="Email me the free version" kind="link-button" />
           <Action action="test-premium" date={date} label="Email me the Premium version" kind="link-button" />
+          <p className="admin-filters" style={{ marginTop: 8 }}>
+            <Link href={`/admin/studies?date=${date}`} aria-current={!premiumView ? 'page' : undefined}>Free version</Link>
+            <Link href={`/admin/studies?date=${date}&edition=premium`} aria-current={premiumView ? 'page' : undefined}>Premium version</Link>
+          </p>
+          {premiumView && (
+            <p className="form-note">The “Yesterday” section below uses a sample reply. Each Premium reader sees a reflection on their own reply, or an invitation to reply.</p>
+          )}
           <iframe
             title="Email preview"
             srcDoc={preview!.html}
@@ -125,9 +126,8 @@ export default async function AdminStudies({ searchParams }: { searchParams: Pro
       )}
       <p className="form-note">
         <Link href={`/admin/studies?date=${pacificDate(0)}`}>Today</Link> ·{' '}
-        <Link href={`/admin/studies?date=${tomorrow}`}>Tomorrow</Link> ·{' '}
-        <Link href="/admin/partners">Partner report</Link>
+        <Link href={`/admin/studies?date=${tomorrow}`}>Tomorrow</Link>
       </p>
-    </LegalShell>
+    </AdminShell>
   );
 }

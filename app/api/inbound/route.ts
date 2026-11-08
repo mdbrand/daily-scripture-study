@@ -1,8 +1,10 @@
-import { NextResponse } from 'next/server';
+import { after, NextResponse } from 'next/server';
+import { handleReply } from '@/lib/reflections';
 import { verifyResendWebhook } from '@/lib/webhookVerify';
 import { LEGAL } from '@/lib/legal';
 
 export const runtime = 'nodejs';
+export const maxDuration = 120;
 
 type ReceivedEvent = { type: string; data: { email_id: string; from: string; to: string[]; subject: string } };
 
@@ -63,5 +65,14 @@ export async function POST(req: Request) {
     console.error('inbound: forward failed', res.status, await res.text());
     return NextResponse.json({ error: 'forward failed' }, { status: 502 });
   }
+  // A Premium reader's note about their day becomes tomorrow's "Yesterday" reflection.
+  after(async () => {
+    try {
+      const r = await handleReply(sender, email.text);
+      if (r.handled) console.log('inbound: reflection', r);
+    } catch (e) {
+      console.error('inbound: reflection', e);
+    }
+  });
   return NextResponse.json({ ok: true });
 }

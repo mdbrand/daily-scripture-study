@@ -47,6 +47,16 @@ const C = {
 };
 export const PREMIUM_URL = 'https://morninglamp.study/?utm_source=email&utm_medium=free-daily&utm_campaign=premium-teaser#premium';
 
+const YESTERDAY_INVITE =
+  'Hit reply and tell us about your day in a sentence or two: something you’re grateful for, something weighing on you, a conversation you keep thinking about.';
+const YESTERDAY_INVITE_2 =
+  'Tomorrow morning, this space will hold a passage chosen for what you shared and a short reflection on it.';
+
+function shorten(s: string, n: number): string {
+  const t = s.replace(/\s+/g, ' ').trim();
+  return t.length > n ? `${t.slice(0, n - 1).trimEnd()}…` : t;
+}
+
 // Required on every subscriber email (CAN-SPAM): why they get it, a working unsubscribe link, and a postal address.
 export type MailFooter = { unsubscribeUrl: string; postalAddress: string; reason?: string };
 
@@ -168,17 +178,27 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
     ${readMoreHtml(s.readMore)}
   </td></tr>`;
 
-  const yesterday = s.yesterday
-    ? `<tr><td style="background:${C.navy};padding:16px 32px;text-align:center;">
+  // Premium readers always get the second half: a reflection on what they shared, or an invitation to share.
+  const isPremium = s.edition ? s.edition === 'premium' : !!s.verseForLife;
+  const yesterdayBand = `<tr><td style="background:${C.navy};padding:16px 32px;text-align:center;">
         <p style="margin:0;font-family:${SANS};font-size:13px;letter-spacing:2.5px;font-weight:bold;color:${C.gold};">YESTERDAY, THROUGH THE LENS OF SCRIPTURE</p>
-      </td></tr>
+      </td></tr>`;
+  const yesterday = !isPremium
+    ? ''
+    : s.yesterday
+      ? `${yesterdayBand}
       <tr><td style="background:${C.ivory};padding:26px 32px 12px;">
         ${h('Looking Back at Yesterday')}
-        ${p(`<em>You wrote: “${esc(s.yesterday.reply)}”</em>`, `color:${C.muted};`)}
+        ${p(`<em>You wrote: “${esc(shorten(s.yesterday.reply, 320))}”</em>`, `color:${C.muted};`)}
         ${quote(s.yesterday.passage, false)}
         ${s.yesterday.body.map((b) => p(rich(b))).join('')}
       </td></tr>`
-    : '';
+      : `${yesterdayBand}
+      <tr><td style="background:${C.ivory};padding:26px 32px 12px;">
+        ${h('How was yesterday?')}
+        ${p(esc(YESTERDAY_INVITE))}
+        ${p(esc(YESTERDAY_INVITE_2), `color:${C.muted};font-size:16px;`)}
+      </td></tr>`;
 
   const premiumUrl = s.premiumUrl ?? PREMIUM_URL;
   const verseOrTeaser = s.verseForLife
@@ -210,7 +230,7 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
     </td></tr></table>
   </td></tr>`;
 
-  const edition: Edition = s.edition ?? (s.verseForLife ? 'premium' : 'free');
+  const edition: Edition = isPremium ? 'premium' : 'free';
   const html = shell(study + yesterday + verse, s.intro, s.isTest, footerHtml(footer), edition);
 
   const text = [
@@ -233,9 +253,11 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
     'WHERE TO READ MORE',
     ...s.readMore.map((l) => `- ${l.label}${l.url ? ` ${l.url}` : ''}`),
     '',
-    ...(s.yesterday
-      ? ['YESTERDAY, THROUGH THE LENS OF SCRIPTURE', `You wrote: "${s.yesterday.reply}"`, `"${s.yesterday.passage.text}" (${s.yesterday.passage.ref})`, ...s.yesterday.body, '']
-      : []),
+    ...(!isPremium
+      ? []
+      : s.yesterday
+        ? ['YESTERDAY, THROUGH THE LENS OF SCRIPTURE', `You wrote: "${shorten(s.yesterday.reply, 320)}"`, `"${s.yesterday.passage.text}" (${s.yesterday.passage.ref})`, ...s.yesterday.body, '']
+        : ['YESTERDAY, THROUGH THE LENS OF SCRIPTURE', 'How was yesterday?', YESTERDAY_INVITE, YESTERDAY_INVITE_2, '']),
     ...(s.verseForLife
       ? ['A VERSE FOR YOUR LIFE', `"${s.verseForLife.text}" (${s.verseForLife.ref})`, s.verseForLife.note, '']
       : [

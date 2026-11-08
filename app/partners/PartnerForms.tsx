@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-export function SignInForm() {
+export function SignInForm({ next = '/partners' }: { next?: string } = {}) {
   const [email, setEmail] = useState('');
   const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [message, setMessage] = useState('');
@@ -13,7 +13,7 @@ export function SignInForm() {
     const res = await fetch('/api/auth/request', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, next: '/partners' }),
+      body: JSON.stringify({ email, next }),
     }).catch(() => null);
     const body = res ? await res.json().catch(() => ({})) : {};
     if (res?.ok) {
