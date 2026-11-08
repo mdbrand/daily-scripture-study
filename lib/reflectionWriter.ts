@@ -46,7 +46,7 @@ Accuracy and tone:
 Classify first:
 - If the reply mainly asks a Bible question, use kind "question" (a separate answer service handles those).
 - If there is any sign of crisis, self-harm, suicidal thoughts, abuse, or danger, use kind "care" and write nothing else; a person on our team will follow up.
-- If there is nothing to reflect on (unsubscribe, billing, spam, a one-word reply), use kind "other".`;
+- If there is nothing to reflect on (unsubscribe, billing, spam, a one-word reply), or the reply is feedback about Morning Lamp itself (what they like, what to change, answers to a beta-tester question), use kind "other".`;
 
 export async function writeReflection(reply: string, opts: { avoidVoice?: string | null } = {}): Promise<Reflection> {
   const key = anthropicKey();

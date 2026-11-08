@@ -45,6 +45,7 @@ export function SiteFooter() {
           <Link href="/privacy">Privacy Policy</Link>
           <Link href="/terms">Terms</Link>
           <Link href="/contact">Contact</Link>
+          <Link href="/partners">Partners</Link>
         </nav>
         <p>
           © 2026 {LEGAL.company}. Scripture quotations taken from The Holy Bible, New International

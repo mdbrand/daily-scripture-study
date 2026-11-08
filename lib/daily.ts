@@ -38,7 +38,7 @@ export function footerFor(token: string, postal: string): MailFooter {
   return { unsubscribeUrl: `${SITE}/u/${token}`, postalAddress: postal };
 }
 // The List-Unsubscribe header target: mail apps POST here for one-click unsubscribe.
-const oneClickUrl = (token: string) => `${SITE}/api/unsubscribe/${token}`;
+export const oneClickUrl = (token: string) => `${SITE}/api/unsubscribe/${token}`;
 
 // ---------- studies ----------
 export type StoredStudy = {
@@ -85,7 +85,7 @@ export function toDailyStudy(date: string, c: StudyContent, premium: boolean, ye
 // ---------- sending (Resend batch API: up to 100 emails per call) ----------
 type Outgoing = { to: string; subject: string; html: string; text: string; unsubscribeUrl: string };
 
-async function sendBatch(emails: Outgoing[]): Promise<string[]> {
+export async function sendBatch(emails: Outgoing[]): Promise<string[]> {
   const key = resendKey();
   const from = process.env.DSS_FROM_EMAIL;
   if (!key || !from) throw new Error('Resend is not configured');

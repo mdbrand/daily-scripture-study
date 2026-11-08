@@ -5,6 +5,7 @@ import { sendEmail } from '@/lib/email/send';
 import { gate, money, PAYOUT_MIN_CENTS } from '@/lib/partners';
 import { dailySettings, generateStudy, getStudy, pacificDate, sendWelcomes } from '@/lib/daily';
 import { anthropicKey } from '@/lib/studyWriter';
+import { sendWeeklyFeedback } from '@/lib/lamplighters';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
@@ -194,10 +195,10 @@ function adminList() {
 // and, once sending is open, welcomes anyone who joined since yesterday.
 async function studyChores() {
   const tomorrow = pacificDate(1);
-  const out: { study: string; welcomed?: number } = { study: 'exists' };
+  const out: { study: string; welcomed?: number; lamplighterFeedback?: number } = { study: 'exists' };
   const admins = adminList();
-  if (!anthropicKey()) return { study: 'skipped: no Anthropic API key is set' };
-  try {
+  if (!anthropicKey()) out.study = 'skipped: no Anthropic API key is set';
+  else try {
     if (!(await getStudy(tomorrow))) {
       const c = await generateStudy(tomorrow);
       out.study = 'written';
@@ -226,9 +227,14 @@ async function studyChores() {
     }
   }
   try {
-    if ((await dailySettings()).send_open) out.welcomed = await sendWelcomes(100);
+    if ((await dailySettings()).send_open) {
+      out.welcomed = await sendWelcomes(100);
+      // Fridays (Pacific): one short feedback question to active Lamplighters.
+      const weekday = new Date(`${pacificDate(0)}T12:00:00Z`).getUTCDay();
+      if (weekday === 5) out.lamplighterFeedback = await sendWeeklyFeedback();
+    }
   } catch (e) {
-    console.error('welcomes', e);
+    console.error('welcomes / lamplighter feedback', e);
   }
   return out;
 }

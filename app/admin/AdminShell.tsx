@@ -8,6 +8,7 @@ export const ADMIN_TABS = [
   { href: '/admin/subscribers', label: 'Subscribers' },
   { href: '/admin/studies', label: 'Daily studies' },
   { href: '/admin/reflections', label: 'Premium replies' },
+  { href: '/admin/lamplighters', label: 'Lamplighters' },
   { href: '/admin/partners', label: 'Partners' },
 ] as const;
 

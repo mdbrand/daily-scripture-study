@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
   title: 'Morning Lamp: a daily Bible study by email',
   description:
-    'A few quiet minutes with God’s Word, every morning. One Bible passage, the story behind it, in plain, simple language.',
+    'Every verse has a story. A free Bible study by email each morning: one passage, the history behind it, and a voice from 2,000 years of faith, in under three minutes.',
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

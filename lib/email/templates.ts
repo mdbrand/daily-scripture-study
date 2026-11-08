@@ -163,7 +163,7 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
   const study = `<tr><td style="background:${C.ivory};padding:30px 32px 14px;">
     ${label(`Today’s Bible Study · ${s.dateLabel}`)}
     <h1 style="margin:0 0 6px;font-family:${SERIF};font-size:28px;line-height:1.25;color:${C.navy};">${esc(s.title)}</h1>
-    <p style="margin:0 0 22px;font-family:${SANS};font-size:14px;color:${C.muted};">Pillar: ${esc(s.pillar)} · about 5 minutes</p>
+    <p style="margin:0 0 22px;font-family:${SANS};font-size:14px;color:${C.muted};">Pillar: ${esc(s.pillar)} · about 3 minutes</p>
     ${quote(s.passage)}
     ${p(rich(s.intro))}
     ${h('Behind the Verse')}
@@ -347,7 +347,7 @@ export function renderAnswerEmail(a: AnswerEmail): { subject: string; html: stri
 export function renderWelcomeEmail(o: { premium: boolean; footer: MailFooter }): { subject: string; html: string; text: string } {
   const lines = [
     'Thank you for joining Morning Lamp.',
-    'Each morning you’ll get one short Bible study: a passage, the history behind it, one detail most people miss, and voices from church history. It takes about five minutes.',
+    'Each morning you’ll get one short Bible study: a passage, the history behind it, one detail most people miss, and a voice from church history. It takes about three minutes.',
     'Your first study arrives at 5 AM your time. If you don’t see it, check your Promotions or Spam folder and move it to your inbox, so the rest find you.',
     o.premium
       ? 'Each evening around 8 PM, we’ll check in to ask how your day went. Reply with a line or two, and the next morning’s study includes a short study written for what you shared.'
@@ -394,5 +394,88 @@ export function renderCheckinEmail(o: { footer: MailFooter; dayIndex: number; is
     subject: o.isTest ? `[Preview] ${subject}` : subject,
     html: shell(inner, 'Reply with a line about your day. Tomorrow’s Last Night’s Lamp will be written in response to it.', o.isTest, footerHtml(o.footer), 'premium'),
     text: ['LAST NIGHT’S LAMP · EVENING CHECK-IN', subject, '', ...lines.flatMap((l) => [l, '']), quiet, '', `"${verse.text}" (${verse.ref})`, '', 'Rest well,', 'Morning Lamp', ...footerText(o.footer)].join('\n'),
+  };
+}
+
+// ---------- Lamplighters (beta testers) ----------
+function simpleEmail(o: {
+  kicker: string;
+  title: string;
+  lines: string[];
+  preheader: string;
+  footer?: MailFooter;
+  edition?: Edition;
+  button?: { label: string; url: string };
+}): { html: string; text: string } {
+  const button = o.button
+    ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 22px;"><tr><td style="background:${C.navy};border-radius:8px;">
+        <a href="${esc(o.button.url)}" style="display:inline-block;padding:13px 24px;font-family:${SANS};font-size:16px;font-weight:bold;color:#faf6ec;text-decoration:none;">${esc(o.button.label)}</a>
+      </td></tr></table>`
+    : '';
+  const inner = `<tr><td style="background:${C.ivory};padding:30px 32px 18px;">
+    ${label(o.kicker)}
+    <h1 style="margin:0 0 18px;font-family:${SERIF};font-size:28px;line-height:1.25;color:${C.navy};">${esc(o.title)}</h1>
+    ${o.lines.map((l) => p(esc(l))).join('')}
+    ${button}
+    ${p('Grace and peace,<br>Morning Lamp')}
+  </td></tr>`;
+  return {
+    html: shell(inner, o.preheader, false, footerHtml(o.footer), o.edition),
+    text: [o.kicker.toUpperCase(), o.title, '', ...o.lines.flatMap((l) => [l, '']), ...(o.button ? [`${o.button.label}: ${o.button.url}`, ''] : []), 'Grace and peace,', 'Morning Lamp', ...footerText(o.footer)].join('\n'),
+  };
+}
+
+export function renderLamplighterReceived(): { subject: string; html: string; text: string } {
+  return {
+    subject: 'We got your Lamplighter application',
+    ...simpleEmail({
+      kicker: 'Lamplighters',
+      title: 'Thank you for applying',
+      preheader: 'We read every application and reply within a few days.',
+      lines: [
+        'We got your application to be one of the first 100 Lamplighters. We read every one, and we’ll email you within a few days.',
+        'You’re also on the list for the free daily study, so you won’t miss anything while you wait.',
+      ],
+    }),
+  };
+}
+
+export function renderLamplighterAccepted(o: { footer: MailFooter; until: string }): { subject: string; html: string; text: string } {
+  return {
+    subject: 'You’re a Lamplighter. Welcome.',
+    ...simpleEmail({
+      kicker: 'Lamplighters',
+      title: 'Welcome, Lamplighter',
+      preheader: 'Premium is on for you, free, for the next 90 days.',
+      edition: 'premium',
+      footer: o.footer,
+      lines: [
+        `You’re one of the first Lamplighters. Premium is on for you, free, until ${o.until}.`,
+        'Each morning at 5 AM your time, your study arrives. Each evening around 8 PM, we’ll check in to ask how your day went. Reply with a line or two, and the next morning brings Last Night’s Lamp: a study written in response to your day.',
+        'Once a week we’ll send you one short question about how it’s going. Honest answers, good and bad, are the whole point. Just hit reply.',
+        'If you ever share your experience publicly, please mention that you received Premium free as a beta tester. If we ever quote you, we’ll ask first and note the same.',
+      ],
+    }),
+  };
+}
+
+const FEEDBACK_QUESTIONS = [
+  'What’s one thing you’d change about Morning Lamp?',
+  'Which part of the study do you read first, and which do you skip?',
+  'Did Last Night’s Lamp feel like it was really written for your day? Why or why not?',
+  'Would you recommend Morning Lamp to a friend? What would you tell them?',
+];
+export function renderLamplighterFeedback(o: { footer: MailFooter; weekIndex: number }): { subject: string; html: string; text: string } {
+  const q = FEEDBACK_QUESTIONS[((o.weekIndex % FEEDBACK_QUESTIONS.length) + FEEDBACK_QUESTIONS.length) % FEEDBACK_QUESTIONS.length];
+  return {
+    subject: `Lamplighter question: ${q}`,
+    ...simpleEmail({
+      kicker: 'Lamplighters · Weekly question',
+      title: q,
+      preheader: 'One honest sentence is plenty. Just hit reply.',
+      edition: 'premium',
+      footer: { ...o.footer, reason: 'You’re getting this because you joined the Lamplighters beta at morninglamp.study.' },
+      lines: ['Just hit reply. One honest sentence is plenty, and it shapes what Morning Lamp becomes.', 'Thank you for helping us build this.'],
+    }),
   };
 }
