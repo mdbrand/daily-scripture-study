@@ -65,8 +65,8 @@ export default async function AdminStudies({ searchParams }: { searchParams: Pro
         <div><dt>Mailing address</dt><dd style={{ fontSize: 18 }}>{address ? 'Set' : 'Missing'}</dd></div>
       </dl>
       <p className="form-note">
-        Each morning around 7 AM Pacific, tomorrow’s study is written and you get an email to review it. It goes out at
-        5 AM Pacific (6 AM in summer) the next day unless you put it on hold.
+        Each morning around 7 AM Pacific, tomorrow’s study is written and you get an email to review it. The next day it
+        reaches each reader at 5 AM in their own time zone, unless you put it on hold first.
       </p>
       {settings.send_open ? (
         <Action action="sending-off" label="Turn daily sending off" kind="link-button" />
@@ -81,11 +81,11 @@ export default async function AdminStudies({ searchParams }: { searchParams: Pro
             <strong>{study.content.title}</strong>
             <br />
             {study.content.passage.ref} · {study.content.pillar} · {STATUS[study.status]}
-            {study.status === 'sent' ? `, to ${study.sent_count} people` : ''}
+            {study.sent_count > 0 ? `, sent to ${study.sent_count} so far` : ''}
           </p>
           {study.status === 'approved' && <Action action="hold" date={date} label="Put on hold" />}
           {study.status === 'held' && <Action action="approve" date={date} label="Approve" />}
-          {study.status !== 'sent' && <Action action="write" date={date} label="Rewrite it" kind="link-button" />}
+          {study.sent_count === 0 && <Action action="write" date={date} label="Rewrite it" kind="link-button" />}
           <Action action="test-free" date={date} label="Email me the free version" kind="link-button" />
           <Action action="test-premium" date={date} label="Email me the Premium version" kind="link-button" />
           <iframe
@@ -116,7 +116,7 @@ export default async function AdminStudies({ searchParams }: { searchParams: Pro
                   <td><Link href={`/admin/studies?date=${s.study_date}`}>{s.study_date}</Link></td>
                   <td>{s.ref}</td>
                   <td>{s.title}</td>
-                  <td>{STATUS[s.status] ?? s.status}{s.status === 'sent' ? ` (${s.sent_count})` : ''}</td>
+                  <td>{STATUS[s.status] ?? s.status}{s.sent_count > 0 ? `, sent to ${s.sent_count}` : ''}</td>
                 </tr>
               ))}
             </tbody>

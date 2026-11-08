@@ -81,7 +81,7 @@ Length: every answer is **400–600 words** (short answer + body + voices; `answ
 ## Daily study emails
 
 - `/api/cron/daily` (15:00 UTC): Claude (`claude-opus-5-5`) writes **tomorrow's** study (`lib/studyWriter.ts`) and emails `ADMIN_EMAILS` a review link. Skipped until `ANTHROPIC_API_KEY` is set. Once sending is on, it also sends welcome emails to anyone not yet welcomed.
-- `/api/cron/send` (13:00 UTC = 5 AM PST / 6 AM PDT): sends today's study to every subscriber who isn't unsubscribed or flagged as a bot, 100 per Resend batch call. Premium members also get the "Verse for your life". Does nothing until daily sending is switched on.
+- `/api/cron/send` (every hour): sends each reader the study for their local date once it's 5 AM in their time zone (saved from the browser at sign-up; Pacific if unknown). `dss_due_recipients` picks readers at 5:00–7:59 AM local who joined before 5 AM that day and haven't had it yet, so a missed hour catches up. 100 per Resend batch call. Premium members also get the "Verse for your life". Does nothing until daily sending is switched on.
 - `/admin/studies`: read each study before it goes out, put it on hold, rewrite it, email yourself a free or Premium test copy, and turn daily sending on/off. Sending can't be turned on until `DSS_POSTAL_ADDRESS` is set.
 - New sign-ups get a welcome email right away once sending is on.
 - Every email has a footer with an unsubscribe link (`/u/<token>`) and the mailing address, plus `List-Unsubscribe` one-click headers (`/api/unsubscribe/<token>`). A plain visit to either link never unsubscribes anyone; it takes a button press or a mail app's one-click POST.

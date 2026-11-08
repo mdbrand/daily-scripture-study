@@ -71,7 +71,7 @@ export default function SignupForm({
       const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, plan, source, website, ref }),
+        body: JSON.stringify({ email, plan, source, website, ref, timezone: browserTimeZone() }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -195,4 +195,13 @@ export default function SignupForm({
       )}
     </form>
   );
+}
+
+// The reader's IANA time zone (e.g. "America/New_York"), so the study arrives at 5 AM their time.
+function browserTimeZone(): string | null {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || null;
+  } catch {
+    return null;
+  }
 }

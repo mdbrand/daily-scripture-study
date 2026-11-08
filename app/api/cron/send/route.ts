@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { dailySettings, generateStudy, getStudy, pacificDate, sendStudy } from '@/lib/daily';
+import { dailySettings, generateStudy, getStudy, pacificDate, sendDue } from '@/lib/daily';
+import { anthropicKey } from '@/lib/studyWriter';
 import { sendEmail } from '@/lib/email/send';
 
 export const runtime = 'nodejs';
@@ -7,7 +8,7 @@ export const maxDuration = 300;
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://morninglamp.study';
 
-// Early each morning (Vercel Cron, see vercel.json): send today's study to every subscriber.
+// Every hour (Vercel Cron, see vercel.json): send the study to everyone for whom it's now 5 AM.
 // Does nothing until sending is switched on (dss_config.daily_send_open = 'true').
 export async function GET(req: Request) {
   const secret = process.env.CRON_SECRET;
@@ -19,14 +20,15 @@ export async function GET(req: Request) {
 
   const today = pacificDate(0);
   try {
-    if (!(await getStudy(today))) await generateStudy(today); // yesterday's attempt failed; try once more
-    const result = await sendStudy(today);
-    if (!result.done) await alert(`Today’s study (${today}) did not finish sending: ${result.reason}. Sent ${result.sent}.`);
-    return NextResponse.json({ ok: true, date: today, ...result });
+    // Safety net: if yesterday's writing failed, try again before anyone's 5 AM passes.
+    if (anthropicKey() && !(await getStudy(today))) await generateStudy(today).catch((e) => console.error('fallback writer', e));
+    const result = await sendDue();
+    if (!result.done) await alert(`The ${new Date().toISOString().slice(11, 13)}:00 UTC send didn’t finish: ${result.reason}. Sent ${result.sent}.`);
+    return NextResponse.json({ ok: true, ...result });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error('daily send', e);
-    await alert(`Today’s study (${today}) failed to send: ${msg.slice(0, 300)}`);
+    await alert(`Sending failed: ${msg.slice(0, 300)}`);
     return NextResponse.json({ ok: false, error: msg }, { status: 500 });
   }
 }

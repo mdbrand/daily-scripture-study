@@ -111,38 +111,41 @@ async function sendBatch(emails: Outgoing[]): Promise<string[]> {
 }
 
 type Recipient = { email: string; unsub_token: string; premium: boolean };
+type DueRecipient = Recipient & { study_date: string };
 
-// Sends one date's study to everyone who hasn't had it yet, until done or out of time.
-export async function sendStudy(date: string, budgetMs = 240_000) {
+// Sends each reader the study for their local date once it's 5 AM where they live.
+// Runs every hour; the database decides who is due (5:00–7:59 AM local, not yet sent).
+export async function sendDue(budgetMs = 240_000) {
   const postal = postalAddress();
   if (!postal) throw new Error('DSS_POSTAL_ADDRESS is not set; emails need a mailing address to be legal.');
-  const study = await getStudy(date);
-  if (!study) return { sent: 0, done: false, reason: 'no study for this date' };
-  if (study.status === 'held') return { sent: 0, done: false, reason: 'study is on hold' };
-
+  const studies = new Map<string, StoredStudy | null>();
   const started = Date.now();
   let sent = 0;
   while (Date.now() - started < budgetMs) {
-    const batch = await rpc<Recipient[]>('dss_daily_recipients', { p_gate: gate(), p_date: date, p_limit: 100 });
-    if (batch.length === 0) {
-      await rpc('dss_study_mark_sent', { p_gate: gate(), p_date: date });
-      return { sent, done: true };
+    const batch = await rpc<DueRecipient[]>('dss_due_recipients', { p_gate: gate(), p_limit: 100 });
+    if (batch.length === 0) return { sent, done: true };
+    for (const d of new Set(batch.map((r) => r.study_date))) {
+      if (!studies.has(d)) studies.set(d, await getStudy(d));
     }
     const emails = batch.map((r) => {
+      const study = studies.get(r.study_date)!;
       const footer = footerFor(r.unsub_token, postal);
-      const m = renderDailyEmail(toDailyStudy(date, study.content, r.premium), footer);
+      const m = renderDailyEmail(toDailyStudy(r.study_date, study.content, r.premium), footer);
       return { to: r.email, ...m, unsubscribeUrl: oneClickUrl(r.unsub_token) };
     });
     const ids = await sendBatch(emails);
-    await rpc('dss_record_sends', {
-      p_gate: gate(),
-      p_date: date,
-      p_rows: batch.map((r, i) => ({ email: r.email, resend_id: ids[i] ?? null })),
-    });
+    // Record per date (a batch can span two local dates near midnight UTC).
+    for (const d of new Set(batch.map((r) => r.study_date))) {
+      await rpc('dss_record_sends', {
+        p_gate: gate(),
+        p_date: d,
+        p_rows: batch.flatMap((r, i) => (r.study_date === d ? [{ email: r.email, resend_id: ids[i] ?? null }] : [])),
+      });
+    }
     sent += batch.length;
     await new Promise((r) => setTimeout(r, 600)); // stay under Resend's default 2 requests/second
   }
-  return { sent, done: false, reason: 'time budget used; the next run continues' };
+  return { sent, done: false, reason: 'time budget used; the next hourly run continues' };
 }
 
 // Welcome emails for people who joined but haven't been welcomed yet.

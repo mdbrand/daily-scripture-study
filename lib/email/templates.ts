@@ -301,7 +301,7 @@ export function renderWelcomeEmail(o: { premium: boolean; footer: MailFooter }):
   const lines = [
     'Thank you for joining Morning Lamp.',
     'Each morning you’ll get one short Bible study: a passage, the history behind it, one detail most people miss, and voices from church history. It takes about five minutes.',
-    'Your first study arrives tomorrow morning. If you don’t see it, check your Promotions or Spam folder and move it to your inbox, so the rest find you.',
+    'Your first study arrives at 5 AM your time. If you don’t see it, check your Promotions or Spam folder and move it to your inbox, so the rest find you.',
     o.premium
       ? 'As a Premium member, you can reply to any study with a Bible question, up to two a day, and you’ll get a careful answer with sources.'
       : 'Have a Bible question? Reply to any study and ask, one question a day.',
@@ -315,7 +315,7 @@ export function renderWelcomeEmail(o: { premium: boolean; footer: MailFooter }):
   </td></tr>`;
   return {
     subject: 'Welcome to Morning Lamp',
-    html: shell(inner, 'Your first study arrives tomorrow morning.', false, footerHtml(o.footer)),
+    html: shell(inner, 'Your first study arrives at 5 AM your time.', false, footerHtml(o.footer)),
     text: ['Welcome to Morning Lamp', '', ...lines.flatMap((l) => [l, '']), `"${verse.text}" (${verse.ref})`, '', 'Grace and peace,', 'Morning Lamp', ...footerText(o.footer)].join('\n'),
   };
 }

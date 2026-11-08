@@ -85,6 +85,10 @@ export async function POST(req: Request) {
       p_consent: CONSENT_TEXT,
       p_user_agent: req.headers.get('user-agent')?.slice(0, 300) ?? null,
       p_email_flag: verdict.flag,
+      p_timezone:
+        typeof body.timezone === 'string' && /^[A-Za-z_]+(\/[A-Za-z0-9_+-]+){0,2}$/.test(body.timezone)
+          ? body.timezone.slice(0, 64)
+          : null,
     }),
   });
 
