@@ -1,0 +1,5 @@
+.env*
+!.env.example
+email-previews
+.next
+node_modules
