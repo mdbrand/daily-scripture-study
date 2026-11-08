@@ -4,6 +4,7 @@ import { stripe } from '@/lib/stripe';
 import { sendEmail } from '@/lib/email/send';
 import { gate, money, PAYOUT_MIN_CENTS } from '@/lib/partners';
 import { dailySettings, generateStudy, getStudy, pacificDate, sendWelcomes } from '@/lib/daily';
+import { anthropicKey } from '@/lib/studyWriter';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
@@ -195,7 +196,7 @@ async function studyChores() {
   const tomorrow = pacificDate(1);
   const out: { study: string; welcomed?: number } = { study: 'exists' };
   const admins = adminList();
-  if (!process.env.ANTHROPIC_API_KEY) return { study: 'skipped: ANTHROPIC_API_KEY is not set' };
+  if (!anthropicKey()) return { study: 'skipped: no Anthropic API key is set' };
   try {
     if (!(await getStudy(tomorrow))) {
       const c = await generateStudy(tomorrow);

@@ -66,8 +66,12 @@ Style: plain, short sentences; American spelling; no em dashes (use commas, colo
 
 export type RecentStudy = { title: string | null; ref: string | null };
 
+// Accepts either name for the key (Vercel has CLAUDE_API_KEY).
+export const anthropicKey = () => process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
+
 export async function writeStudy(opts: { date: string; pillar: string; recent: RecentStudy[] }): Promise<StudyContent> {
-  const client = new Anthropic();
+  const key = anthropicKey();
+  const client = key ? new Anthropic({ apiKey: key }) : new Anthropic();
   const avoid = opts.recent
     .filter((r) => r.ref)
     .map((r) => `- ${r.ref}: ${r.title ?? ''}`)
