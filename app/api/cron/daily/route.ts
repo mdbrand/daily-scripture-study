@@ -3,9 +3,10 @@ import { rpc } from '@/lib/supabaseRpc';
 import { stripe } from '@/lib/stripe';
 import { sendEmail } from '@/lib/email/send';
 import { gate, money, PAYOUT_MIN_CENTS } from '@/lib/partners';
+import { dailySettings, generateStudy, getStudy, pacificDate, sendWelcomes } from '@/lib/daily';
 
 export const runtime = 'nodejs';
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://morninglamp.study';
 
@@ -38,7 +39,8 @@ export async function GET(req: Request) {
   const period = now.toISOString().slice(0, 7); // e.g. 2026-12
 
   const matured = await rpc<number>('dss_mature_commissions', { p_gate: gate() });
-  if (!monthly) return NextResponse.json({ ok: true, matured });
+  const studies = await studyChores();
+  if (!monthly) return NextResponse.json({ ok: true, matured, ...studies });
 
   // 1. Payouts
   const batch = await rpc<Batch[]>('dss_payout_batch', { p_gate: gate(), p_min_cents: PAYOUT_MIN_CENTS });
@@ -109,14 +111,15 @@ export async function GET(req: Request) {
   return NextResponse.json({
     ok: true,
     matured,
+    ...studies,
     payouts: payouts.map(({ code, amount_cents, transfer_id, error }) => ({ code, amount_cents, paid: !!transfer_id, error })),
     statements,
   });
 }
 
-function shell(inner: string) {
+function shell(inner: string, why = 'You’re getting this because you’re a Morning Lamp partner.') {
   return `<div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;padding:24px;color:#24323b">${inner}
-  <p style="font-family:Arial,sans-serif;font-size:12px;color:#5b676d;margin-top:32px">Morning Lamp · Mission Driven Brand, LLC · You’re getting this because you’re a Morning Lamp partner.</p></div>`;
+  <p style="font-family:Arial,sans-serif;font-size:12px;color:#5b676d;margin-top:32px">Morning Lamp · Mission Driven Brand, LLC · ${why}</p></div>`;
 }
 
 function row(label: string, value: string) {
@@ -180,4 +183,55 @@ function adminEmail(monthName: string, matured: number, payouts: PayoutResult[],
     html,
     text: `Partner payouts for ${monthName}\nSent: ${sent.length} (${money(total)})\nFailed: ${failed.length}\n\n${lines}\n\n${SITE}/admin/partners`,
   };
+}
+
+function adminList() {
+  return (process.env.ADMIN_EMAILS || '').split(',').map((x) => x.trim()).filter(Boolean);
+}
+
+// Writes tomorrow's study (so there's a day to review it), emails the admins a preview link,
+// and, once sending is open, welcomes anyone who joined since yesterday.
+async function studyChores() {
+  const tomorrow = pacificDate(1);
+  const out: { study: string; welcomed?: number } = { study: 'exists' };
+  const admins = adminList();
+  if (!process.env.ANTHROPIC_API_KEY) return { study: 'skipped: ANTHROPIC_API_KEY is not set' };
+  try {
+    if (!(await getStudy(tomorrow))) {
+      const c = await generateStudy(tomorrow);
+      out.study = 'written';
+      if (admins.length) {
+        await sendEmail({
+          to: admins,
+          subject: `Tomorrow’s Morning Lamp: ${c.title}`,
+          html: shell(`<p style="font-size:22px;color:#172b38;margin:0 0 8px">${esc(c.title)}</p>
+            <p style="font-family:Arial,sans-serif;font-size:15px;color:#5b676d;margin:0 0 16px">${esc(c.passage.ref)} · ${esc(c.pillar)}</p>
+            <p style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6">It goes out automatically tomorrow morning. Please read it over and check the Scripture wording. If anything is off, put it on hold from the review page.</p>
+            <p style="margin:24px 0"><a href="${SITE}/admin/studies?date=${tomorrow}" style="background:#172b38;color:#faf7f0;padding:13px 24px;border-radius:6px;text-decoration:none;font-family:Arial,sans-serif;font-weight:bold">Review tomorrow’s study</a></p>`, 'Sent to Morning Lamp admins.'),
+          text: `${c.title}\n${c.passage.ref}\n\nReview it: ${SITE}/admin/studies?date=${tomorrow}`,
+        });
+      }
+    }
+  } catch (e) {
+    out.study = 'failed';
+    console.error('study writer', e);
+    if (admins.length) {
+      await sendEmail({
+        to: admins,
+        subject: 'Morning Lamp: tomorrow’s study could not be written',
+        html: shell(`<p style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6">The study for ${tomorrow} failed to generate. The send job will try once more before sending. Error: ${esc(String(e instanceof Error ? e.message : e).slice(0, 300))}</p>
+          <p><a href="${SITE}/admin/studies?date=${tomorrow}">Open the review page</a></p>`, 'Sent to Morning Lamp admins.'),
+      }).catch(() => {});
+    }
+  }
+  try {
+    if ((await dailySettings()).send_open) out.welcomed = await sendWelcomes(100);
+  } catch (e) {
+    console.error('welcomes', e);
+  }
+  return out;
+}
+
+function esc(s: string) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }

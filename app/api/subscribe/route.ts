@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+import { after, NextResponse } from 'next/server';
+import { dailySettings, sendWelcomes } from '@/lib/daily';
 import { CONSENT_TEXT, normalizeEmail, normalizePlan, normalizeRef } from '@/lib/subscribe';
 import { checkEmail } from '@/lib/emailCheck';
 import { suggestEmail } from '@/lib/emailTypos';
@@ -90,6 +91,17 @@ export async function POST(req: Request) {
   if (!res.ok) {
     console.error('subscribe: Supabase error', res.status, await res.text());
     return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 502 });
+  }
+
+  // Once daily sending is open, welcome new people right away (after the response goes back).
+  if (!suspectedBot && process.env.DSS_DB_GATE) {
+    after(async () => {
+      try {
+        if ((await dailySettings()).send_open) await sendWelcomes(10);
+      } catch (e) {
+        console.error('subscribe: welcome email', e);
+      }
+    });
   }
 
   return NextResponse.json({ ok: true, plan });

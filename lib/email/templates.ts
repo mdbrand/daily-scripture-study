@@ -44,6 +44,9 @@ const C = {
 };
 export const PREMIUM_URL = 'https://morninglamp.study/?utm_source=email&utm_medium=free-daily&utm_campaign=premium-teaser#premium';
 
+// Required on every subscriber email (CAN-SPAM): why they get it, a working unsubscribe link, and a postal address.
+export type MailFooter = { unsubscribeUrl: string; postalAddress: string; reason?: string };
+
 const SERIF = "Georgia, 'Times New Roman', serif";
 const SANS = 'Arial, Helvetica, sans-serif';
 
@@ -93,6 +96,24 @@ function readMoreHtml(links: Link[]): string {
     .join('')}</ul>`;
 }
 
+function footerHtml(f?: MailFooter): string {
+  if (!f) return '';
+  return `<p style="margin:0 0 6px;font-family:${SANS};font-size:13px;line-height:1.6;color:${C.muted};">${esc(
+    f.reason ?? 'You’re getting this because you signed up for Morning Lamp at morninglamp.study.',
+  )} <a href="${esc(f.unsubscribeUrl)}" style="color:${C.muted};text-decoration:underline;">Unsubscribe</a></p>
+  <p style="margin:0 0 10px;font-family:${SANS};font-size:13px;line-height:1.6;color:${C.muted};">Mission Driven Brand, LLC · ${esc(f.postalAddress)}</p>`;
+}
+
+function footerText(f?: MailFooter): string[] {
+  if (!f) return [];
+  return [
+    '',
+    f.reason ?? 'You’re getting this because you signed up for Morning Lamp at morninglamp.study.',
+    `Unsubscribe: ${f.unsubscribeUrl}`,
+    `Mission Driven Brand, LLC · ${f.postalAddress}`,
+  ];
+}
+
 function shell(inner: string, preheader: string, isTest?: boolean, footerHtml = ''): string {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Morning Lamp</title></head>
 <body style="margin:0;padding:0;background:${C.page};">
@@ -112,7 +133,7 @@ ${inner}
 </table></td></tr></table></body></html>`;
 }
 
-export function renderDailyEmail(s: DailyStudy): { subject: string; html: string; text: string } {
+export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject: string; html: string; text: string } {
   const study = `<tr><td style="background:${C.ivory};padding:30px 32px 14px;">
     ${label(`Today’s Bible Study · ${s.dateLabel}`)}
     <h1 style="margin:0 0 6px;font-family:${SERIF};font-size:28px;line-height:1.25;color:${C.navy};">${esc(s.title)}</h1>
@@ -173,7 +194,7 @@ export function renderDailyEmail(s: DailyStudy): { subject: string; html: string
     </td></tr></table>
   </td></tr>`;
 
-  const html = shell(study + yesterday + verse, s.intro, s.isTest);
+  const html = shell(study + yesterday + verse, s.intro, s.isTest, footerHtml(footer));
 
   const text = [
     s.isTest ? 'TEST SEND · not a live subscription email\n' : '',
@@ -209,6 +230,7 @@ export function renderDailyEmail(s: DailyStudy): { subject: string; html: string
     'Have a Bible question? Just hit reply and ask, one question a day.',
     '',
     'Scripture quotations are from the Holy Bible, New International Version (NIV).',
+    ...footerText(footer),
   ].join('\n');
 
   return { subject: s.subject, html, text };
@@ -273,4 +295,27 @@ export function renderAnswerEmail(a: AnswerEmail): { subject: string; html: stri
     'Scripture quotations are from the Holy Bible, New International Version (NIV).',
   ].join('\n');
   return { subject: a.subject, html, text };
+}
+
+export function renderWelcomeEmail(o: { premium: boolean; footer: MailFooter }): { subject: string; html: string; text: string } {
+  const lines = [
+    'Thank you for joining Morning Lamp.',
+    'Each morning you’ll get one short Bible study: a passage, the history behind it, one detail most people miss, and voices from church history. It takes about five minutes.',
+    'Your first study arrives tomorrow morning. If you don’t see it, check your Promotions or Spam folder and move it to your inbox, so the rest find you.',
+    o.premium
+      ? 'As a Premium member, you can reply to any study with a Bible question, up to two a day, and you’ll get a careful answer with sources.'
+      : 'Have a Bible question? Reply to any study and ask, one question a day.',
+  ];
+  const verse: Passage = { text: 'Your word is a lamp for my feet, a light on my path.', ref: 'Psalm 119:105 (NIV)' };
+  const inner = `<tr><td style="background:${C.ivory};padding:30px 32px 18px;">
+    <h1 style="margin:0 0 18px;font-family:${SERIF};font-size:28px;line-height:1.25;color:${C.navy};">Welcome to Morning Lamp</h1>
+    ${lines.map((l) => p(esc(l))).join('')}
+    ${quote(verse, false)}
+    ${p('Grace and peace,<br>Morning Lamp')}
+  </td></tr>`;
+  return {
+    subject: 'Welcome to Morning Lamp',
+    html: shell(inner, 'Your first study arrives tomorrow morning.', false, footerHtml(o.footer)),
+    text: ['Welcome to Morning Lamp', '', ...lines.flatMap((l) => [l, '']), `"${verse.text}" (${verse.ref})`, '', 'Grace and peace,', 'Morning Lamp', ...footerText(o.footer)].join('\n'),
+  };
 }
