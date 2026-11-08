@@ -121,7 +121,7 @@ export default async function Home() {
       <section className="chapter chapel premium-center" id="premium">
         <div className="container">
           <header className="chapter-head on-dark">
-            <p className="kicker">Premium · $7 a month or $47 a year{checkoutOpen ? '' : ' after the beta'}</p>
+            <p className="kicker">{checkoutOpen ? 'Premium · $7 a month or $47 a year' : 'Premium'}</p>
             <h2>Last Night’s Lamp: a study written for your day.</h2>
           </header>
 
@@ -170,6 +170,7 @@ export default async function Home() {
               <a className="button gold" href="#lamplighters">
                 Apply to be a Lamplighter
               </a>
+              <p className="beta-price">After the beta, Premium is $7 a month or $47 a year.</p>
             </div>
           )}
         </div>
