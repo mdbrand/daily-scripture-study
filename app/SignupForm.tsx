@@ -10,9 +10,18 @@ type Props = {
   defaultPlan?: Plan;
   tone?: 'dark' | 'light';
   buttonLabel?: string;
+  hidePlanSelect?: boolean; // used where the plan is already chosen (e.g. the Premium plan picker)
+  premiumNote?: string;
 };
 
-export default function SignupForm({ source, defaultPlan = 'free', tone = 'dark', buttonLabel }: Props) {
+export default function SignupForm({
+  source,
+  defaultPlan = 'free',
+  tone = 'dark',
+  buttonLabel,
+  hidePlanSelect = false,
+  premiumNote,
+}: Props) {
   const id = useId();
   const [email, setEmail] = useState('');
   const [plan, setPlan] = useState<Plan>(defaultPlan);
@@ -83,7 +92,7 @@ export default function SignupForm({ source, defaultPlan = 'free', tone = 'dark'
   }
 
   return (
-    <form className={`signup-form ${tone}`} onSubmit={onSubmit} noValidate>
+    <form className={`signup-form ${tone}${hidePlanSelect ? ' no-plan' : ''}`} onSubmit={onSubmit} noValidate>
       <div className="fields">
         <label className="sr-only" htmlFor={`${id}-email`}>
           Email address
@@ -102,13 +111,17 @@ export default function SignupForm({ source, defaultPlan = 'free', tone = 'dark'
           }}
           onBlur={() => setSuggestion(suggestEmail(email))}
         />
-        <label className="sr-only" htmlFor={`${id}-plan`}>
-          Which edition?
-        </label>
-        <select id={`${id}-plan`} value={plan} onChange={(e) => setPlan(e.target.value as Plan)}>
-          <option value="free">Free daily email</option>
-          <option value="premium">Premium, $7 a month</option>
-        </select>
+        {!hidePlanSelect && (
+          <>
+            <label className="sr-only" htmlFor={`${id}-plan`}>
+              Which edition?
+            </label>
+            <select id={`${id}-plan`} value={plan} onChange={(e) => setPlan(e.target.value as Plan)}>
+              <option value="free">Free daily email</option>
+              <option value="premium">Premium, from $7 a month</option>
+            </select>
+          </>
+        )}
         <button type="submit" disabled={state === 'sending'}>
           {state === 'sending' ? 'Joining…' : buttonLabel || 'Join'}
         </button>
@@ -128,7 +141,7 @@ export default function SignupForm({ source, defaultPlan = 'free', tone = 'dark'
 
       <p className="form-note">
         {plan === 'premium'
-          ? 'Premium is $7/month when it opens. No payment today. You can cancel any time.'
+          ? premiumNote || 'Premium is $7/month or $47/year when it opens. No payment today.'
           : 'Free. One email each morning. We never sell or share your email.'}{' '}
         By joining, you agree to our <a className="linklike" href="/terms">Terms</a> and{' '}
         <a className="linklike" href="/privacy">Privacy Policy</a>.

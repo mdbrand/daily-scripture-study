@@ -26,7 +26,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Founders checkout opens very soon. Please check back.' }, { status: 503 });
   }
 
-  const { price_cents } = await getFounderStats();
+  const { price_cents, open } = await getFounderStats();
+  if (!open) return NextResponse.json({ error: 'The Founders Membership is not available right now.' }, { status: 403 });
   const tier = { tier: tierFor(price_cents), cents: price_cents };
 
   const ref = normalizeRef(body.ref);

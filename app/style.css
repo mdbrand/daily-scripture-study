@@ -215,6 +215,65 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 @media (max-width: 1000px) { .founders { grid-template-columns: 1fr; gap: 28px; } }
 @media (max-width: 720px) { .founders { padding: 30px 22px; } .founders-price .amount { font-size: 54px; } }
 
+/* ---------- Premium plans ---------- */
+.plans {
+  margin-top: 88px;
+  background: var(--linen);
+  color: var(--ink);
+  border-radius: 8px;
+  border-top: 4px solid var(--brass);
+  padding: 44px 48px;
+  max-width: 900px;
+  box-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.55);
+}
+.plans-kicker { font-variant-caps: all-small-caps; letter-spacing: 0.08em; font-size: 19px; color: var(--brass-dark); margin-bottom: 4px; }
+.plans h3 { color: var(--navy) !important; font-size: 30px; font-weight: 500; margin-bottom: 24px; }
+.plan-options { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 26px; }
+.plan-option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  background: #fff;
+  border: 1.5px solid var(--rule);
+  border-radius: 10px;
+  padding: 22px 22px 20px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.plan-option:hover { border-color: var(--brass-light); }
+.plan-option.selected { border-color: var(--brass); box-shadow: 0 0 0 3px rgba(168, 131, 74, 0.18); }
+.plan-option:focus-visible { outline: 3px solid rgba(168, 131, 74, 0.55); outline-offset: 2px; }
+.plan-name { font-variant-caps: all-small-caps; letter-spacing: 0.08em; font-size: 19px; color: var(--muted); }
+.plan-price { font-size: 46px; line-height: 1.05; color: var(--navy); font-weight: 500; }
+.plan-price small { font-size: 19px; color: var(--muted); margin-left: 3px; }
+.plan-sub { font-family: var(--ui); font-size: 14px; color: var(--muted); }
+.plan-save {
+  position: absolute;
+  top: -12px;
+  right: 16px;
+  font-family: var(--ui);
+  font-size: 12.5px;
+  font-weight: 600;
+  background: var(--brass);
+  color: #fff;
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+.plans .signup-form { margin: 0; max-width: none; }
+.signup-form.no-plan .fields { grid-template-columns: 1.6fr 1fr; }
+.plans .form-note { text-align: left; }
+@media (max-width: 720px) {
+  .plans { padding: 30px 20px; }
+  .plan-options { grid-template-columns: 1fr; gap: 22px; }
+  .plan-price { font-size: 40px; }
+  .signup-form.no-plan .fields { grid-template-columns: 1fr; }
+}
+
 /* ---------- Partners ---------- */
 .ledger { width: 100%; max-width: 780px; border-collapse: collapse; margin-top: 72px; }
 .ledger caption { text-align: left; font-variant-caps: all-small-caps; letter-spacing: 0.08em; font-size: 20px; color: var(--brass-dark); padding-bottom: 12px; }

@@ -2,6 +2,7 @@ import SignupForm from './SignupForm';
 import Crest from './Crest';
 import BackToTop from './BackToTop';
 import FoundersOffer from './FoundersOffer';
+import PremiumPlans from './PremiumPlans';
 import { SiteFooter } from './LegalShell';
 import {
   compare,
@@ -136,7 +137,7 @@ export default function Home() {
       <section className="chapter chapel" id="premium">
         <div className="container">
           <header className="chapter-head on-dark">
-            <p className="kicker">The Premium edition, $7 a month</p>
+            <p className="kicker">The Premium edition, $7 a month or $47 a year</p>
             <h2>Scripture that knows your story.</h2>
             <p>
               The free email is the same for everyone. Premium is written for you: your season of
@@ -211,21 +212,10 @@ export default function Home() {
             </table>
           </div>
 
-          {/* Shown only once Stripe is connected (STRIPE_SECRET_KEY set at build time). */}
-          {process.env.STRIPE_SECRET_KEY ? <FoundersOffer /> : null}
+          {/* Founders appears only when switched on in the database (dss_config.founders_open). */}
+          <FoundersOffer />
 
-          <div className="enroll">
-            <div className="enroll-price">
-              <p className="enroll-label">Prefer monthly?</p>
-              <p className="amount">
-                $7<span>/month</span>
-              </p>
-              <p>Join the list now. No payment today; we’ll email you when monthly Premium opens.</p>
-            </div>
-            <div className="enroll-form">
-              <SignupForm source="premium" defaultPlan="premium" tone="light" buttonLabel="Get early access" />
-            </div>
-          </div>
+          <PremiumPlans />
         </div>
       </section>
 
@@ -237,7 +227,7 @@ export default function Home() {
             <h2>Share the Word, and earn 30% every month.</h2>
             <p>
               Know someone who would love this? Share your personal link. For every person who joins
-              Premium through it, you earn 30% of their subscription, $2.10 a month, for as long as
+              Premium through it, you earn 30% of their subscription ($2.10 a month, or $14.10 a year on yearly) for as long as
               they stay. Refer four friends and your own Premium pays for itself.
             </p>
           </header>
@@ -294,7 +284,7 @@ export default function Home() {
             <p>Anything else? Once you’re subscribed, just reply to any email.</p>
           </header>
           <div className="faq">
-            {faqs.filter((f) => process.env.STRIPE_SECRET_KEY || f.q !== foundersFaqQ).map((f) => (
+            {faqs.filter((f) => process.env.SHOW_FOUNDERS_FAQ === 'true' || f.q !== foundersFaqQ).map((f) => (
               <details key={f.q}>
                 <summary>{f.q}</summary>
                 <p>{f.a}</p>

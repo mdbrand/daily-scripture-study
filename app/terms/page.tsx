@@ -42,15 +42,15 @@ export default function TermsPage() {
       <h2>3. Premium subscriptions</h2>
       <ul>
         <li>
-          Premium costs $7 per month (US dollars, plus any applicable tax), billed through Stripe, and
-          renews automatically each month until you cancel.
+          Premium costs $7 per month or $47 per year (US dollars, plus any applicable tax), billed
+          through Stripe. Your plan renews automatically each month or each year until you cancel.
         </li>
         <li>
           You can cancel anytime. Cancellation takes effect at the end of your current billing
-          month, and you keep Premium until then.
+          period (month or year), and you keep Premium until then.
         </li>
         <li>
-          Payments are non-refundable for partial months, except where the law requires a refund. If
+          Payments are non-refundable, including for partial months or years, except where the law requires a refund. If
           you were charged in error, contact us and we will make it right.
         </li>
         <li>
@@ -122,7 +122,7 @@ export default function TermsPage() {
         <li>
           <strong>Commission.</strong> Partners earn 30% of each Premium payment we actually receive
           from a member they referred, not counting taxes, refunds, or chargebacks. For monthly
-          Premium, commissions recur for as long as the referred member keeps paying and the partner
+          and yearly Premium, commissions recur for as long as the referred member keeps paying and the partner
           remains an active Premium member in good standing. For a Founders Membership, the 30% is
           earned once.
         </li>

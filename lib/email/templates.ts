@@ -159,10 +159,10 @@ export function renderDailyEmail(s: DailyStudy): { subject: string; html: string
       <p style="margin:0 0 22px;font-family:${SANS};font-size:15px;line-height:1.6;color:#c9c2b3;">Premium adds a second passage picked for where you are: single, newly married, raising kids, grieving, or starting over. Plus a study shaped by what happened yesterday.</p>
       <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto;"><tr>
         <td style="background:${C.gold};border-radius:8px;">
-          <a href="${esc(premiumUrl)}" style="display:inline-block;padding:14px 28px;font-family:${SANS};font-size:16px;font-weight:bold;color:${C.navy};text-decoration:none;">Get Premium for $7 a month</a>
+          <a href="${esc(premiumUrl)}" style="display:inline-block;padding:14px 28px;font-family:${SANS};font-size:16px;font-weight:bold;color:${C.navy};text-decoration:none;">Get Premium: $7/month or $47/year</a>
         </td>
       </tr></table>
-      <p style="margin:14px 0 0;font-family:${SANS};font-size:13px;color:#9fb0b8;">About 23 cents a day. Cancel anytime.</p>
+      <p style="margin:14px 0 0;font-family:${SANS};font-size:13px;color:#9fb0b8;">Save $37 with yearly. Cancel anytime.</p>
     </td></tr></table>
   </td></tr>`;
   const verse = `${verseOrTeaser}
@@ -203,7 +203,7 @@ export function renderDailyEmail(s: DailyStudy): { subject: string; html: string
       : [
           'PREMIUM: A VERSE FOR YOUR LIFE, CHOSEN FOR YOUR SEASON',
           'Premium adds a second passage picked for where you are, plus a study shaped by what happened yesterday.',
-          `Get Premium for $7 a month: ${s.premiumUrl ?? PREMIUM_URL}`,
+          `Get Premium ($7/month or $47/year, save $37 yearly): ${s.premiumUrl ?? PREMIUM_URL}`,
           '',
         ]),
     'Have a Bible question? Just hit reply and ask, one question a day.',

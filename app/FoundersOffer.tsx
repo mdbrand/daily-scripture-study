@@ -4,7 +4,7 @@ import { useEffect, useId, useState } from 'react';
 import { suggestEmail } from '@/lib/emailTypos';
 import { track } from '@/lib/track';
 
-type Stats = { price_cents: number };
+type Stats = { price_cents: number; open: boolean };
 
 const money = (c: number) => `$${Math.round(c / 100)}`;
 
@@ -58,6 +58,9 @@ export default function FoundersOffer() {
       setBusy(false);
     }
   }
+
+  // Behind-the-scenes offer: render nothing unless the switch is on.
+  if (!stats?.open) return null;
 
   return (
     <div className="founders" id="founders">

@@ -99,7 +99,7 @@ export const partnerSteps = [
   },
   {
     title: 'Earn 30% every month',
-    text: 'That’s $2.10 a month for each person who joins Premium through your link, paid after their month is fully paid and complete, for as long as they stay.',
+    text: 'That’s $2.10 a month (or $14.10 a year on yearly) for each person who joins Premium through your link, paid after their payment period is complete, for as long as they stay.',
   },
 ];
 
@@ -131,7 +131,7 @@ export const faqs = [
   },
   {
     q: 'What does it cost?',
-    a: 'The daily email is free. Premium will be $7 a month, about 23 cents a day, and you can cancel any time. Joining the monthly list costs nothing today.',
+    a: 'The daily email is free. Premium will be $7 a month, or $47 a year, which saves you $37 (44%). You can cancel any time, and joining the Premium list costs nothing today.',
   },
   {
     q: 'What is the Founders Membership?',
@@ -139,7 +139,7 @@ export const faqs = [
   },
   {
     q: 'How does the partner program work?',
-    a: 'Any Premium member can become a partner and get a personal link. When someone joins Premium through your link, you earn 30% of what they pay ($2.10 a month at $7) for every month they pay for and complete. Each commission is paid once that month is over, about 30 days after their payment (net 30), so a referral who cancels or is refunded during their first month does not count. If they cancel later, the commission stops. Your own subscription does not count, and you need an active Premium membership to keep earning.',
+    a: 'Any Premium member can become a partner and get a personal link. When someone joins Premium through your link, you earn 30% of what they pay: $2.10 a month on the monthly plan, or $14.10 a year on the yearly plan, for every period they pay for and complete. Each commission is paid once that month is over, about 30 days after their payment (net 30), so a referral who cancels or is refunded during their first month does not count. If they cancel later, the commission stops. Your own subscription does not count, and you need an active Premium membership to keep earning.',
   },
   {
     q: 'Is what I share with Premium private?',
