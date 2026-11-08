@@ -47,14 +47,19 @@ export async function handleReply(from: string, text: string | null) {
   });
 
   try {
-    const r = await writeReflection(merged);
+    // Use a different historical voice from the one in that morning's main study, if it's written yet.
+    const study = await rpc<{ content?: { voices?: { name: string }[] } } | null>('dss_study_get', {
+      p_gate: gate(),
+      p_date: reader.next_date,
+    }).catch(() => null);
+    const r = await writeReflection(merged, { avoidVoice: study?.content?.voices?.[0]?.name ?? null });
     const ready = r.kind === 'reflection' && r.passage;
     await rpc('dss_reflection_save', {
       p_gate: gate(),
       p_email: email,
       p_for_date: reader.next_date,
       p_reply: merged,
-      p_content: ready ? { passage: r.passage, body: r.body } : null,
+      p_content: ready ? { passage: r.passage, body: r.body, voice: r.voice } : null,
       p_status: ready ? 'ready' : 'skipped',
       p_note: r.kind,
     });

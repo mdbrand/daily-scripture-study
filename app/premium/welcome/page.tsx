@@ -62,7 +62,7 @@ export default async function PremiumWelcome({ searchParams }: { searchParams: P
       </div>
       <h2>What happens next</h2>
       <ul>
-        <li>We’ll be in touch by email shortly to set up studies written for your season of life.</li>
+        <li>Reply to any study with a line or two about your day. The next morning, your email includes a short study written for what you shared.</li>
         <li>Reply to any Morning Lamp email with a Bible question. Premium members can ask two a day.</li>
         <li>
           Know someone who would love this? <Link href="/partners">Join the partner program</Link> and earn

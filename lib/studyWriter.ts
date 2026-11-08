@@ -3,6 +3,14 @@ import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
 import { z } from 'zod';
 import { sampleFreeStudy } from './email/samples';
 
+export const VoiceSchema = z.object({
+  name: z.string(),
+  dates: z.string().describe('Birth and death years, e.g. "1483–1546".'),
+  kind: z.enum(['Direct commentary', 'Thematic connection']),
+  body: z.string().describe('What this person wrote or did, in plain words. Paraphrase; no invented quotations.'),
+  source: z.string().describe('The real work it comes from, with an approximate date.'),
+});
+
 // What Claude writes for one day. The date label, pillar, and links are filled in by code.
 export const StudyContentSchema = z.object({
   subject: z.string().describe('Email subject line, under 70 characters, specific to the passage.'),
@@ -12,19 +20,9 @@ export const StudyContentSchema = z.object({
     ref: z.string().describe('Reference with translation, e.g. "Psalm 46:10 (NIV)".'),
   }),
   intro: z.string().describe('Two or three sentences that open the study.'),
-  behind: z.array(z.string()).describe('2 to 4 short paragraphs of historical and literary background.'),
+  behind: z.array(z.string()).describe('Behind the Verse: 2 or 3 short paragraphs (never more than 3) of historical and literary background.'),
   detail: z.string().describe('One concrete detail in or near the passage that most readers miss.'),
-  voices: z
-    .array(
-      z.object({
-        name: z.string(),
-        dates: z.string().describe('Birth and death years, e.g. "1483–1546".'),
-        kind: z.enum(['Direct commentary', 'Thematic connection']),
-        body: z.string().describe('What this person wrote or did, in plain words. Paraphrase; no invented quotations.'),
-        source: z.string().describe('The real work it comes from, with an approximate date.'),
-      }),
-    )
-    .describe('1 or 2 voices from church history.'),
+  voice: VoiceSchema.describe('Exactly one voice from church history.'),
   readMore: z
     .array(
       z.object({
@@ -33,13 +31,10 @@ export const StudyContentSchema = z.object({
       }),
     )
     .describe('2 or 3 places to keep reading.'),
-  verseForLife: z.object({
-    text: z.string().describe('Exact 2011 NIV wording of a second, related passage (1 or 2 verses).'),
-    ref: z.string(),
-    note: z.string().describe('Two or three sentences applying it to everyday life. Premium readers see this.'),
-  }),
 });
-export type StudyContent = z.infer<typeof StudyContentSchema> & { pillar: string };
+type Written = z.infer<typeof StudyContentSchema>;
+// Stored shape: one voice (kept as a one-item list for the email template), at most three background paragraphs.
+export type StudyContent = Omit<Written, 'voice'> & { pillar: string; voices: Written['voice'][] };
 
 // One pillar per weekday, Sunday first, so each week covers the whole range.
 export const PILLARS = [
@@ -54,7 +49,7 @@ export const PILLARS = [
 
 const SYSTEM = `You write Morning Lamp, a free daily Bible study email read by Christians of every age and season of life: single, married, raising kids, grieving, starting over. Readers get about five minutes each morning.
 
-What a study does: takes one short passage, explains what it meant in its first setting (history, language, literary context), points out one detail people miss, and brings in one or two voices from church history. It is warm and clear, never preachy, and never assumes the reader is a scholar.
+What a study does: takes one short passage, explains what it meant in its first setting (history, language, literary context), points out one detail people miss, and brings in one voice from church history. It is warm and clear, never preachy, and never assumes the reader is a scholar.
 
 Accuracy matters more than anything else, because readers trust this:
 - Quote Scripture only in the exact wording of the 2011 New International Version. Choose passages whose NIV wording you know precisely. If you are not certain of the exact wording, choose a different passage.
@@ -83,7 +78,7 @@ export async function writeStudy(opts: { date: string; pillar: string; recent: R
     intro: sampleFreeStudy.intro,
     behind: sampleFreeStudy.behind,
     detail: sampleFreeStudy.detail,
-    voices: sampleFreeStudy.voices,
+    voice: sampleFreeStudy.voices[0],
   };
 
   const response = await client.messages.parse({
@@ -112,5 +107,6 @@ ${JSON.stringify(example, null, 2)}`,
   if (response.stop_reason === 'max_tokens') throw new Error('The study was cut off before it finished.');
   const out = response.parsed_output;
   if (!out) throw new Error('The study writer returned an unreadable result.');
-  return { ...out, pillar: opts.pillar };
+  const { voice, ...rest } = out;
+  return { ...rest, behind: rest.behind.slice(0, 3), voices: [voice], pillar: opts.pillar };
 }

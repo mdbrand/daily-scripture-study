@@ -73,11 +73,10 @@ export function toDailyStudy(date: string, c: StudyContent, premium: boolean, ye
     title: c.title,
     passage: c.passage,
     intro: c.intro,
-    behind: c.behind,
+    behind: c.behind.slice(0, 3),
     detail: c.detail,
-    voices: c.voices,
+    voices: (c.voices ?? []).slice(0, 1),
     readMore: c.readMore.map((l) => ({ label: l.label, url: l.passage_ref ? gatewayUrl(l.passage_ref) : undefined })),
-    verseForLife: premium ? c.verseForLife : undefined,
     edition: premium ? 'premium' : 'free',
     yesterday: premium && yesterday ? yesterday : undefined,
   };
@@ -177,6 +176,14 @@ export const SAMPLE_YESTERDAY: NonNullable<DailyStudy['yesterday']> = {
     'A hard evening doesn’t get the last word on you as a parent. This morning is a fresh start, and the same mercy God shows you is the mercy you can show your kids. A simple “I’m sorry I was short with you last night” teaches them more about grace than a perfect day would.',
     'Today, you might ask God for patience before you walk in the door this evening.',
   ],
+  voice: {
+    name: 'John Newton',
+    dates: '1725–1807',
+    kind: 'Thematic connection',
+    body:
+      'Before he became a pastor, Newton worked in the Atlantic slave trade, and he carried the weight of that past for the rest of his life. He never excused it. Instead he wrote, again and again, about grace that meets people who know exactly how far they have fallen. His best-known hymn, “Amazing Grace,” comes out of that experience: not a man who had it all together, but one who had been forgiven much and kept learning to receive it.',
+    source: 'John Newton, “Amazing Grace,” written for a New Year’s Day sermon in 1773 and published in Olney Hymns (1779)',
+  },
 };
 
 // A single preview copy (admin test sends). Not logged as a subscriber send.

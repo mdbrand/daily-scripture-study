@@ -70,7 +70,20 @@ export default async function Reflections({ searchParams }: { searchParams: Prom
           {tried.kind === 'reflection' && tried.passage ? (
             <>
               <p><em>“{tried.passage.text}”</em><br />{tried.passage.ref}</p>
+              <p><strong>Behind the Verse</strong></p>
               {tried.body.map((b, i) => <p key={i}>{b}</p>)}
+              {tried.voice && (
+                <>
+                  <p><strong>Voices Through History</strong></p>
+                  <p>
+                    <strong>{tried.voice.name}</strong> ({tried.voice.dates}), {tried.voice.kind}
+                    <br />
+                    {tried.voice.body}
+                    <br />
+                    <span className="form-note">Source: {tried.voice.source}</span>
+                  </p>
+                </>
+              )}
             </>
           ) : (
             <p>No reflection: {tried.kind === 'care' ? 'possible crisis. A real reply like this emails you so you can follow up personally' : KIND[tried.kind] ?? tried.kind}.</p>

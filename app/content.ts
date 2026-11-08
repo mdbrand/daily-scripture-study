@@ -54,8 +54,8 @@ export const premiumFeatures = [
     text: 'Your one-line reply becomes tomorrow’s study. A hard day, a big win, a quiet worry, held up to God’s Word.',
   },
   {
-    title: 'A verse chosen for your season',
-    text: 'Not a random verse of the day. A second passage picked for where you are: single, newly married, raising kids, grieving, starting over.',
+    title: 'A full study on your own day',
+    text: 'One passage that speaks to what you felt, the story behind it, and a voice from Christian history who walked through the same thing.',
   },
   {
     title: 'It remembers what matters',
@@ -81,7 +81,6 @@ export const compare: [string, boolean | string, true | string][] = [
   ['The story behind the verse', true, true],
   ['Voices from Christian history, with sources', true, true],
   ['Ask any Bible question', '1 a day', '2 a day'],
-  ['A second verse chosen for your season of life', false, true],
   ['Yesterday, through the lens of Scripture', false, true],
   ['Remembers what you share and follows up', false, true],
   ['Private Scripture journal + a recap every 30 days', false, true],

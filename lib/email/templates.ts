@@ -16,11 +16,10 @@ export type DailyStudy = {
   detail: string;
   voices: Voice[];
   readMore: Link[];
-  // Premium only: a second passage chosen for the reader's season. Free emails show the Premium teaser instead.
-  verseForLife?: Passage & { note: string };
   premiumUrl?: string; // where the free email's Upgrade button points
-  yesterday?: { reply: string; passage: Passage; body: string[] }; // Premium only
-  // Which version this reader gets. Shown as a badge in the header. Defaults from verseForLife.
+  // Premium only: a short study on what the reader shared yesterday (verse, Behind the Verse, one voice).
+  yesterday?: { reply: string; passage: Passage; body: string[]; voice?: Voice | null };
+  // Which version this reader gets. Shown as a badge in the header.
   edition?: Edition;
   isTest?: boolean;
 };
@@ -167,19 +166,19 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
     ${quote(s.passage)}
     ${p(rich(s.intro))}
     ${h('Behind the Verse')}
-    ${s.behind.map((b) => p(rich(b))).join('')}
+    ${s.behind.slice(0, 3).map((b) => p(rich(b))).join('')}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:4px 0 8px;background:#ffffff;border-radius:10px;"><tr><td style="padding:16px 20px;">
       ${label('One detail you might miss')}
       ${p(rich(s.detail), 'margin:0;font-size:16px;')}
     </td></tr></table>
     ${h('Voices Through History')}
-    ${voicesHtml(s.voices)}
+    ${voicesHtml(s.voices.slice(0, 1))}
     ${h('Where to Read More')}
     ${readMoreHtml(s.readMore)}
   </td></tr>`;
 
   // Premium readers always get the second half: a reflection on what they shared, or an invitation to share.
-  const isPremium = s.edition ? s.edition === 'premium' : !!s.verseForLife;
+  const isPremium = s.edition === 'premium';
   const yesterdayBand = `<tr><td style="background:${C.navy};padding:16px 32px;text-align:center;">
         <p style="margin:0;font-family:${SANS};font-size:13px;letter-spacing:2.5px;font-weight:bold;color:${C.gold};">YESTERDAY, THROUGH THE LENS OF SCRIPTURE</p>
       </td></tr>`;
@@ -191,7 +190,9 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
         ${h('Looking Back at Yesterday')}
         ${p(`<em>You wrote: “${esc(shorten(s.yesterday.reply, 320))}”</em>`, `color:${C.muted};`)}
         ${quote(s.yesterday.passage, false)}
-        ${s.yesterday.body.map((b) => p(rich(b))).join('')}
+        ${h('Behind the Verse')}
+        ${s.yesterday.body.slice(0, 3).map((b) => p(rich(b))).join('')}
+        ${s.yesterday.voice ? `${h('Voices Through History')}${voicesHtml([s.yesterday.voice])}` : ''}
       </td></tr>`
       : `${yesterdayBand}
       <tr><td style="background:${C.ivory};padding:26px 32px 12px;">
@@ -201,19 +202,13 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
       </td></tr>`;
 
   const premiumUrl = s.premiumUrl ?? PREMIUM_URL;
-  const verseOrTeaser = s.verseForLife
-    ? `<tr><td style="background:${C.page};padding:18px 0 0;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border:2px solid ${C.navy};border-radius:12px;"><tr><td style="padding:26px 30px 10px;">
-      ${label('A Verse for Your Life')}
-      ${quote(s.verseForLife, false)}
-      ${p(rich(s.verseForLife.note), 'font-size:16px;')}
-    </td></tr></table>
-  </td></tr>`
+  const verseOrTeaser = isPremium
+    ? ''
     : `<tr><td style="background:${C.page};padding:18px 0 0;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${C.navy};border-radius:12px;"><tr><td style="padding:28px 30px;text-align:center;">
       <p style="margin:0 0 8px;font-family:${SANS};font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:bold;color:${C.gold};">Premium</p>
-      <p style="margin:0 0 10px;font-family:${SERIF};font-size:22px;line-height:1.35;color:#f6efe1;">A Verse for Your Life, chosen for your season</p>
-      <p style="margin:0 0 22px;font-family:${SANS};font-size:15px;line-height:1.6;color:#c9c2b3;">Premium adds a second passage picked for where you are: single, newly married, raising kids, grieving, or starting over. Plus a study shaped by what happened yesterday.</p>
+      <p style="margin:0 0 10px;font-family:${SERIF};font-size:22px;line-height:1.35;color:#f6efe1;">Yesterday, through the lens of Scripture</p>
+      <p style="margin:0 0 22px;font-family:${SANS};font-size:15px;line-height:1.6;color:#c9c2b3;">Reply with a line about your day. With Premium, the next morning brings a study written for it: a passage for what you felt, the story behind it, and a voice from Christian history who walked through the same thing.</p>
       <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto;"><tr>
         <td style="background:${C.gold};border-radius:8px;">
           <a href="${esc(premiumUrl)}" style="display:inline-block;padding:14px 28px;font-family:${SANS};font-size:16px;font-weight:bold;color:${C.navy};text-decoration:none;">Get Premium: $7/month or $47/year</a>
@@ -243,12 +238,12 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
     s.intro,
     '',
     'BEHIND THE VERSE',
-    ...s.behind,
+    ...s.behind.slice(0, 3),
     '',
     `One detail you might miss: ${s.detail}`,
     '',
     'VOICES THROUGH HISTORY',
-    ...s.voices.map((v) => `${v.name} (${v.dates}), ${v.kind}: ${v.body} Source: ${v.source}`),
+    ...s.voices.slice(0, 1).map((v) => `${v.name} (${v.dates}), ${v.kind}: ${v.body} Source: ${v.source}`),
     '',
     'WHERE TO READ MORE',
     ...s.readMore.map((l) => `- ${l.label}${l.url ? ` ${l.url}` : ''}`),
@@ -256,13 +251,24 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
     ...(!isPremium
       ? []
       : s.yesterday
-        ? ['YESTERDAY, THROUGH THE LENS OF SCRIPTURE', `You wrote: "${shorten(s.yesterday.reply, 320)}"`, `"${s.yesterday.passage.text}" (${s.yesterday.passage.ref})`, ...s.yesterday.body, '']
+        ? [
+            'YESTERDAY, THROUGH THE LENS OF SCRIPTURE',
+            `You wrote: "${shorten(s.yesterday.reply, 320)}"`,
+            `"${s.yesterday.passage.text}" (${s.yesterday.passage.ref})`,
+            '',
+            'BEHIND THE VERSE',
+            ...s.yesterday.body.slice(0, 3),
+            ...(s.yesterday.voice
+              ? ['', 'VOICES THROUGH HISTORY', `${s.yesterday.voice.name} (${s.yesterday.voice.dates}), ${s.yesterday.voice.kind}: ${s.yesterday.voice.body} Source: ${s.yesterday.voice.source}`]
+              : []),
+            '',
+          ]
         : ['YESTERDAY, THROUGH THE LENS OF SCRIPTURE', 'How was yesterday?', YESTERDAY_INVITE, YESTERDAY_INVITE_2, '']),
-    ...(s.verseForLife
-      ? ['A VERSE FOR YOUR LIFE', `"${s.verseForLife.text}" (${s.verseForLife.ref})`, s.verseForLife.note, '']
+    ...(isPremium
+      ? []
       : [
-          'PREMIUM: A VERSE FOR YOUR LIFE, CHOSEN FOR YOUR SEASON',
-          'Premium adds a second passage picked for where you are, plus a study shaped by what happened yesterday.',
+          'PREMIUM: YESTERDAY, THROUGH THE LENS OF SCRIPTURE',
+          'Reply with a line about your day. With Premium, the next morning brings a study written for it: a passage for what you felt, the story behind it, and a voice from Christian history.',
           `Get Premium ($7/month or $47/year, save $37 yearly): ${s.premiumUrl ?? PREMIUM_URL}`,
           '',
         ]),
