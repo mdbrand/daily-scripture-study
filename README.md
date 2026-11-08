@@ -1,5 +1,8 @@
 # Morning Lamp
 
+> **Email format is locked.** See [docs/email-format.md](docs/email-format.md) before changing any email, the study writer, or the Last Night's Lamp writer.
+
+
 A daily Bible study by email, at **morninglamp.study** (domain bought Nov 8 2026 at Namecheap). Formerly "Daily Scripture Study"; the GitHub repo keeps the old name.
 
 Next.js starter project for a public Scripture-study landing page and future subscription product. Prepared for Claude Code and eventual Vercel deployment.

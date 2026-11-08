@@ -1,3 +1,4 @@
+// APPROVED FORMAT: see docs/email-format.md. Don't add, remove, or rename sections without the owner's sign-off.
 // Email templates for Morning Lamp. Email-safe HTML: tables + inline styles only.
 
 export type Passage = { text: string; ref: string }; // ref includes translation, e.g. "Psalm 46:10 (NIV)"
