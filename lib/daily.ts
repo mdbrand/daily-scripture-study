@@ -78,6 +78,7 @@ export function toDailyStudy(date: string, c: StudyContent, premium: boolean): D
     voices: c.voices,
     readMore: c.readMore.map((l) => ({ label: l.label, url: l.passage_ref ? gatewayUrl(l.passage_ref) : undefined })),
     verseForLife: premium ? c.verseForLife : undefined,
+    edition: premium ? 'premium' : 'free',
   };
 }
 
@@ -169,5 +170,5 @@ export async function sendPreview(date: string, to: string, premium: boolean) {
   if (!study) throw new Error('No study for that date yet.');
   const footer = footerFor('preview', postalAddress() ?? '(mailing address not set yet)');
   const m = renderDailyEmail({ ...toDailyStudy(date, study.content, premium), isTest: true }, footer);
-  await sendBatch([{ to, ...m, subject: `[Preview] ${m.subject}`, unsubscribeUrl: footer.unsubscribeUrl }]);
+  await sendBatch([{ to, ...m, subject: `[Preview · ${premium ? 'Premium' : 'Free'}] ${m.subject}`, unsubscribeUrl: footer.unsubscribeUrl }]);
 }

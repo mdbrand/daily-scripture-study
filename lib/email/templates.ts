@@ -3,6 +3,7 @@
 export type Passage = { text: string; ref: string }; // ref includes translation, e.g. "Psalm 46:10 (NIV)"
 export type Voice = { name: string; dates: string; kind: 'Direct commentary' | 'Thematic connection'; body: string; source: string };
 export type Link = { label: string; url?: string };
+export type Edition = 'free' | 'premium';
 
 export type DailyStudy = {
   dateLabel: string;
@@ -19,6 +20,8 @@ export type DailyStudy = {
   verseForLife?: Passage & { note: string };
   premiumUrl?: string; // where the free email's Upgrade button points
   yesterday?: { reply: string; passage: Passage; body: string[] }; // Premium only
+  // Which version this reader gets. Shown as a badge in the header. Defaults from verseForLife.
+  edition?: Edition;
   isTest?: boolean;
 };
 
@@ -114,15 +117,28 @@ function footerText(f?: MailFooter): string[] {
   ];
 }
 
-function shell(inner: string, preheader: string, isTest?: boolean, footerHtml = ''): string {
+function badgeHtml(edition?: Edition): string {
+  if (edition === 'premium') {
+    return `<span style="display:inline-block;background:${C.gold};color:${C.navy};font-family:${SANS};font-size:12px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;padding:6px 12px;border-radius:999px;">&#10022; Premium</span>`;
+  }
+  if (edition === 'free') {
+    return `<span style="display:inline-block;border:1px solid #5d7480;color:#c9c2b3;font-family:${SANS};font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:5px 12px;border-radius:999px;">Free edition</span>`;
+  }
+  return '';
+}
+
+function shell(inner: string, preheader: string, isTest?: boolean, footerHtml = '', edition?: Edition): string {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Morning Lamp</title></head>
 <body style="margin:0;padding:0;background:${C.page};">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${esc(preheader)}</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${C.page};"><tr><td align="center" style="padding:24px 12px;">
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;">
 ${isTest ? `<tr><td style="padding:0 0 10px;font-family:${SANS};font-size:12px;color:${C.muted};text-align:center;">TEST SEND · not a live subscription email</td></tr>` : ''}
-<tr><td style="background:${C.navy};padding:26px 32px;border-radius:12px 12px 0 0;">
-  <p style="margin:0;font-family:${SERIF};font-size:20px;color:${C.gold};">Morning Lamp</p>
+<tr><td style="background:${C.navy};padding:22px 32px;border-radius:12px 12px 0 0;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+    <td style="vertical-align:middle;"><p style="margin:0;font-family:${SERIF};font-size:20px;color:${C.gold};">Morning Lamp</p></td>
+    <td align="right" style="vertical-align:middle;">${badgeHtml(edition)}</td>
+  </tr></table>
 </td></tr>
 ${inner}
 <tr><td style="padding:24px 32px 8px;text-align:center;">
@@ -194,11 +210,12 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
     </td></tr></table>
   </td></tr>`;
 
-  const html = shell(study + yesterday + verse, s.intro, s.isTest, footerHtml(footer));
+  const edition: Edition = s.edition ?? (s.verseForLife ? 'premium' : 'free');
+  const html = shell(study + yesterday + verse, s.intro, s.isTest, footerHtml(footer), edition);
 
   const text = [
     s.isTest ? 'TEST SEND · not a live subscription email\n' : '',
-    `MORNING LAMP: ${s.dateLabel}`,
+    `MORNING LAMP${edition === 'premium' ? ' PREMIUM' : ' (FREE EDITION)'}: ${s.dateLabel}`,
     '',
     `TODAY'S BIBLE STUDY: ${s.title}`,
     `"${s.passage.text}" (${s.passage.ref})`,
@@ -315,7 +332,7 @@ export function renderWelcomeEmail(o: { premium: boolean; footer: MailFooter }):
   </td></tr>`;
   return {
     subject: 'Welcome to Morning Lamp',
-    html: shell(inner, 'Your first study arrives at 5 AM your time.', false, footerHtml(o.footer)),
+    html: shell(inner, 'Your first study arrives at 5 AM your time.', false, footerHtml(o.footer), o.premium ? 'premium' : 'free'),
     text: ['Welcome to Morning Lamp', '', ...lines.flatMap((l) => [l, '']), `"${verse.text}" (${verse.ref})`, '', 'Grace and peace,', 'Morning Lamp', ...footerText(o.footer)].join('\n'),
   };
 }
