@@ -44,11 +44,11 @@ function status(r: Row) {
   return 'Active';
 }
 
-export default async function Subscribers({ searchParams }: { searchParams: Promise<{ q?: string; filter?: string; page?: string }> }) {
+export default async function Subscribers({ searchParams }: { searchParams: Promise<{ q?: string; filter?: string; page?: string; deleted?: string; blocked?: string; msg?: string }> }) {
   const email = await adminEmail();
   if (!email) return <AdminSignIn next="/admin/subscribers" />;
 
-  const { q = '', filter = 'all', page = '1' } = await searchParams;
+  const { q = '', filter = 'all', page = '1', deleted, blocked, msg } = await searchParams;
   const f = FILTERS.some((x) => x.key === filter) ? filter : 'all';
   const n = Math.max(1, parseInt(page, 10) || 1);
   const data = await rpc<{ total: number; rows: Row[] }>('dss_admin_subscribers', {
@@ -71,6 +71,13 @@ export default async function Subscribers({ searchParams }: { searchParams: Prom
 
   return (
     <AdminShell title="Subscribers" active="/admin/subscribers" email={email}>
+      {deleted && (
+        <p className="partner-notice" role="status">
+          Deleted {deleted} {deleted === '1' ? 'subscriber' : 'subscribers'}.
+          {blocked ? ` Skipped (active paid membership, cancel in Stripe first): ${blocked.split(',').join(', ')}.` : ''}
+        </p>
+      )}
+      {msg === 'error' && <p className="partner-notice" role="alert">That didn’t work. Please try again.</p>}
       <form className="partner-row" action="/admin/subscribers" method="get">
         <input name="q" defaultValue={q} placeholder="Search by email" aria-label="Search by email" />
         {f !== 'all' && <input type="hidden" name="filter" value={f} />}
@@ -90,17 +97,20 @@ export default async function Subscribers({ searchParams }: { searchParams: Prom
       {data.rows.length === 0 ? (
         <p>No one matches that.</p>
       ) : (
+        <form action="/admin/subscribers/delete" method="get">
         <div style={{ overflowX: 'auto' }}>
           <table className="partner-table">
             <thead>
               <tr>
+                <th><span className="sr-only">Select</span></th>
                 <th>Email</th><th>Joined</th><th>Premium</th><th>Status</th><th>Time zone</th><th>From</th><th>Studies</th>
               </tr>
             </thead>
             <tbody>
               {data.rows.map((r) => (
                 <tr key={r.email}>
-                  <td>{r.email}</td>
+                  <td><input type="checkbox" name="email" value={r.email} aria-label={`Select ${r.email}`} /></td>
+                  <td><Link href={`/admin/subscribers/view?email=${encodeURIComponent(r.email)}`}>{r.email}</Link></td>
                   <td>{date(r.created_at)}</td>
                   <td>{r.premium_status ? PREMIUM[r.premium_status] ?? r.premium_status : r.plan_interest === 'premium' ? 'Interested' : 'Free'}</td>
                   <td>{status(r)}</td>
@@ -112,6 +122,11 @@ export default async function Subscribers({ searchParams }: { searchParams: Prom
             </tbody>
           </table>
         </div>
+        <p style={{ marginTop: 16 }}>
+          <button type="submit" className="link-button">Delete selected…</button>
+          <span className="form-note"> You’ll confirm on the next screen. Click an email to edit that person or mark them as spam.</span>
+        </p>
+        </form>
       )}
       {pages > 1 && (
         <p className="form-note">
