@@ -3,6 +3,7 @@
 import { useEffect, useId, useState } from 'react';
 import type { Plan } from '@/lib/subscribe';
 import { suggestEmail } from '@/lib/emailTypos';
+import { track } from '@/lib/track';
 
 type Props = {
   source: string;
@@ -57,6 +58,8 @@ export default function SignupForm({ source, defaultPlan = 'free', tone = 'dark'
         return;
       }
       setState('done');
+      // GA4 recommended event name; plan + form location as parameters.
+      track('sign_up', { method: 'email', plan, form_location: source });
     } catch {
       setState('error');
       setMessage('Could not connect. Please check your internet and try again.');

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { EB_Garamond, Inter } from 'next/font/google';
 import './style.css';
+import { GtmHead, GtmNoScript } from './Analytics';
 
 const garamond = EB_Garamond({
   subsets: ['latin'],
@@ -12,6 +13,8 @@ const garamond = EB_Garamond({
 const inter = Inter({ subsets: ['latin'], variable: '--font-ui', display: 'swap' });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://morninglamp.study'),
+  alternates: { canonical: '/' },
   title: 'Morning Lamp: a daily Bible study by email',
   description:
     'A few quiet minutes with God’s Word, every morning. One Bible passage, the story behind it, in plain, simple language.',
@@ -20,7 +23,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${garamond.variable} ${inter.variable}`}>
-      <body>{children}</body>
+      <body>
+        <GtmNoScript />
+        {children}
+        <GtmHead />
+      </body>
     </html>
   );
 }
