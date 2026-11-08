@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useState } from 'react';
 import type { Plan } from '@/lib/subscribe';
+import { suggestEmail } from '@/lib/emailTypos';
 
 type Props = {
   source: string;
@@ -18,6 +19,7 @@ export default function SignupForm({ source, defaultPlan = 'free', tone = 'dark'
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
   const [message, setMessage] = useState('');
   const [ref, setRef] = useState('');
+  const [suggestion, setSuggestion] = useState<string | null>(null);
 
   // Remember a partner link (?ref=code) so the signup is credited even if they browse first.
   useEffect(() => {
@@ -33,6 +35,12 @@ export default function SignupForm({ source, defaultPlan = 'free', tone = 'dark'
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    // Catch an obvious typo once, before sending. A second click sends it as typed.
+    const typo = suggestEmail(email);
+    if (typo && typo !== suggestion) {
+      setSuggestion(typo);
+      return;
+    }
     setState('sending');
     setMessage('');
     try {
@@ -45,6 +53,7 @@ export default function SignupForm({ source, defaultPlan = 'free', tone = 'dark'
       if (!res.ok) {
         setState('error');
         setMessage(data.error || 'Something went wrong. Please try again.');
+        if (data.suggestion) setSuggestion(data.suggestion);
         return;
       }
       setState('done');
@@ -84,7 +93,11 @@ export default function SignupForm({ source, defaultPlan = 'free', tone = 'dark'
           placeholder="Your email address"
           required
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setSuggestion(null);
+          }}
+          onBlur={() => setSuggestion(suggestEmail(email))}
         />
         <label className="sr-only" htmlFor={`${id}-plan`}>
           Which edition?
@@ -123,6 +136,25 @@ export default function SignupForm({ source, defaultPlan = 'free', tone = 'dark'
           </>
         )}
       </p>
+
+      {suggestion && (
+        <p className="form-suggest" role="status">
+          Did you mean{' '}
+          <button
+            type="button"
+            className="linklike"
+            onClick={() => {
+              setEmail(suggestion);
+              setSuggestion(null);
+              setState('idle');
+              setMessage('');
+            }}
+          >
+            {suggestion}
+          </button>
+          ?
+        </p>
+      )}
 
       {state === 'error' && (
         <p className="form-error" role="alert">

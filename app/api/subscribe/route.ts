@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
 import { CONSENT_TEXT, normalizeEmail, normalizePlan, normalizeRef } from '@/lib/subscribe';
+import { checkEmail } from '@/lib/emailCheck';
+import { suggestEmail } from '@/lib/emailTypos';
+
+export const runtime = 'nodejs';
 
 // Best-effort limit per server instance: 5 signups per IP per 10 minutes.
 const WINDOW_MS = 10 * 60 * 1000;
@@ -31,6 +35,19 @@ export async function POST(req: Request) {
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   if (rateLimited(ip)) {
     return NextResponse.json({ error: 'Too many tries. Please wait a few minutes.' }, { status: 429 });
+  }
+
+  // Keep throwaway inboxes and dead domains off the list; flag privacy relays.
+  const verdict = await checkEmail(email);
+  if (!verdict.ok) {
+    return NextResponse.json(
+      {
+        error: verdict.message,
+        reason: verdict.reason,
+        suggestion: verdict.reason === 'no_mail_server' ? suggestEmail(email) : null,
+      },
+      { status: 422 },
+    );
   }
 
   const url = process.env.SUPABASE_URL;
@@ -66,6 +83,7 @@ export async function POST(req: Request) {
       p_suspected_bot: suspectedBot,
       p_consent: CONSENT_TEXT,
       p_user_agent: req.headers.get('user-agent')?.slice(0, 300) ?? null,
+      p_email_flag: verdict.flag,
     }),
   });
 

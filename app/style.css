@@ -276,6 +276,9 @@ details p { color: var(--muted); font-size: 19px; margin: -4px 0 24px; max-width
 .enroll .form-note { text-align: left; }
 .linklike { color: var(--brass-dark); text-decoration: underline; text-underline-offset: 3px; }
 .dark .linklike { color: var(--brass-light); }
+.form-suggest { font-family: var(--ui); font-size: 15px; margin: 10px 0 0; text-align: center; color: var(--ink); }
+.dark .form-suggest { color: var(--on-dark); }
+.form-suggest .linklike { font: inherit; font-weight: 600; background: none; border: 0; padding: 0; cursor: pointer; }
 .form-error { font-family: var(--ui); margin: 10px 0 0; font-size: 15px; color: #a3261b; font-weight: 600; text-align: center; }
 .dark .form-error { color: #ffb4a8; }
 .signup-done { max-width: 620px; margin: 0 auto; border-radius: 6px; padding: 20px 24px; text-align: left; }
