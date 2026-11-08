@@ -36,8 +36,8 @@ Open http://localhost:3000. Deploy on Vercel after pushing to a GitHub repositor
 2. Separate PUBLIC daily edition (shared second Scripture) from future PAID personalized edition. Never expose one person's ChatGPT, Gmail, Fathom, or personal activity to other subscribers.
 3. Build an editor/research workflow for one primary ESV passage, a second passage, biblical background, and historically verified commentary. Keep citation URLs and label direct commentary versus thematic parallels.
 4. Track prior passages, commentators, dates, and angles; aim for 90-day commentator variety while prioritizing accuracy.
-5. Render full-content responsive HTML email with navy header, ivory Today's Bible Study card, an independent full-width navy divider reading YESTERDAY, THROUGH THE LENS OF SCRIPTURE, and a separate white bordered A Verse for Your Life card.
-6. Approved headings: Today's Bible Study; A Verse for Your Life; Looking Back at Yesterday; Behind the Verse; Voices Through History; Where to Read More.
+5. Render full-content responsive HTML email with navy header (Premium / Free edition badge) and an ivory Today's Bible Study card. Premium adds a full-width navy divider reading LAST NIGHT'S LAMP ("Written for what you shared last night"), then a study on the reader's own reply: their words, one passage, Behind the Verse (max 3 paragraphs), one voice. Free shows a Premium box instead.
+6. Approved headings: Today's Bible Study; Behind the Verse (max 3 paragraphs); Voices Through History (exactly one voice); Where to Read More; Last Night's Lamp (Premium).
 7. Keep copy accessible to sixth-grade readers without removing dates, authorship uncertainty, historical detail, or sources. No prayers, challenges, generic applications, or invented historical quotations.
 8. Add scheduled sending with idempotency to avoid duplicate sends; logging, delivery tracking, retries, and test sends. Respect ESV licensing and quotation limits.
 9. Add subscriber consent, access controls, rate limiting, data retention, and GDPR/CCPA-aware deletion requests before public launch.

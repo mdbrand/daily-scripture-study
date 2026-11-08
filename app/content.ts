@@ -50,8 +50,8 @@ export const premiumSteps = [
 
 export const premiumFeatures = [
   {
-    title: 'Yesterday, through the lens of Scripture',
-    text: 'Your one-line reply becomes tomorrow’s study. A hard day, a big win, a quiet worry, held up to God’s Word.',
+    title: 'Last Night’s Lamp',
+    text: 'Each evening we ask how your day went. Your one-line reply becomes the next morning’s study, written for you. A hard day, a big win, a quiet worry, held up to God’s Word.',
   },
   {
     title: 'A full study on your own day',
@@ -81,7 +81,7 @@ export const compare: [string, boolean | string, true | string][] = [
   ['The story behind the verse', true, true],
   ['Voices from Christian history, with sources', true, true],
   ['Ask any Bible question', '1 a day', '1 a day'],
-  ['Yesterday, through the lens of Scripture', false, true],
+  ['Last Night’s Lamp: a study written for your own day', false, true],
   ['Remembers what you share and follows up', false, true],
   ['Private Scripture journal + a recap every 30 days', false, true],
   ['Partner program: earn 30% every month for each friend who joins', false, true],

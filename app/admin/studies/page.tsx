@@ -61,7 +61,7 @@ export default async function AdminStudies({ searchParams }: { searchParams: Pro
       <p className="form-note">
         Each morning around 7 AM Pacific, tomorrow’s study is written and you get an email to review it. The next day it
         reaches each reader at 5 AM in their own time zone, unless you put it on hold first. Premium readers also get a
-        short check-in at 8 PM their time; their reply shapes the Yesterday section of their next study.
+        short check-in at 8 PM their time; their reply shapes Last Night’s Lamp in their next study.
       </p>
       {settings.send_open ? (
         <Action action="sending-off" label="Turn daily sending off" kind="link-button" />

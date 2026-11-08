@@ -46,7 +46,7 @@ export default async function Reflections({ searchParams }: { searchParams: Prom
     <AdminShell title="Premium replies" active="/admin/reflections" email={email}>
       <p>
         When a Premium reader replies to a study with a note about their day, Claude picks a passage and writes a short
-        reflection that appears in their next morning’s email under “Yesterday, through the lens of Scripture.” Bible
+        reflection that appears in their next morning’s email under “Last Night’s Lamp.” Bible
         questions, unsubscribe notes, and anything that sounds like a crisis are not turned into reflections. Crisis
         replies are emailed to you for a personal follow-up.
       </p>

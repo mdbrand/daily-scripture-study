@@ -47,7 +47,8 @@ const C = {
 export const PREMIUM_URL = 'https://morninglamp.study/?utm_source=email&utm_medium=free-daily&utm_campaign=premium-teaser#premium';
 
 const YESTERDAY_INVITE =
-  'Each evening around 8 PM your time, we’ll send a short check-in. Reply with a line or two about your day, and the next morning this space becomes a study written for what you shared.';
+  'Each evening around 8 PM your time, we’ll send a short check-in. Reply with a line or two about your day, and the next morning Last Night’s Lamp will be written for what you shared.';
+const LAMP_SUBTITLE = 'Written for what you shared last night';
 const YESTERDAY_INVITE_2 = 'You can also reply to this email anytime today.';
 
 function shorten(s: string, n: number): string {
@@ -178,15 +179,15 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
 
   // Premium readers always get the second half: a reflection on what they shared, or an invitation to share.
   const isPremium = s.edition === 'premium';
-  const yesterdayBand = `<tr><td style="background:${C.navy};padding:16px 32px;text-align:center;">
-        <p style="margin:0;font-family:${SANS};font-size:13px;letter-spacing:2.5px;font-weight:bold;color:${C.gold};">YESTERDAY, THROUGH THE LENS OF SCRIPTURE</p>
+  const yesterdayBand = `<tr><td style="background:${C.navy};padding:18px 32px;text-align:center;">
+        <p style="margin:0;font-family:${SANS};font-size:13px;letter-spacing:2.5px;font-weight:bold;color:${C.gold};">LAST NIGHT’S LAMP</p>
+        <p style="margin:6px 0 0;font-family:${SERIF};font-size:16px;font-style:italic;color:#e9e1cf;">${esc(LAMP_SUBTITLE)}</p>
       </td></tr>`;
   const yesterday = !isPremium
     ? ''
     : s.yesterday
       ? `${yesterdayBand}
       <tr><td style="background:${C.ivory};padding:26px 32px 12px;">
-        ${h('Looking Back at Yesterday')}
         ${p(`<em>You wrote: “${esc(shorten(s.yesterday.reply, 320))}”</em>`, `color:${C.muted};`)}
         ${quote(s.yesterday.passage, false)}
         ${h('Behind the Verse')}
@@ -206,8 +207,8 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
     : `<tr><td style="background:${C.page};padding:18px 0 0;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${C.navy};border-radius:12px;"><tr><td style="padding:28px 30px;text-align:center;">
       <p style="margin:0 0 8px;font-family:${SANS};font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:bold;color:${C.gold};">Premium</p>
-      <p style="margin:0 0 10px;font-family:${SERIF};font-size:22px;line-height:1.35;color:#f6efe1;">Yesterday, through the lens of Scripture</p>
-      <p style="margin:0 0 22px;font-family:${SANS};font-size:15px;line-height:1.6;color:#c9c2b3;">Reply with a line about your day. With Premium, the next morning brings a study written for it: a passage for what you felt, the story behind it, and a voice from Christian history who walked through the same thing.</p>
+      <p style="margin:0 0 10px;font-family:${SERIF};font-size:22px;line-height:1.35;color:#f6efe1;">Last Night’s Lamp</p>
+      <p style="margin:0 0 22px;font-family:${SANS};font-size:15px;line-height:1.6;color:#c9c2b3;">Each evening, Premium checks in to ask how your day went. Reply with a line or two, and the next morning brings a study written for what you shared: a passage for what you felt, the story behind it, and a voice from Christian history who walked through the same thing.</p>
       <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto;"><tr>
         <td style="background:${C.gold};border-radius:8px;">
           <a href="${esc(premiumUrl)}" style="display:inline-block;padding:14px 28px;font-family:${SANS};font-size:16px;font-weight:bold;color:${C.navy};text-decoration:none;">Get Premium: $7/month or $47/year</a>
@@ -251,7 +252,8 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
       ? []
       : s.yesterday
         ? [
-            'YESTERDAY, THROUGH THE LENS OF SCRIPTURE',
+            'LAST NIGHT’S LAMP',
+            LAMP_SUBTITLE,
             `You wrote: "${shorten(s.yesterday.reply, 320)}"`,
             `"${s.yesterday.passage.text}" (${s.yesterday.passage.ref})`,
             '',
@@ -262,12 +264,12 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
               : []),
             '',
           ]
-        : ['YESTERDAY, THROUGH THE LENS OF SCRIPTURE', 'How was yesterday?', YESTERDAY_INVITE, YESTERDAY_INVITE_2, '']),
+        : ['LAST NIGHT’S LAMP', 'How was yesterday?', YESTERDAY_INVITE, YESTERDAY_INVITE_2, '']),
     ...(isPremium
       ? []
       : [
-          'PREMIUM: YESTERDAY, THROUGH THE LENS OF SCRIPTURE',
-          'Reply with a line about your day. With Premium, the next morning brings a study written for it: a passage for what you felt, the story behind it, and a voice from Christian history.',
+          'PREMIUM: LAST NIGHT’S LAMP',
+          'Each evening, Premium checks in to ask how your day went. Reply with a line or two, and the next morning brings a study written for what you shared: a passage for what you felt, the story behind it, and a voice from Christian history.',
           `Get Premium ($7/month or $47/year, save $37 yearly): ${s.premiumUrl ?? PREMIUM_URL}`,
           '',
         ]),
@@ -364,7 +366,7 @@ export function renderWelcomeEmail(o: { premium: boolean; footer: MailFooter }):
   };
 }
 
-// Premium evening check-in. The reply becomes tomorrow's "Yesterday, through the lens of Scripture."
+// Premium evening check-in. The reply becomes tomorrow's Last Night's Lamp.
 const CHECKIN_SUBJECTS = [
   'How did today go?',
   'Before you rest: how was today?',
@@ -375,7 +377,7 @@ export function renderCheckinEmail(o: { footer: MailFooter; dayIndex: number; is
   const subject = CHECKIN_SUBJECTS[((o.dayIndex % CHECKIN_SUBJECTS.length) + CHECKIN_SUBJECTS.length) % CHECKIN_SUBJECTS.length];
   const lines = [
     'Hit reply and tell us in a sentence or two. A win, a worry, a hard conversation, something you’re grateful for.',
-    'Tomorrow at 5 AM, the Yesterday section of your study will be written for what you share: a passage for how you felt, the story behind it, and a voice from Christian history who walked through the same thing.',
+    'Tomorrow at 5 AM, Last Night’s Lamp will be written for what you share: a passage for how you felt, the story behind it, and a voice from Christian history who walked through the same thing.',
   ];
   const quiet = 'No need to reply if today was quiet. Your study will be there in the morning either way.';
   const verse: Passage = { text: 'In peace I will lie down and sleep, for you alone, LORD, make me dwell in safety.', ref: 'Psalm 4:8 (NIV)' };

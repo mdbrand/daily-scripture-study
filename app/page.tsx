@@ -164,7 +164,7 @@ export default function Home() {
               “Hard conversation with my sister. I said some things I regret.”
             </p>
             <article className="leaf">
-              <p className="leaf-kicker">Looking Back at Yesterday</p>
+              <p className="leaf-kicker">Last Night’s Lamp</p>
               <blockquote className="leaf-verse">
                 “If it is possible, as far as it depends on you, live at peace with everyone.”
                 <cite>Romans 12:18</cite>

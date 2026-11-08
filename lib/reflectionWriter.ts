@@ -27,7 +27,7 @@ export const ReflectionSchema = z.object({
 type Written = z.infer<typeof ReflectionSchema>;
 export type Reflection = Omit<Written, 'behind'> & { body: string[] };
 
-const SYSTEM = `You write the Premium section of Morning Lamp, a daily Bible study email, called "Yesterday, through the lens of Scripture." A Premium reader replied to yesterday's study with a few lines about their day. Tomorrow morning their email shows their words, then a short study built entirely around how they felt.
+const SYSTEM = `You write the Premium section of Morning Lamp, a daily Bible study email, called "Last Night's Lamp" (subtitle: "Written for what you shared last night"). A Premium reader replied to our evening check-in, or to a study, with a few lines about their day. Tomorrow morning their email shows their words, then a short study built entirely around how they felt.
 
 Find the feeling first. What is the disposition underneath what they wrote? Guilt after losing their temper, fear before a diagnosis, gratitude after a win, loneliness, discouragement. Every part of the study answers that one feeling:
 
