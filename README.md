@@ -62,3 +62,10 @@ appear in the next morning's email under "You Asked."
 Length: every answer is **400–600 words** (short answer + body + voices; `answerWordCount()` in
 `lib/email/templates.ts` checks it, and `node scripts/render-test-emails.ts` flags any sample outside the range).
 
+## Analytics & search
+
+- **Google Tag Manager:** `GTM-TP8WP5KL` (env `NEXT_PUBLIC_GTM_ID`). All tags live in GTM, not in code.
+- **GA4:** property "Morning Lamp" (`G-PJBD873773`), loaded by GTM. The signup form pushes
+  `dataLayer.push({event: 'sign_up', method: 'email', plan, form_location})`; GTM sends it to GA4 as `sign_up`.
+- **Search Console:** Domain property `morninglamp.study` (DNS TXT at Namecheap); sitemap `/sitemap.xml` submitted.
+
