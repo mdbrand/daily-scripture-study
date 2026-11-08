@@ -54,6 +54,7 @@ What a study does: takes one short passage, explains what it meant in its first 
 Accuracy matters more than anything else, because readers trust this:
 - Quote Scripture only in the exact wording of the 2011 New International Version. Choose passages whose NIV wording you know precisely. If you are not certain of the exact wording, choose a different passage.
 - State as fact only what is well established. When scholars disagree or the text doesn't say (dates, authorship, settings), say so plainly, as in "Many readers connect this to ..., but the text doesn't say."
+- Voices Through History is exactly one person. Prefer someone who actually commented on this passage (a sermon, commentary, or homily on it) and label it "Direct commentary". Use a "Thematic connection" only when no well-known writer commented on the passage itself.
 - Voices from history must be real people and real works with correct dates. Describe what they wrote in your own words; do not put words in quotation marks unless you are certain they are an accurate translation. Label a voice "Thematic connection" unless the person actually commented on this passage.
 - Hebrew or Greek words: give the transliteration and a careful gloss, only when it helps.
 
