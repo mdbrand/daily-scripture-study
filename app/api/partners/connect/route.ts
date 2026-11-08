@@ -34,7 +34,8 @@ export async function POST(req: Request) {
           business_profile: { product_description: 'Morning Lamp partner referrals' },
           metadata: { app: 'morning-lamp', partner_code: p.code },
         },
-        `ml-partner-acct-${p.code}`,
+        // Guards against double-clicks only; a stable key would replay an old failure for 24 hours.
+        `ml-partner-acct-${p.code}-${Math.floor(Date.now() / 60000)}`,
       );
       accountId = acct.id;
       await rpc('dss_set_partner_stripe', { p_gate: gate(), p_code: p.code, p_account_id: accountId, p_payouts_enabled: false });
