@@ -590,3 +590,14 @@ details p { color: var(--muted); font-size: 19px; margin: -4px 0 24px; max-width
 .beta-cta p { color: var(--on-dark-muted); font-size: 19px; margin: 0 0 26px; }
 .button.gold { background: var(--brass-light); color: var(--navy); }
 .button.gold:hover { background: #e6d2a8; }
+
+/* Premium section: everything centered on one axis with the "Try Premium free" call to action */
+.premium-center .chapter-head { margin-left: auto; margin-right: auto; text-align: center; }
+.premium-center .lamp-steps { text-align: center; max-width: 980px; margin-left: auto; margin-right: auto; }
+.premium-center .example { margin-left: auto; margin-right: auto; text-align: center; }
+.premium-center .reply { margin-left: auto; margin-right: auto; }
+.premium-center .leaf { margin-left: auto; margin-right: auto; text-align: center; }
+.premium-center .leaf-verse { border-left: 0; padding-left: 0; }
+.premium-center .leaf-verse::after { content: ''; display: block; width: 48px; height: 2px; background: var(--brass-light); margin: 18px auto 0; }
+.premium-center .beta-cta { max-width: 760px; margin-left: auto; margin-right: auto; }
+.premium-center .reply { border-radius: 16px; }

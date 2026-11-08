@@ -118,7 +118,7 @@ export default async function Home() {
       </section>
 
       {/* Premium */}
-      <section className="chapter chapel" id="premium">
+      <section className="chapter chapel premium-center" id="premium">
         <div className="container">
           <header className="chapter-head on-dark">
             <p className="kicker">Premium · $7 a month or $47 a year{checkoutOpen ? '' : ' after the beta'}</p>
