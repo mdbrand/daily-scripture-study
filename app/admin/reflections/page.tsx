@@ -69,11 +69,11 @@ export default async function Reflections({ searchParams }: { searchParams: Prom
         <div className="contact-card">
           {tried.kind === 'reflection' && tried.passage ? (
             <>
-              <p><em>“{tried.passage.text}”</em> ({tried.passage.ref})</p>
+              <p><em>“{tried.passage.text}”</em><br />{tried.passage.ref}</p>
               {tried.body.map((b, i) => <p key={i}>{b}</p>)}
             </>
           ) : (
-            <p>No reflection: {KIND[tried.kind] ?? tried.kind}.</p>
+            <p>No reflection: {tried.kind === 'care' ? 'possible crisis. A real reply like this emails you so you can follow up personally' : KIND[tried.kind] ?? tried.kind}.</p>
           )}
         </div>
       )}
