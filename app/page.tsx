@@ -1,6 +1,7 @@
 import SignupForm from './SignupForm';
 import Crest from './Crest';
 import BackToTop from './BackToTop';
+import { SiteFooter } from './LegalShell';
 import {
   compare,
   earnings,
@@ -311,16 +312,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="colophon">
-        <div className="container">
-          <p className="colophon-name">Morning Lamp</p>
-          <p>
-            Scripture quotations taken from The Holy Bible, New International Version® NIV®.
-            Copyright © 1973, 1978, 1984, 2011 by Biblica, Inc.™ Used by permission. All rights
-            reserved worldwide.
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
       <BackToTop />
     </main>
   );

@@ -288,6 +288,24 @@ details p { color: var(--muted); font-size: 19px; margin: -4px 0 24px; max-width
 .done-title { font-family: var(--book) !important; font-size: 24px !important; margin-bottom: 6px !important; color: var(--navy); }
 .signup-done.dark .done-title { color: var(--brass-light); }
 
+/* ---------- Legal and contact pages ---------- */
+.legal-top { background: var(--linen); border-bottom: 1px solid var(--rule); }
+.legal { max-width: 760px; padding-top: 72px; padding-bottom: 96px; }
+.legal h1 { font-size: clamp(38px, 5vw, 52px); margin-bottom: 18px; }
+.legal h2 { font-size: 27px; margin: 48px 0 12px; }
+.legal h3 { font-size: 20px; margin: 26px 0 8px; }
+.legal p, .legal li { font-size: 19px; line-height: 1.65; }
+.legal ul { padding-left: 22px; margin: 0 0 18px; }
+.legal li { margin-bottom: 10px; }
+.legal-meta { color: var(--muted); font-size: 20px !important; border-bottom: 1px solid var(--rule); padding-bottom: 28px; margin-bottom: 8px; }
+.contact-card { background: var(--paper); border: 1px solid var(--rule); border-top: 3px solid var(--brass); border-radius: 6px; padding: 36px 40px; margin: 28px 0 16px; }
+.contact-lede { font-size: 21px !important; color: var(--ink); }
+.contact-button { margin: 8px 0 4px; font-size: 17px; padding: 16px 30px; }
+.contact-fallback { font-family: var(--ui); font-size: 14px !important; color: var(--muted); margin: 14px 0 0; }
+.footer-links { display: flex; justify-content: center; gap: 24px; margin: 4px 0 14px; font-family: var(--ui); font-size: 14px; }
+.footer-links a { color: var(--brass-dark); }
+@media (max-width: 720px) { .contact-card { padding: 26px 22px; } .legal { padding-top: 48px; } }
+
 /* ---------- Back to top ---------- */
 .to-top {
   position: fixed;

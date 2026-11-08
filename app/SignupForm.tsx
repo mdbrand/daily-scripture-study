@@ -129,7 +129,9 @@ export default function SignupForm({ source, defaultPlan = 'free', tone = 'dark'
       <p className="form-note">
         {plan === 'premium'
           ? 'Premium is $7/month when it opens. No payment today. You can cancel any time.'
-          : 'Free. One email each morning. We never sell or share your email.'}
+          : 'Free. One email each morning. We never sell or share your email.'}{' '}
+        By joining, you agree to our <a className="linklike" href="/terms">Terms</a> and{' '}
+        <a className="linklike" href="/privacy">Privacy Policy</a>.
         {plan === 'free' && (
           <>
             {' '}
