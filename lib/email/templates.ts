@@ -47,7 +47,7 @@ const C = {
 export const PREMIUM_URL = 'https://morninglamp.study/?utm_source=email&utm_medium=free-daily&utm_campaign=premium-teaser#premium';
 
 const YESTERDAY_INVITE =
-  'Each evening around 8 PM your time, we’ll send a short check-in. Reply with a line or two about your day, and the next morning Last Night’s Lamp will be written for what you shared.';
+  'Last Night’s Lamp is written in response to what you share the evening before. Tonight around 8 PM your time, we’ll check in to ask how your day went. Reply with a line or two, and tomorrow morning this section will be a study written for your day.';
 const LAMP_SUBTITLE = 'Written for what you shared last night';
 const YESTERDAY_INVITE_2 = 'You can also reply to this email anytime today.';
 
@@ -179,24 +179,24 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
 
   // Premium readers always get the second half: a reflection on what they shared, or an invitation to share.
   const isPremium = s.edition === 'premium';
-  const yesterdayBand = `<tr><td style="background:${C.navy};padding:18px 32px;text-align:center;">
+  const lampBand = (subtitle: string) => `<tr><td style="background:${C.navy};padding:18px 32px;text-align:center;">
         <p style="margin:0;font-family:${SANS};font-size:13px;letter-spacing:2.5px;font-weight:bold;color:${C.gold};">LAST NIGHT’S LAMP</p>
-        <p style="margin:6px 0 0;font-family:${SERIF};font-size:16px;font-style:italic;color:#e9e1cf;">${esc(LAMP_SUBTITLE)}</p>
+        <p style="margin:6px 0 0;font-family:${SERIF};font-size:16px;font-style:italic;color:#e9e1cf;">${esc(subtitle)}</p>
       </td></tr>`;
   const yesterday = !isPremium
     ? ''
     : s.yesterday
-      ? `${yesterdayBand}
+      ? `${lampBand(LAMP_SUBTITLE)}
       <tr><td style="background:${C.ivory};padding:26px 32px 12px;">
-        ${p(`<em>You wrote: “${esc(shorten(s.yesterday.reply, 320))}”</em>`, `color:${C.muted};`)}
+        ${p(`<em>Last night you wrote: “${esc(shorten(s.yesterday.reply, 320))}”</em>`, `color:${C.muted};`)}
         ${quote(s.yesterday.passage, false)}
         ${h('Behind the Verse')}
         ${s.yesterday.body.slice(0, 3).map((b) => p(rich(b))).join('')}
         ${s.yesterday.voice ? `${h('Voices Through History')}${voicesHtml([s.yesterday.voice])}` : ''}
       </td></tr>`
-      : `${yesterdayBand}
+      : `${lampBand('A study written in response to your day')}
       <tr><td style="background:${C.ivory};padding:26px 32px 12px;">
-        ${h('How was yesterday?')}
+        ${h('Tonight, tell us about your day')}
         ${p(esc(YESTERDAY_INVITE))}
         ${p(esc(YESTERDAY_INVITE_2), `color:${C.muted};font-size:16px;`)}
       </td></tr>`;
@@ -254,7 +254,7 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
         ? [
             'LAST NIGHT’S LAMP',
             LAMP_SUBTITLE,
-            `You wrote: "${shorten(s.yesterday.reply, 320)}"`,
+            `Last night you wrote: "${shorten(s.yesterday.reply, 320)}"`,
             `"${s.yesterday.passage.text}" (${s.yesterday.passage.ref})`,
             '',
             'BEHIND THE VERSE',
@@ -264,7 +264,7 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
               : []),
             '',
           ]
-        : ['LAST NIGHT’S LAMP', 'How was yesterday?', YESTERDAY_INVITE, YESTERDAY_INVITE_2, '']),
+        : ['LAST NIGHT’S LAMP', 'Tonight, tell us about your day', YESTERDAY_INVITE, YESTERDAY_INVITE_2, '']),
     ...(isPremium
       ? []
       : [
@@ -376,12 +376,13 @@ const CHECKIN_SUBJECTS = [
 export function renderCheckinEmail(o: { footer: MailFooter; dayIndex: number; isTest?: boolean }): { subject: string; html: string; text: string } {
   const subject = CHECKIN_SUBJECTS[((o.dayIndex % CHECKIN_SUBJECTS.length) + CHECKIN_SUBJECTS.length) % CHECKIN_SUBJECTS.length];
   const lines = [
-    'Hit reply and tell us in a sentence or two. A win, a worry, a hard conversation, something you’re grateful for.',
-    'Tomorrow at 5 AM, Last Night’s Lamp will be written for what you share: a passage for how you felt, the story behind it, and a voice from Christian history who walked through the same thing.',
+    'Hit reply and tell us how today went, in a sentence or two: a win, a worry, a hard conversation, something you’re grateful for.',
+    'Whatever you share tonight becomes tomorrow morning’s Last Night’s Lamp, a short study written in response to your day. You’ll see your own words, a passage chosen for how you felt, the story behind it, and a voice from Christian history who walked through the same thing.',
   ];
-  const quiet = 'No need to reply if today was quiet. Your study will be there in the morning either way.';
+  const quiet = 'Nothing to share tonight? No need to reply. Your daily study still arrives at 5 AM.';
   const verse: Passage = { text: 'In peace I will lie down and sleep, for you alone, LORD, make me dwell in safety.', ref: 'Psalm 4:8 (NIV)' };
   const inner = `<tr><td style="background:${C.ivory};padding:30px 32px 18px;">
+    ${label('Last Night’s Lamp · Evening check-in')}
     <h1 style="margin:0 0 18px;font-family:${SERIF};font-size:28px;line-height:1.25;color:${C.navy};">${esc(subject)}</h1>
     ${lines.map((l) => p(esc(l))).join('')}
     ${p(esc(quiet), `color:${C.muted};font-size:16px;`)}
@@ -390,7 +391,7 @@ export function renderCheckinEmail(o: { footer: MailFooter; dayIndex: number; is
   </td></tr>`;
   return {
     subject: o.isTest ? `[Preview] ${subject}` : subject,
-    html: shell(inner, 'Reply with a line about your day. Tomorrow’s study will be written for it.', o.isTest, footerHtml(o.footer), 'premium'),
-    text: [subject, '', ...lines.flatMap((l) => [l, '']), quiet, '', `"${verse.text}" (${verse.ref})`, '', 'Rest well,', 'Morning Lamp', ...footerText(o.footer)].join('\n'),
+    html: shell(inner, 'Reply with a line about your day. Tomorrow’s Last Night’s Lamp will be written in response to it.', o.isTest, footerHtml(o.footer), 'premium'),
+    text: ['LAST NIGHT’S LAMP · EVENING CHECK-IN', subject, '', ...lines.flatMap((l) => [l, '']), quiet, '', `"${verse.text}" (${verse.ref})`, '', 'Rest well,', 'Morning Lamp', ...footerText(o.footer)].join('\n'),
   };
 }
