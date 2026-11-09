@@ -23,12 +23,12 @@ export const metadata: Metadata = {
     type: 'website',
     url: '/',
     siteName: 'Morning Lamp',
-    title: 'Morning Lamp: Read the Bible the way its first readers heard it',
+    title: 'Daily Relevant Bible Study...Literally',
     description: 'One passage, the world behind it, and a voice from 2,000 years of faith. Free, every morning.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Morning Lamp: Read the Bible the way its first readers heard it',
+    title: 'Daily Relevant Bible Study...Literally',
     description: 'One passage, the world behind it, and a voice from 2,000 years of faith. Free, every morning.',
   },
 };
