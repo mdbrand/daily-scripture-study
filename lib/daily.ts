@@ -184,14 +184,15 @@ export async function sendCheckinPreview(to: string) {
 }
 
 // Welcome emails for people who joined but haven't been welcomed yet.
-export async function sendWelcomes(limit = 100) {
+// todayFor: people whose welcome should say today's study is in the next email.
+export async function sendWelcomes(limit = 100, todayFor?: Set<string>) {
   const postal = postalAddress();
   if (!postal) return 0;
   const pending = await rpc<Recipient[]>('dss_welcome_pending', { p_gate: gate(), p_limit: limit });
   if (pending.length === 0) return 0;
   const emails = pending.map((r) => {
     const footer = footerFor(r.unsub_token, postal);
-    return { to: r.email, ...renderWelcomeEmail({ premium: r.premium, footer }), unsubscribeUrl: oneClickUrl(r.unsub_token) };
+    return { to: r.email, ...renderWelcomeEmail({ premium: r.premium, footer, todayNext: todayFor?.has(r.email.toLowerCase()) }), unsubscribeUrl: oneClickUrl(r.unsub_token) };
   });
   await sendBatch(emails);
   await rpc('dss_mark_welcomed', { p_gate: gate(), p_emails: pending.map((r) => r.email) });
@@ -227,4 +228,48 @@ export async function sendPreview(date: string, to: string, premium: boolean) {
   const footer = footerFor('preview', postalAddress() ?? '(mailing address not set yet)');
   const m = renderDailyEmail({ ...toDailyStudy(date, study.content, premium, premium ? SAMPLE_YESTERDAY : null), isTest: true }, footer);
   await sendBatch([{ to, ...m, subject: `[Preview · ${premium ? 'Premium' : 'Free'}] ${m.subject}`, unsubscribeUrl: footer.unsubscribeUrl }]);
+}
+
+// ---------- one person, today (joined after the 5 AM run) ----------
+export type TodayResult = {
+  status: 'ok' | 'not_found' | 'unsubscribed' | 'flagged' | 'unconfirmed' | 'sending_off' | 'outside_hours' | 'no_study' | 'already' | 'error';
+  study_date?: string;
+};
+type TodayClaim = TodayResult & { email?: string; unsub_token?: string; premium?: boolean; yesterday?: DailyStudy['yesterday'] | null };
+
+// Would today's study go to this person right now? (No send; used to word the welcome email.)
+export const todayCheck = (email: string, manual = false) =>
+  rpc<TodayResult>('dss_today_claim', { p_gate: gate(), p_email: email, p_manual: manual, p_dry: true });
+
+// Sends today's study (for their local date) to one person. manual = the admin button (any hour, even
+// while daily sending is off); otherwise only 5 AM to 7:59 PM their time while sending is on. Never twice.
+export async function sendTodayTo(email: string, manual = false): Promise<TodayResult> {
+  const postal = postalAddress();
+  if (!postal) return { status: 'error' };
+  const c = await rpc<TodayClaim>('dss_today_claim', { p_gate: gate(), p_email: email, p_manual: manual, p_dry: false });
+  if (c.status !== 'ok' || !c.email || !c.unsub_token || !c.study_date) return { status: c.status, study_date: c.study_date };
+  try {
+    const study = await getStudy(c.study_date);
+    if (!study) throw new Error('study vanished');
+    const m = renderDailyEmail(toDailyStudy(c.study_date, study.content, !!c.premium, c.yesterday), footerFor(c.unsub_token, postal));
+    const [id] = await sendBatch([{ to: c.email, ...m, unsubscribeUrl: oneClickUrl(c.unsub_token) }]);
+    await rpc('dss_today_finish', { p_gate: gate(), p_email: c.email, p_date: c.study_date, p_resend_id: id ?? null, p_ok: true });
+    return { status: 'ok', study_date: c.study_date };
+  } catch (e) {
+    console.error('sendTodayTo', email, e);
+    await rpc('dss_today_finish', { p_gate: gate(), p_email: c.email, p_date: c.study_date, p_resend_id: null, p_ok: false }).catch(() => {});
+    return { status: 'error', study_date: c.study_date };
+  }
+}
+
+// Right after someone confirms (or is started by an admin): welcome first, then today's study if they
+// joined after their 5 AM and it's before 8 PM their time. Does nothing while daily sending is off.
+export async function welcomeAndToday(emails: string[]) {
+  if (!(await dailySettings()).send_open) return;
+  const today = new Set<string>();
+  for (const e of emails) {
+    if ((await todayCheck(e)).status === 'ok') today.add(e.toLowerCase());
+  }
+  await sendWelcomes(Math.max(10, emails.length + 10), today);
+  for (const e of today) await sendTodayTo(e);
 }

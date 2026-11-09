@@ -34,6 +34,14 @@ type Sub = {
 };
 
 const MSG: Record<string, string> = {
+  today_ok: 'Sent. Today’s study is on its way to them.',
+  today_already: 'They already have today’s study, so nothing was sent.',
+  today_no_study: 'Today’s study isn’t written or approved yet. Approve it in Daily studies, then try again.',
+  today_unconfirmed: 'They haven’t confirmed their email yet. Tick “Email confirmed” and save first if you know they want it.',
+  today_unsubscribed: 'They unsubscribed, so nothing was sent.',
+  today_flagged: 'They’re flagged as spam or a bot, so nothing was sent.',
+  today_not_found: 'That subscriber wasn’t found.',
+  today_error: 'The send didn’t go through. Try again in a minute.',
   saved: 'Saved.',
   spam: 'Marked as spam: flagged and unsubscribed. They won’t get any more email. You can delete them below.',
 };
@@ -92,6 +100,18 @@ export default async function SubscriberView({ searchParams }: { searchParams: P
         {s.email_flag === 'privacy_relay' ? 'Uses a privacy relay address. ' : ''}
         {s.welcomed_at ? `Welcome email sent ${when(s.welcomed_at)}.` : 'No welcome email yet.'}
       </p>
+
+      <h2>Today’s study</h2>
+      <p>
+        Joined after 5 AM their time? New sign-ups get today’s study automatically when they confirm (5 AM to 8 PM their
+        time, while daily sending is on). Use this button if they didn’t, or to resend after a problem. It never sends
+        the same day twice.
+      </p>
+      <form action="/api/admin/subscribers" method="post" style={{ marginBottom: 32 }}>
+        <input type="hidden" name="action" value="today" />
+        <input type="hidden" name="email" value={s.email} />
+        <button type="submit" className="button">Send today’s study now</button>
+      </form>
 
       <h2>Edit</h2>
       <form action="/api/admin/subscribers" method="post" className="partner-form" style={{ maxWidth: 560 }}>

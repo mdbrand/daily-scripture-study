@@ -344,11 +344,15 @@ export function renderAnswerEmail(a: AnswerEmail): { subject: string; html: stri
   return { subject: a.subject, html, text };
 }
 
-export function renderWelcomeEmail(o: { premium: boolean; footer: MailFooter }): { subject: string; html: string; text: string } {
+// todayNext: they joined after 5 AM, so today's study follows in the next email.
+export function renderWelcomeEmail(o: { premium: boolean; footer: MailFooter; todayNext?: boolean }): { subject: string; html: string; text: string } {
+  const when = o.todayNext
+    ? 'Today’s study is in the next email, and from tomorrow it arrives at 5 AM your time.'
+    : 'Your first study arrives at 5 AM your time.';
   const lines = [
     'Thank you for joining Morning Lamp.',
     'Each morning you’ll get one short Bible study: a passage, the history behind it, one detail most people miss, and a voice from church history. It takes about three minutes.',
-    'Your first study arrives at 5 AM your time. If you don’t see it, check your Promotions or Spam folder and move it to your inbox, so the rest find you.',
+    `${when} If you don’t see it, check your Promotions or Spam folder and move it to your inbox, so the rest find you.`,
     o.premium
       ? 'Each evening around 8 PM, we’ll check in to ask how your day went. Reply with a line or two, and the next morning’s study includes a short study written for what you shared.'
       : 'Have a Bible question? Reply to any study and ask, one question a day.',
@@ -362,7 +366,7 @@ export function renderWelcomeEmail(o: { premium: boolean; footer: MailFooter }):
   </td></tr>`;
   return {
     subject: 'Welcome to Morning Lamp',
-    html: shell(inner, 'Your first study arrives at 5 AM your time.', false, footerHtml(o.footer), o.premium ? 'premium' : 'free'),
+    html: shell(inner, when, false, footerHtml(o.footer), o.premium ? 'premium' : 'free'),
     text: ['Welcome to Morning Lamp', '', ...lines.flatMap((l) => [l, '']), `"${verse.text}" (${verse.ref})`, '', 'Grace and peace,', 'Morning Lamp', ...footerText(o.footer)].join('\n'),
   };
 }

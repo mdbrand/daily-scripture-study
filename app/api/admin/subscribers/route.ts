@@ -3,7 +3,7 @@ import { getSessionEmail, isAdmin } from '@/lib/session';
 import { rpc } from '@/lib/supabaseRpc';
 import { gate } from '@/lib/partners';
 import { sendConfirmation } from '@/lib/confirm';
-import { dailySettings, sendWelcomes } from '@/lib/daily';
+import { sendTodayTo, welcomeAndToday } from '@/lib/daily';
 
 export const runtime = 'nodejs';
 
@@ -27,6 +27,7 @@ export async function POST(req: Request) {
     const counts = { added: 0, existing: 0 };
     const skipped: string[] = [];
     const toInvite: string[] = [];
+    const started: string[] = [];
     for (const e of emails) {
       try {
         const r = await rpc<{ status: string; confirmed?: boolean }>('dss_admin_add_subscriber', {
@@ -40,6 +41,7 @@ export async function POST(req: Request) {
         if (r.status === 'added' || r.status === 'existing') {
           counts[r.status] += 1;
           if (mode === 'invite' && !r.confirmed) toInvite.push(e);
+          if (mode === 'start') started.push(e);
         } else skipped.push(`${e} (${r.status === 'unsubscribed' ? 'unsubscribed earlier' : 'not a valid email'})`);
       } catch {
         skipped.push(`${e} (error)`);
@@ -49,7 +51,7 @@ export async function POST(req: Request) {
     after(async () => {
       try {
         for (const e of toInvite) await sendConfirmation(e, { origin, invite: { premium } });
-        if (mode === 'start' && (await dailySettings()).send_open) await sendWelcomes(200);
+        if (mode === 'start') await welcomeAndToday(started);
       } catch (err) {
         console.error('admin add', err);
       }
@@ -80,6 +82,13 @@ export async function POST(req: Request) {
         await rpc('dss_admin_set_confirmed', { p_gate: gate(), p_email: r.email ?? email, p_confirmed: form.get('confirmed') === 'on' });
       }
       return go(req, view(r.email ?? email, r.ok ? 'saved' : r.error || 'error'));
+    }
+
+    // "Send today's study now" (manual: any hour, even while daily sending is off; never twice a day).
+    if (action === 'today') {
+      const email = String(form.get('email') || '');
+      const r = await sendTodayTo(email, true);
+      return go(req, view(email, `today_${r.status}`));
     }
 
     if (action === 'spam') {
