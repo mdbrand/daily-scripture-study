@@ -9,14 +9,31 @@ export const metadata: Metadata = { title: 'Subscribers | Morning Lamp', robots:
 export const dynamic = 'force-dynamic';
 
 const PAGE = 100;
+// Chips shown above the list; every Overview card links to one of LABELS.
 const FILTERS = [
   { key: 'all', label: 'Everyone' },
+  { key: 'getting', label: 'Getting email' },
   { key: 'free', label: 'Free' },
   { key: 'premium', label: 'Premium' },
   { key: 'lamplighters', label: 'Lamplighters' },
+  { key: 'unconfirmed', label: 'Not confirmed yet' },
   { key: 'unsubscribed', label: 'Unsubscribed' },
   { key: 'flagged', label: 'Flagged' },
 ];
+const LABELS: Record<string, string> = {
+  ...Object.fromEntries(FILTERS.map((x) => [x.key, x.label])),
+  today: 'New today',
+  week: 'New this week',
+  month: 'New in the last 30 days',
+  chose_premium: 'Chose Premium at sign-up',
+  partner: 'Came from a partner',
+  monthly: 'Monthly Premium ($7)',
+  yearly: 'Yearly Premium ($47)',
+  paid: 'Paying for Premium',
+  canceling: 'Canceling at period end',
+  past_due: 'Payment failing',
+  founders: 'Founders (lifetime)',
+};
 
 type Row = {
   email: string;
@@ -61,7 +78,7 @@ export default async function Subscribers({ searchParams }: { searchParams: Prom
   if (!email) return <AdminSignIn next="/admin/subscribers" />;
 
   const { q = '', filter = 'all', page = '1', deleted, blocked, msg, addmsg, added = '0', existing = '0', invited = '0', skipped } = await searchParams;
-  const f = FILTERS.some((x) => x.key === filter) ? filter : 'all';
+  const f = filter in LABELS ? filter : 'all';
   const n = Math.max(1, parseInt(page, 10) || 1);
   const data = await rpc<{ total: number; rows: Row[] }>('dss_admin_subscribers', {
     p_gate: gate(),
@@ -144,6 +161,11 @@ export default async function Subscribers({ searchParams }: { searchParams: Prom
           </Link>
         ))}
       </p>
+      {!FILTERS.some((x) => x.key === f) && (
+        <p className="partner-notice" role="status">
+          Showing: <strong>{LABELS[f]}</strong>. <Link href={link({ filter: 'all' })}>Show everyone</Link>
+        </p>
+      )}
       <p className="form-note">
         {data.total} {data.total === 1 ? 'person' : 'people'}
         {q ? ` matching “${q}”` : ''}. Newest first. {conf.unconfirmed_total} still need to confirm their email before they get anything.

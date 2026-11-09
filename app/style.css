@@ -635,3 +635,14 @@ details p { color: var(--muted); font-size: 19px; margin: -4px 0 24px; max-width
   .ll-offer { padding: 24px 20px 26px; }
   .ll-offer-title { font-size: 24px; }
 }
+
+/* Admin Overview: whole number card is a link to the people behind it */
+.partner-stats .stat-link { position: relative; transition: background-color 0.15s; }
+.partner-stats .stat-link:hover { background: #fbf6ea; }
+.partner-stats .stat-link dt a { color: inherit; text-decoration: none; }
+.partner-stats .stat-link dt a::after { content: ''; position: absolute; inset: 0; }
+.partner-stats .stat-link dt a:focus-visible { outline: none; }
+.partner-stats .stat-link:focus-within { box-shadow: inset 0 0 0 2px var(--brass); }
+.stat-go { position: absolute; top: 18px; right: 18px; font-family: var(--ui); font-size: 12px; color: var(--brass-dark); opacity: 0; transition: opacity 0.15s; }
+.partner-stats .stat-link:hover .stat-go, .partner-stats .stat-link:focus-within .stat-go { opacity: 1; }
+@media (hover: none) { .stat-go { opacity: 1; } }

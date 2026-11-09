@@ -19,21 +19,25 @@ type Overview = {
   signups_by_day: { day: string; n: number }[];
 };
 
+// A number card. With href, the whole card is clickable and opens the list behind the number.
 function Stat({ label, value, href }: { label: string; value: React.ReactNode; href?: string }) {
   return (
-    <div>
-      <dt>{label}</dt>
-      <dd>{href ? <Link href={href}>{value}</Link> : value}</dd>
+    <div className={href ? 'stat-link' : undefined}>
+      <dt>{href ? <Link href={href}>{label}</Link> : label}</dt>
+      <dd>{value}</dd>
+      {href && <span className="stat-go" aria-hidden="true">See who</span>}
     </div>
   );
 }
+const list = (filter: string) => `/admin/subscribers?filter=${filter}`;
 
 export default async function AdminHome() {
   const email = await adminEmail();
   if (!email) return <AdminSignIn next="/admin" />;
 
-  const [o, today, tomorrow] = await Promise.all([
+  const [o, lamplighters, today, tomorrow] = await Promise.all([
     rpc<Overview>('dss_admin_overview', { p_gate: gate() }),
+    rpc<number>('dss_admin_lamplighter_count', { p_gate: gate() }),
     getStudy(pacificDate(0)),
     getStudy(pacificDate(1)),
   ]);
@@ -48,14 +52,14 @@ export default async function AdminHome() {
       <h2>Subscribers</h2>
       <dl className="partner-stats">
         <Stat label="Total sign-ups" value={s.total} href="/admin/subscribers" />
-        <Stat label="Getting email" value={s.mailable} />
-        <Stat label="New today" value={s.new_today} />
-        <Stat label="New this week" value={s.new_7d} />
-        <Stat label="New in 30 days" value={s.new_30d} />
-        <Stat label="Unsubscribed" value={s.unsubscribed} href="/admin/subscribers?filter=unsubscribed" />
-        <Stat label="Chose Premium at sign-up" value={s.wanted_premium} />
-        <Stat label="Came from a partner" value={s.referred} />
-        <Stat label="Flagged (bot or relay)" value={s.flagged_bot + s.privacy_relay} href="/admin/subscribers?filter=flagged" />
+        <Stat label="Getting email" value={s.mailable} href={list('getting')} />
+        <Stat label="New today" value={s.new_today} href={list('today')} />
+        <Stat label="New this week" value={s.new_7d} href={list('week')} />
+        <Stat label="New in 30 days" value={s.new_30d} href={list('month')} />
+        <Stat label="Unsubscribed" value={s.unsubscribed} href={list('unsubscribed')} />
+        <Stat label="Chose Premium at sign-up" value={s.wanted_premium} href={list('chose_premium')} />
+        <Stat label="Came from a partner" value={s.referred} href={list('partner')} />
+        <Stat label="Flagged (bot or relay)" value={s.flagged_bot + s.privacy_relay} href={list('flagged')} />
       </dl>
       {o.signups_by_day.length > 0 && (
         <p className="form-note">
@@ -65,18 +69,19 @@ export default async function AdminHome() {
 
       <h2>Premium</h2>
       <dl className="partner-stats">
-        <Stat label="Monthly ($7)" value={p.monthly} href="/admin/subscribers?filter=premium" />
-        <Stat label="Yearly ($47)" value={p.yearly} href="/admin/subscribers?filter=premium" />
-        <Stat label="Monthly revenue (est.)" value={money(mrr)} />
-        <Stat label="Canceling at period end" value={p.canceling} />
-        <Stat label="Payment failing" value={p.past_due} />
-        <Stat label="Founders (lifetime)" value={p.founders} />
+        <Stat label="Lamplighters (free for life)" value={lamplighters} href={list('lamplighters')} />
+        <Stat label="Monthly ($7)" value={p.monthly} href={list('monthly')} />
+        <Stat label="Yearly ($47)" value={p.yearly} href={list('yearly')} />
+        <Stat label="Monthly revenue (est.)" value={money(mrr)} href={list('paid')} />
+        <Stat label="Canceling at period end" value={p.canceling} href={list('canceling')} />
+        <Stat label="Payment failing" value={p.past_due} href={list('past_due')} />
+        <Stat label="Founders (lifetime)" value={p.founders} href={list('founders')} />
       </dl>
 
       <h2>Daily studies</h2>
       <dl className="partner-stats">
         <Stat label="Daily sending" value={o.sending.open ? 'On' : 'Off'} href="/admin/studies" />
-        <Stat label="Emails sent, last 7 days" value={o.sending.sent_7d} />
+        <Stat label="Emails sent, last 7 days" value={o.sending.sent_7d} href="/admin/studies" />
         <Stat label="Mailing address" value={postalAddress() ? 'Set' : 'Missing'} />
       </dl>
       <p>
@@ -88,9 +93,9 @@ export default async function AdminHome() {
       <h2>Partners</h2>
       <dl className="partner-stats">
         <Stat label="Partners" value={o.partners.count} href="/admin/partners" />
-        <Stat label="Waiting 30 days" value={money(o.partners.pending_cents)} />
-        <Stat label="Ready to pay" value={money(o.partners.earned_cents)} />
-        <Stat label="Paid out" value={money(o.partners.paid_cents)} />
+        <Stat label="Waiting 30 days" value={money(o.partners.pending_cents)} href="/admin/partners" />
+        <Stat label="Ready to pay" value={money(o.partners.earned_cents)} href="/admin/partners" />
+        <Stat label="Paid out" value={money(o.partners.paid_cents)} href="/admin/partners" />
       </dl>
 
       <h2>Where sign-ups come from</h2>
