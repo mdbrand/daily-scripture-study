@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#101e2a"/>
+      <stop offset="0.62" stop-color="#182c39"/>
+      <stop offset="0.84" stop-color="#2b3640"/>
+      <stop offset="1" stop-color="#9a7448"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#f3d9a0" stop-opacity="0.55"/>
+      <stop offset="0.45" stop-color="#c9ae7c" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#c9ae7c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="flame" cx="0.5" cy="0.7" r="0.6">
+      <stop offset="0" stop-color="#fff6dc"/>
+      <stop offset="0.5" stop-color="#f2c871"/>
+      <stop offset="1" stop-color="#d99a3e"/>
+    </radialGradient>
+    <linearGradient id="clay" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c39663"/>
+      <stop offset="1" stop-color="#6e4c2a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#sky)"/>
+  <g fill="#e9dcc0">
+    <circle cx="700" cy="70" r="2" opacity="0.6"/><circle cx="1120" cy="60" r="2.4" opacity="0.8"/>
+    <circle cx="1010" cy="150" r="1.6" opacity="0.5"/><circle cx="1160" cy="210" r="1.5" opacity="0.5"/>
+    <circle cx="760" cy="180" r="1.4" opacity="0.4"/><circle cx="560" cy="40" r="1.6" opacity="0.5"/>
+    <circle cx="420" cy="110" r="1.3" opacity="0.35"/><circle cx="1080" cy="300" r="1.4" opacity="0.35"/>
+    <path d="M870 70 l3 15 l15 3 l-15 3 l-3 15 l-3 -15 l-15 -3 l15 -3z" opacity="0.75"/>
+  </g>
+  <!-- lamp on the right -->
+  <ellipse cx="1030" cy="385" rx="280" ry="215" fill="url(#glow)"/>
+  <g transform="translate(860 470) scale(1.25)">
+    <ellipse cx="0" cy="44" rx="120" ry="12" fill="#000" opacity="0.3"/>
+    <path d="M-112 6 q-34 -4 -34 -26 q0 -16 18 -18" fill="none" stroke="#8a6338" stroke-width="12" stroke-linecap="round"/>
+    <path d="M-118 4 C-118 -34 -60 -48 0 -48 C40 -48 74 -40 96 -24 C112 -14 126 -14 140 -18 C152 -21 158 -12 150 -2 C140 12 118 14 98 22 C70 34 40 40 0 40 C-60 40 -118 32 -118 4 Z" fill="url(#clay)"/>
+    <ellipse cx="-14" cy="-30" rx="40" ry="10" fill="#4f351c"/>
+    <ellipse cx="-14" cy="-32" rx="40" ry="10" fill="none" stroke="#d1aa74" stroke-width="3" opacity="0.7"/>
+    <path d="M-90 10 Q-20 26 70 12" fill="none" stroke="#d1aa74" stroke-width="2.5" opacity="0.5"/>
+    <path d="M144 -16 q4 -8 2 -14" stroke="#2b1c10" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M146 -26 C126 -46 132 -76 148 -104 C152 -80 176 -62 168 -40 C164 -28 156 -24 146 -26 Z" fill="url(#flame)"/>
+    <path d="M148 -32 C140 -44 144 -60 150 -72 C154 -58 162 -50 158 -40 C156 -34 152 -32 148 -32 Z" fill="#fffaf0" opacity="0.85"/>
+  </g>
+  <!-- text -->
+  <g font-family="Georgia, serif">
+    <text x="80" y="118" font-size="30" fill="#c9ae7c" letter-spacing="1">Morning Lamp</text>
+    <rect x="80" y="140" width="64" height="3" fill="#c9ae7c"/>
+    <text x="78" y="262" font-size="84" fill="#f6efe1">Every verse</text>
+    <text x="78" y="358" font-size="84" fill="#f6efe1">has a story.</text>
+  </g>
+  <g font-family="Helvetica, Arial, sans-serif" fill="#d8cfbd">
+    <text x="82" y="432" font-size="30">A free Bible study in your inbox</text>
+    <text x="82" y="474" font-size="30">every morning. Three minutes.</text>
+    <text x="82" y="560" font-size="24" fill="#c9ae7c" font-weight="bold" letter-spacing="1">morninglamp.study</text>
+  </g>
+</svg>

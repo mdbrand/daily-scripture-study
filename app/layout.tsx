@@ -18,6 +18,19 @@ export const metadata: Metadata = {
   title: 'Morning Lamp: a daily Bible study by email',
   description:
     'Every verse has a story. A free Bible study by email each morning: one passage, the history behind it, and a voice from 2,000 years of faith, in under three minutes.',
+  // Link previews (iMessage, Facebook, LinkedIn, X). The image is app/opengraph-image.png, drawn from scripts/og-image.svg.
+  openGraph: {
+    type: 'website',
+    url: '/',
+    siteName: 'Morning Lamp',
+    title: 'Morning Lamp: Every verse has a story',
+    description: 'A free Bible study in your inbox every morning. The history behind the verse, in three minutes.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Morning Lamp: Every verse has a story',
+    description: 'A free Bible study in your inbox every morning. The history behind the verse, in three minutes.',
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
