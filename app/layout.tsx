@@ -23,13 +23,13 @@ export const metadata: Metadata = {
     type: 'website',
     url: '/',
     siteName: 'Morning Lamp',
-    title: 'Morning Lamp: Every verse has a story',
-    description: 'A free Bible study in your inbox every morning. The history behind the verse, in three minutes.',
+    title: 'Morning Lamp: Read the Bible the way its first readers heard it',
+    description: 'One passage, the world behind it, and a voice from 2,000 years of faith. Free, every morning.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Morning Lamp: Every verse has a story',
-    description: 'A free Bible study in your inbox every morning. The history behind the verse, in three minutes.',
+    title: 'Morning Lamp: Read the Bible the way its first readers heard it',
+    description: 'One passage, the world behind it, and a voice from 2,000 years of faith. Free, every morning.',
   },
 };
 
