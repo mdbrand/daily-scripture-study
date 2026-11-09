@@ -374,26 +374,68 @@ const CHECKIN_SUBJECTS = [
   'One line about your day?',
   'How was today, really?',
 ];
+const EVENING_IMAGE = 'https://morninglamp.study/email/evening-header.png';
+
+// Evening check-in (Premium, 8 PM local). Night look so it reads as the evening half of the loop:
+// tonight you reply -> overnight we find Scripture -> 5 AM Last Night's Lamp.
 export function renderCheckinEmail(o: { footer: MailFooter; dayIndex: number; isTest?: boolean }): { subject: string; html: string; text: string } {
   const subject = CHECKIN_SUBJECTS[((o.dayIndex % CHECKIN_SUBJECTS.length) + CHECKIN_SUBJECTS.length) % CHECKIN_SUBJECTS.length];
-  const lines = [
-    'Hit reply and tell us how today went, in a sentence or two: a win, a worry, a hard conversation, something you’re grateful for.',
-    'Whatever you share tonight becomes tomorrow morning’s Last Night’s Lamp, a short study written in response to your day. You’ll see your own words, a passage chosen for how you felt, the story behind it, and a voice from Christian history who walked through the same thing.',
-  ];
+  const verse: Passage = { text: 'Your word is a lamp for my feet, a light on my path.', ref: 'Psalm 119:105 (NIV)' };
+  const ask = 'Hit reply and tell us how today went, in a sentence or two: a win, a worry, a hard conversation, something you’re grateful for.';
+  const why = 'We read what you share, find Scripture for it, and write tomorrow morning’s Last Night’s Lamp just for you: your own words, a passage for how you felt, the story behind it, and a voice from Christian history who walked through the same thing.';
   const quiet = 'Nothing to share tonight? No need to reply. Your daily study still arrives at 5 AM.';
-  const verse: Passage = { text: 'In peace I will lie down and sleep, for you alone, LORD, make me dwell in safety.', ref: 'Psalm 4:8 (NIV)' };
-  const inner = `<tr><td style="background:${C.ivory};padding:30px 32px 18px;">
+  const steps: { when: string; what: string; now: boolean }[] = [
+    { when: 'Tonight', what: 'Reply and tell us how your day went', now: true },
+    { when: 'Overnight', what: 'We find Scripture for what you shared', now: false },
+    { when: '5 AM', what: 'Last Night’s Lamp, written for you', now: false },
+  ];
+  const step = (st: (typeof steps)[number], i: number) => `<td width="33%" valign="top" style="padding:0 ${i < 2 ? 6 : 0}px 0 ${i > 0 ? 6 : 0}px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${st.now ? C.navy : '#ffffff'};border:1px solid ${st.now ? C.navy : C.line};border-radius:10px;"><tr><td style="padding:14px 12px;text-align:center;">
+        <p style="margin:0 0 6px;font-family:${SANS};font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:bold;color:${st.now ? C.gold : C.goldDark};">${i + 1} · ${esc(st.when)}</p>
+        <p style="margin:0;font-family:${SANS};font-size:14px;line-height:1.45;color:${st.now ? '#f6efe1' : C.muted};">${esc(st.what)}</p>
+      </td></tr></table>
+    </td>`;
+  const inner = `<tr><td style="background:#101e2a;padding:0;line-height:0;font-size:0;">
+    <img src="${EVENING_IMAGE}" width="600" alt="A clay oil lamp glowing under a night sky" style="display:block;width:100%;max-width:600px;height:auto;border:0;">
+  </td></tr>
+  <tr><td style="background:#101e2a;padding:6px 32px 30px;text-align:center;">
+    <p style="margin:0 0 14px;font-family:${SANS};font-size:12px;letter-spacing:3px;text-transform:uppercase;font-weight:bold;color:${C.gold};">Evening &middot; A lamp for your feet</p>
+    <p style="margin:0;font-family:${SERIF};font-size:21px;line-height:1.5;font-style:italic;color:#f6efe1;">“${esc(verse.text)}”</p>
+    <p style="margin:8px 0 0;font-family:${SANS};font-size:13px;color:#9fb0b8;">${esc(verse.ref)}</p>
+  </td></tr>
+  <tr><td style="background:${C.ivory};padding:30px 32px 18px;">
     ${label('Last Night’s Lamp · Evening check-in')}
-    <h1 style="margin:0 0 18px;font-family:${SERIF};font-size:28px;line-height:1.25;color:${C.navy};">${esc(subject)}</h1>
-    ${lines.map((l) => p(esc(l))).join('')}
+    <h1 style="margin:0 0 16px;font-family:${SERIF};font-size:28px;line-height:1.25;color:${C.navy};">${esc(subject)}</h1>
+    ${p(esc(ask))}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 22px;"><tr>
+      ${steps.map(step).join('')}
+    </tr></table>
+    ${p(esc(why))}
     ${p(esc(quiet), `color:${C.muted};font-size:16px;`)}
-    ${quote(verse, false)}
     ${p('Rest well,<br>Morning Lamp')}
   </td></tr>`;
   return {
     subject: o.isTest ? `[Preview] ${subject}` : subject,
     html: shell(inner, 'Reply with a line about your day. Tomorrow’s Last Night’s Lamp will be written in response to it.', o.isTest, footerHtml(o.footer), 'premium'),
-    text: ['LAST NIGHT’S LAMP · EVENING CHECK-IN', subject, '', ...lines.flatMap((l) => [l, '']), quiet, '', `"${verse.text}" (${verse.ref})`, '', 'Rest well,', 'Morning Lamp', ...footerText(o.footer)].join('\n'),
+    text: [
+      'MORNING LAMP · EVENING: A LAMP FOR YOUR FEET',
+      `"${verse.text}" (${verse.ref})`,
+      '',
+      'LAST NIGHT’S LAMP · EVENING CHECK-IN',
+      subject,
+      '',
+      ask,
+      '',
+      ...steps.map((st, i) => `${i + 1}. ${st.when}: ${st.what}`),
+      '',
+      why,
+      '',
+      quiet,
+      '',
+      'Rest well,',
+      'Morning Lamp',
+      ...footerText(o.footer),
+    ].join('\n'),
   };
 }
 

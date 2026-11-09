@@ -28,10 +28,12 @@ If the reader didn't share anything: subtitle *A study written in response to yo
 There is **no "A Verse for Your Life"** and no second verse anywhere. It was removed on purpose.
 
 ## Evening check-in: Premium only (8 PM in the reader's time zone)
+- Night look so it reads as the evening half of the loop: under the "Morning Lamp" header, a night-sky picture with a glowing clay oil lamp (`public/email/evening-header.png`, drawn from `scripts/evening-header.svg`), then a dark band: "Evening · A lamp for your feet" and Psalm 119:105 (NIV).
 - Small label: "Last Night's Lamp · Evening check-in". Rotating headline ("How did today go?", "Before you rest: how was today?", ...).
-- Says plainly that whatever they share tonight becomes tomorrow morning's Last Night's Lamp, a study written in response to their day.
-- "Nothing to share tonight? No need to reply. Your daily study still arrives at 5 AM."
-- Psalm 4:8 (NIV), then "Rest well, Morning Lamp".
+- The ask: hit reply and tell us how today went.
+- Three-step path, "Tonight" lit: 1 Tonight: reply and tell us how your day went · 2 Overnight: we find Scripture for what you shared · 3 5 AM: Last Night's Lamp, written for you.
+- Says plainly that what they share becomes tomorrow morning's Last Night's Lamp.
+- "Nothing to share tonight? No need to reply. Your daily study still arrives at 5 AM." Then "Rest well, Morning Lamp".
 - Not sent if they already shared something that day.
 
 ## Rules
