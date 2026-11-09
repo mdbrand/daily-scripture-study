@@ -23,7 +23,7 @@ export async function POST(req: Request) {
         plan_interest: String(form.get('plan_interest') || ''),
         unsubscribed: form.get('unsubscribed') === 'on',
         suspected_bot: form.get('suspected_bot') === 'on',
-        beta_until: String(form.get('beta_until') || ''),
+        beta_until: form.get('lifetime') === 'on' ? 'lifetime' : String(form.get('beta_until') || ''),
         admin_note: String(form.get('admin_note') || ''),
       };
       const r = await rpc<{ ok: boolean; error?: string; email?: string }>('dss_admin_subscriber_update', {

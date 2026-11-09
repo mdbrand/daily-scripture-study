@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: 'Lamplighters | Morning Lamp', robots
 export const dynamic = 'force-dynamic';
 
 const messages: Record<string, string> = {
-  accepted: 'Accepted. They have 90 days of free Premium and a welcome email is on its way.',
+  accepted: 'Accepted. They have free Premium for life and a welcome email is on its way.',
   declined: 'Declined. They stay on the free daily study; no email is sent.',
   full: 'All spots are taken. Raise the number of spots to accept more.',
   error: 'That didn’t work. Try again in a minute.',
@@ -50,7 +50,7 @@ export default async function Lamplighters({ searchParams }: { searchParams: Pro
         <div><dt>Waiting for review</dt><dd>{waiting.length}</dd></div>
       </dl>
       <p className="form-note">
-        Accepted Lamplighters get Premium free for 90 days (Last Night’s Lamp and the evening check-in), plus one short
+        Accepted Lamplighters get Premium free for life (Last Night’s Lamp and the evening check-in), plus one short
         feedback question each Friday. Their replies come to your inbox. The number of spots is the
         <code> lamplighter_spots</code> setting in the database; ask to change it.
       </p>
@@ -76,7 +76,7 @@ export default async function Lamplighters({ searchParams }: { searchParams: Pro
                     {a.status === 'applied' ? (
                       <Decide email={a.email} />
                     ) : a.status === 'accepted' ? (
-                      `Accepted${a.beta_until ? `, Premium until ${date(a.beta_until)}` : ''}`
+                      `Accepted${a.beta_until ? (a.beta_until === 'infinity' ? ', Premium for life' : `, Premium until ${date(a.beta_until)}`) : ''}`
                     ) : (
                       'Declined'
                     )}

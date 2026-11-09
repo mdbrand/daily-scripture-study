@@ -440,17 +440,17 @@ export function renderLamplighterReceived(): { subject: string; html: string; te
   };
 }
 
-export function renderLamplighterAccepted(o: { footer: MailFooter; until: string }): { subject: string; html: string; text: string } {
+export function renderLamplighterAccepted(o: { footer: MailFooter }): { subject: string; html: string; text: string } {
   return {
     subject: 'You’re a Lamplighter. Welcome.',
     ...simpleEmail({
       kicker: 'Lamplighters',
       title: 'Welcome, Lamplighter',
-      preheader: 'Premium is on for you, free, for the next 90 days.',
+      preheader: 'Premium is on for you, free, for life.',
       edition: 'premium',
       footer: o.footer,
       lines: [
-        `You’re one of the first Lamplighters. Premium is on for you, free, until ${o.until}.`,
+        'You’re one of the first Lamplighters. Premium is on for you, free, for life. As long as Morning Lamp is running, you’ll never pay for it.',
         'Each morning at 5 AM your time, your study arrives. Each evening around 8 PM, we’ll check in to ask how your day went. Reply with a line or two, and the next morning brings Last Night’s Lamp: a study written in response to your day.',
         'Once a week we’ll send you one short question about how it’s going. Honest answers, good and bad, are the whole point. Just hit reply.',
         'If you ever share your experience publicly, please mention that you received Premium free as a beta tester. If we ever quote you, we’ll ask first and note the same.',

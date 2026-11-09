@@ -40,7 +40,8 @@ const MSG: Record<string, string> = {
 
 const when = (d: string | null) =>
   d ? new Date(d).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/Los_Angeles' }) : '–';
-const dateOnly = (d: string | null) => (d ? new Date(d).toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' }) : '');
+const dateOnly = (d: string | null) =>
+  d && d !== 'infinity' ? new Date(d).toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' }) : '';
 
 export default async function SubscriberView({ searchParams }: { searchParams: Promise<{ email?: string; msg?: string }> }) {
   const admin = await adminEmail();
@@ -86,6 +87,7 @@ export default async function SubscriberView({ searchParams }: { searchParams: P
           : ''}
         {s.founder ? 'Founder. ' : ''}
         {s.lamplighter ? `Lamplighter: ${s.lamplighter}. ` : ''}
+        {s.beta_until === 'infinity' ? 'Free Premium for life. ' : ''}
         {s.partner_code ? `Partner link: ${s.partner_code}. ` : ''}
         {s.email_flag === 'privacy_relay' ? 'Uses a privacy relay address. ' : ''}
         {s.welcomed_at ? `Welcome email sent ${when(s.welcomed_at)}.` : 'No welcome email yet.'}
@@ -104,7 +106,11 @@ export default async function SubscriberView({ searchParams }: { searchParams: P
           <option value="free">Free</option>
           <option value="premium">Premium</option>
         </select>
-        <label htmlFor="beta_until">Free Premium until (beta / comp). Leave blank for none.</label>
+        <label className="partner-check">
+          <input type="checkbox" name="lifetime" defaultChecked={s.beta_until === 'infinity'} />
+          <span>Free Premium for life (Lamplighters)</span>
+        </label>
+        <label htmlFor="beta_until">Or free Premium until a date (comp). Leave blank for none.</label>
         <input id="beta_until" name="beta_until" type="date" defaultValue={dateOnly(s.beta_until)} />
         <label className="partner-check">
           <input type="checkbox" name="confirmed" defaultChecked={confirmed} />

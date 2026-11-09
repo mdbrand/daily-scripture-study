@@ -161,11 +161,11 @@ export default async function Home() {
               <p className="fine on-dark-fine">Includes everything in the free study.</p>
             </>
           ) : (
-            // During the beta, Premium is free for the first 100 Lamplighters instead of a paid waitlist.
+            // During the beta, the first 100 Lamplighters get Premium free for life instead of a paid waitlist.
             <div className="beta-cta">
-              <p className="beta-cta-title">Try Premium free during the beta.</p>
+              <p className="beta-cta-title">Get Premium free for life.</p>
               <p>
-                The first 100 Lamplighters get Premium free for 90 days. {spots.left} of {spots.spots} spots left.
+                Be one of the first 100 Lamplighters. {spots.left} of {spots.spots} spots left.
               </p>
               <a className="button gold" href="#lamplighters">
                 Apply to be a Lamplighter
@@ -185,7 +185,7 @@ export default async function Home() {
             </p>
             <h2>Be one of the first 100.</h2>
             <p className="lamp-lede">
-              Get Premium free for 90 days. In return, tell us honestly what works and what doesn’t: one short question
+              Get Premium free for life. In return, tell us honestly what works and what doesn’t: one short question
               a week.
             </p>
           </div>

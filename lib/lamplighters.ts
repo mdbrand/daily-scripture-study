@@ -25,10 +25,8 @@ export async function lamplighterStats(): Promise<LamplighterStats> {
 
 export const listApplications = () => rpc<Application[]>('dss_lamplighter_list', { p_gate: gate() });
 
-const longDate = (d: string) =>
-  new Date(d).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'America/Los_Angeles' });
 
-// Accept (90 days of free Premium + welcome email) or decline (no email).
+// Accept (free Premium for life + welcome email) or decline (no email).
 export async function decide(email: string, accept: boolean) {
   const r = await rpc<{ ok: boolean; error?: string }>('dss_lamplighter_decide', { p_gate: gate(), p_email: email, p_accept: accept });
   if (!r.ok || !accept) return r;
@@ -36,7 +34,7 @@ export async function decide(email: string, accept: boolean) {
   const me = (await rpc<Active[]>('dss_lamplighters_active', { p_gate: gate() })).find((a) => a.email === email.toLowerCase());
   if (postal && me) {
     const footer = footerFor(me.unsub_token, postal);
-    await sendBatch([{ to: me.email, ...renderLamplighterAccepted({ footer, until: longDate(me.beta_until) }), unsubscribeUrl: oneClickUrl(me.unsub_token) }]);
+    await sendBatch([{ to: me.email, ...renderLamplighterAccepted({ footer }), unsubscribeUrl: oneClickUrl(me.unsub_token) }]);
   }
   return r;
 }
