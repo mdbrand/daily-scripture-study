@@ -13,6 +13,7 @@ const FILTERS = [
   { key: 'all', label: 'Everyone' },
   { key: 'free', label: 'Free' },
   { key: 'premium', label: 'Premium' },
+  { key: 'lamplighters', label: 'Lamplighters' },
   { key: 'unsubscribed', label: 'Unsubscribed' },
   { key: 'flagged', label: 'Flagged' },
 ];
@@ -29,6 +30,8 @@ type Row = {
   suspected_bot: boolean;
   email_flag: string | null;
   welcomed_at: string | null;
+  beta_until: string | null;
+  lamplighter: string | null;
   studies_received: number;
 };
 
@@ -36,6 +39,14 @@ const PREMIUM: Record<string, string> = { founder: 'Founder', monthly: 'Monthly'
 
 function date(d: string) {
   return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'America/Los_Angeles' });
+}
+
+// Type: Lamplighter (free Premium for life), a paid plan, comped Premium until a date, or Free.
+function type(r: Row) {
+  if (r.lamplighter === 'accepted') return 'Lamplighter';
+  if (r.premium_status) return PREMIUM[r.premium_status] ?? r.premium_status;
+  if (r.beta_until && r.beta_until !== 'infinity' && new Date(r.beta_until) > new Date()) return `Premium until ${date(r.beta_until)}`;
+  return 'Free';
 }
 
 function status(r: Row) {
@@ -108,7 +119,7 @@ export default async function Subscribers({ searchParams }: { searchParams: Prom
           <input id="add-tz" name="timezone" />
           <label className="partner-check">
             <input type="checkbox" name="premium" />
-            <span>Give them Premium, free for life</span>
+            <span>Make them Lamplighters (Premium free for life)</span>
           </label>
           <p className="admin-add-buttons">
             <button type="submit" name="mode" value="invite">Send confirm invite</button>
@@ -146,7 +157,7 @@ export default async function Subscribers({ searchParams }: { searchParams: Prom
             <thead>
               <tr>
                 <th><span className="sr-only">Select</span></th>
-                <th>Email</th><th>Joined</th><th>Premium</th><th>Status</th><th>Time zone</th><th>From</th><th>Studies</th>
+                <th>Email</th><th>Joined</th><th>Type</th><th>Status</th><th>Time zone</th><th>From</th><th>Studies</th>
               </tr>
             </thead>
             <tbody>
@@ -155,7 +166,7 @@ export default async function Subscribers({ searchParams }: { searchParams: Prom
                   <td><input type="checkbox" name="email" value={r.email} aria-label={`Select ${r.email}`} /></td>
                   <td><Link href={`/admin/subscribers/view?email=${encodeURIComponent(r.email)}`}>{r.email}</Link></td>
                   <td>{date(r.created_at)}</td>
-                  <td>{r.premium_status ? PREMIUM[r.premium_status] ?? r.premium_status : r.plan_interest === 'premium' ? 'Interested' : 'Free'}</td>
+                  <td>{type(r)}</td>
                   <td>{!r.unsubscribed_at && !r.suspected_bot && conf.confirmed[r.email] === false ? 'Waiting for email confirmation' : status(r)}</td>
                   <td>{r.timezone ?? 'Pacific (default)'}</td>
                   <td>{[r.source, r.referred_by && `partner: ${r.referred_by}`].filter(Boolean).join(', ') || '–'}</td>

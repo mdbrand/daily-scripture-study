@@ -75,7 +75,7 @@ export default async function SubscriberView({ searchParams }: { searchParams: P
 
       <dl className="partner-stats">
         <div><dt>Status</dt><dd style={{ fontSize: 18 }}>{status}</dd></div>
-        <div><dt>Edition</dt><dd style={{ fontSize: 18 }}>{s.has_premium ? 'Premium' : 'Free'}</dd></div>
+        <div><dt>Type</dt><dd style={{ fontSize: 18 }}>{s.lamplighter === 'accepted' ? 'Lamplighter' : s.has_premium ? 'Premium' : 'Free'}</dd></div>
         <div><dt>Joined</dt><dd style={{ fontSize: 18 }}>{when(s.created_at)}</dd></div>
         <div><dt>Studies received</dt><dd>{s.studies_received}</dd></div>
         <div><dt>Replies about their day</dt><dd>{s.replies}</dd></div>
@@ -86,8 +86,8 @@ export default async function SubscriberView({ searchParams }: { searchParams: P
           ? `Stripe: ${s.subscription.plan} plan, ${s.subscription.status}${s.subscription.cancel_at_period_end ? ', canceling at period end' : ''}. `
           : ''}
         {s.founder ? 'Founder. ' : ''}
-        {s.lamplighter ? `Lamplighter: ${s.lamplighter}. ` : ''}
-        {s.beta_until === 'infinity' ? 'Free Premium for life. ' : ''}
+        {s.lamplighter ? `Lamplighter: ${({ applied: 'applied, waiting for review', accepted: 'yes, Premium free for life', declined: 'application declined', removed: 'removed' } as Record<string, string>)[s.lamplighter] ?? s.lamplighter}. ` : ''}
+        
         {s.partner_code ? `Partner link: ${s.partner_code}. ` : ''}
         {s.email_flag === 'privacy_relay' ? 'Uses a privacy relay address. ' : ''}
         {s.welcomed_at ? `Welcome email sent ${when(s.welcomed_at)}.` : 'No welcome email yet.'}
@@ -108,7 +108,7 @@ export default async function SubscriberView({ searchParams }: { searchParams: P
         </select>
         <label className="partner-check">
           <input type="checkbox" name="lifetime" defaultChecked={s.beta_until === 'infinity'} />
-          <span>Free Premium for life (Lamplighters)</span>
+          <span>Lamplighter: Premium free for life</span>
         </label>
         <label htmlFor="beta_until">Or free Premium until a date (comp). Leave blank for none.</label>
         <input id="beta_until" name="beta_until" type="date" defaultValue={dateOnly(s.beta_until)} />

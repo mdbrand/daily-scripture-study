@@ -611,3 +611,27 @@ details p { color: var(--muted); font-size: 19px; margin: -4px 0 24px; max-width
 .admin-add[open] summary { margin-bottom: 12px; }
 .admin-add-buttons { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0 0; }
 .admin-add .button-secondary { background: transparent; color: var(--navy, #182c39); border: 1px solid currentColor; }
+
+/* Lamplighter offer: top bar + hero card (only while spots remain) */
+.ll-bar {
+  margin: 0; padding: 11px 20px; background: var(--navy); color: var(--on-dark);
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 18px;
+  font-family: var(--ui); font-size: 15px; line-height: 1.4; text-align: center;
+}
+.ll-bar strong { color: var(--brass-light); }
+.ll-bar-left { white-space: nowrap; }
+.ll-bar a { color: var(--brass-light); font-weight: 600; text-underline-offset: 3px; white-space: nowrap; }
+.ll-bar a:hover { color: #f0dfb8; }
+.ll-offer {
+  margin: 44px auto 0; max-width: 560px; padding: 28px 28px 30px; border-radius: 14px;
+  background: var(--navy); color: var(--on-dark); text-align: center;
+  box-shadow: 0 0 0 1px rgba(217, 192, 143, 0.5), 0 18px 40px -22px rgba(23, 43, 56, 0.55);
+}
+.ll-offer-kicker { margin: 0 0 10px; font-family: var(--ui); font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass-light); }
+.ll-offer-title { margin: 0 0 10px; font-family: var(--font-book), Georgia, serif; font-size: 28px; line-height: 1.25; color: #fffaf0; }
+.ll-offer-text { margin: 0 0 20px; font-family: var(--ui); font-size: 16px; color: var(--on-dark); }
+#lamplighters { scroll-margin-top: 16px; }
+@media (max-width: 560px) {
+  .ll-offer { padding: 24px 20px 26px; }
+  .ll-offer-title { font-size: 24px; }
+}

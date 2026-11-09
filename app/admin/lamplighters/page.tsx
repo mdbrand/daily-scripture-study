@@ -51,7 +51,8 @@ export default async function Lamplighters({ searchParams }: { searchParams: Pro
       </dl>
       <p className="form-note">
         Accepted Lamplighters get Premium free for life (Last Night’s Lamp and the evening check-in), plus one short
-        feedback question each Friday. Their replies come to your inbox. The number of spots is the
+        feedback question each Friday. To make anyone a Lamplighter yourself, open them in Subscribers and tick
+        “Lamplighter: Premium free for life”, or use Add people. Their replies come to your inbox. The number of spots is the
         <code> lamplighter_spots</code> setting in the database; ask to change it.
       </p>
       {apps.length === 0 ? (
@@ -60,7 +61,7 @@ export default async function Lamplighters({ searchParams }: { searchParams: Pro
         <div style={{ overflowX: 'auto' }}>
           <table className="partner-table">
             <thead>
-              <tr><th>Email</th><th>Why they want in</th><th>Applied</th><th>Status</th></tr>
+              <tr><th>Email</th><th>How they joined</th><th>Date</th><th>Status</th></tr>
             </thead>
             <tbody>
               {apps.map((a) => (
@@ -70,13 +71,15 @@ export default async function Lamplighters({ searchParams }: { searchParams: Pro
                     <br />
                     <span className="form-note">{conf.confirmed[a.email] ? 'Email confirmed' : 'Hasn’t confirmed email yet'}</span>
                   </td>
-                  <td style={{ maxWidth: 360 }}>{a.why}</td>
-                  <td>{date(a.created_at)}</td>
+                  <td style={{ maxWidth: 360 }}>{a.source === 'admin' ? <em>Added by you</em> : a.why}</td>
+                  <td>{date(a.source === 'admin' ? a.decided_at ?? a.created_at : a.created_at)}</td>
                   <td>
                     {a.status === 'applied' ? (
                       <Decide email={a.email} />
                     ) : a.status === 'accepted' ? (
                       `Accepted${a.beta_until ? (a.beta_until === 'infinity' ? ', Premium for life' : `, Premium until ${date(a.beta_until)}`) : ''}`
+                    ) : a.status === 'removed' ? (
+                      'Removed'
                     ) : (
                       'Declined'
                     )}

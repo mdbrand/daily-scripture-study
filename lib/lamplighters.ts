@@ -7,7 +7,8 @@ export type LamplighterStats = { spots: number; accepted: number; left: number; 
 export type Application = {
   email: string;
   why: string | null;
-  status: 'applied' | 'accepted' | 'declined';
+  status: 'applied' | 'accepted' | 'declined' | 'removed';
+  source: 'applied' | 'admin';
   timezone: string | null;
   created_at: string;
   decided_at: string | null;

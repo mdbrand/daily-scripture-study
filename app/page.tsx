@@ -53,6 +53,17 @@ export default async function Home() {
 
   return (
     <main>
+      {/* Lamplighter offer: top bar (only while spots remain) */}
+      {spots.open && (
+        <p className="ll-bar">
+          <span>
+            <strong>Limited time:</strong> the first {spots.spots} Lamplighters get Premium free for life.{' '}
+            <span className="ll-bar-left">{spots.left} spots left.</span>
+          </span>
+          <a href="#lamplighters">Become a Lamplighter</a>
+        </p>
+      )}
+
       {/* Hero */}
       <header className="title-page">
         <nav className="topbar container" aria-label="Site">
@@ -75,6 +86,18 @@ export default async function Home() {
             years of faith.
           </p>
           <SignupForm source="hero" tone="light" hidePlanSelect buttonLabel="Start free" />
+          {spots.open && (
+            <div className="ll-offer">
+              <p className="ll-offer-kicker">Limited time only</p>
+              <p className="ll-offer-title">Become a Lamplighter and get Premium free for life.</p>
+              <p className="ll-offer-text">
+                Only the first {spots.spots} get lifetime access. {spots.left} of {spots.spots} spots left.
+              </p>
+              <a className="button gold" href="#lamplighters">
+                Claim my Lamplighter spot
+              </a>
+            </div>
+          )}
         </div>
       </header>
 
