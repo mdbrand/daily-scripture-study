@@ -1,7 +1,9 @@
-import { NextResponse } from 'next/server';
+import { after, NextResponse } from 'next/server';
 import { getSessionEmail, isAdmin } from '@/lib/session';
 import { rpc } from '@/lib/supabaseRpc';
 import { gate } from '@/lib/partners';
+import { sendConfirmation } from '@/lib/confirm';
+import { dailySettings, sendWelcomes } from '@/lib/daily';
 
 export const runtime = 'nodejs';
 
@@ -10,9 +12,52 @@ const view = (email: string, msg: string) => `/admin/subscribers/view?email=${en
 
 // Admin edits to subscribers (plain form posts): save, mark as spam, delete.
 export async function POST(req: Request) {
-  if (!isAdmin(await getSessionEmail())) return go(req, '/admin/subscribers');
+  const admin = await getSessionEmail();
+  if (!isAdmin(admin)) return go(req, '/admin/subscribers');
   const form = await req.formData();
   const action = String(form.get('action') || '');
+
+  // Add people by hand: "start" = they get email right away; "invite" = they get a confirm invite first.
+  if (action === 'add') {
+    const mode = String(form.get('mode') || '') === 'start' ? 'start' : 'invite';
+    const premium = form.get('premium') === 'on';
+    const timezone = String(form.get('timezone') || '').trim();
+    const emails = [...new Set((String(form.get('emails') || '').toLowerCase().match(/[^\s,;<>()"']+@[^\s,;<>()"']+\.[a-z]{2,}/g) ?? []))].slice(0, 200);
+    if (emails.length === 0) return go(req, '/admin/subscribers?addmsg=none');
+    const counts = { added: 0, existing: 0 };
+    const skipped: string[] = [];
+    const toInvite: string[] = [];
+    for (const e of emails) {
+      try {
+        const r = await rpc<{ status: string; confirmed?: boolean }>('dss_admin_add_subscriber', {
+          p_gate: gate(),
+          p_email: e,
+          p_premium: premium,
+          p_start_now: mode === 'start',
+          p_timezone: timezone,
+          p_added_by: admin,
+        });
+        if (r.status === 'added' || r.status === 'existing') {
+          counts[r.status] += 1;
+          if (mode === 'invite' && !r.confirmed) toInvite.push(e);
+        } else skipped.push(`${e} (${r.status === 'unsubscribed' ? 'unsubscribed earlier' : 'not a valid email'})`);
+      } catch {
+        skipped.push(`${e} (error)`);
+      }
+    }
+    const origin = new URL(req.url).origin;
+    after(async () => {
+      try {
+        for (const e of toInvite) await sendConfirmation(e, { origin, invite: { premium } });
+        if (mode === 'start' && (await dailySettings()).send_open) await sendWelcomes(200);
+      } catch (err) {
+        console.error('admin add', err);
+      }
+    });
+    const sp = new URLSearchParams({ addmsg: mode, added: String(counts.added), existing: String(counts.existing), invited: String(toInvite.length) });
+    if (skipped.length) sp.set('skipped', skipped.join(', ').slice(0, 1500));
+    return go(req, `/admin/subscribers?${sp}`);
+  }
 
   try {
     if (action === 'save') {

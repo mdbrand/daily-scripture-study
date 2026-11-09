@@ -45,11 +45,11 @@ function status(r: Row) {
   return 'Active';
 }
 
-export default async function Subscribers({ searchParams }: { searchParams: Promise<{ q?: string; filter?: string; page?: string; deleted?: string; blocked?: string; msg?: string }> }) {
+export default async function Subscribers({ searchParams }: { searchParams: Promise<{ q?: string; filter?: string; page?: string; deleted?: string; blocked?: string; msg?: string; addmsg?: string; added?: string; existing?: string; invited?: string; skipped?: string }> }) {
   const email = await adminEmail();
   if (!email) return <AdminSignIn next="/admin/subscribers" />;
 
-  const { q = '', filter = 'all', page = '1', deleted, blocked, msg } = await searchParams;
+  const { q = '', filter = 'all', page = '1', deleted, blocked, msg, addmsg, added = '0', existing = '0', invited = '0', skipped } = await searchParams;
   const f = FILTERS.some((x) => x.key === filter) ? filter : 'all';
   const n = Math.max(1, parseInt(page, 10) || 1);
   const data = await rpc<{ total: number; rows: Row[] }>('dss_admin_subscribers', {
@@ -80,6 +80,47 @@ export default async function Subscribers({ searchParams }: { searchParams: Prom
         </p>
       )}
       {msg === 'error' && <p className="partner-notice" role="alert">That didn’t work. Please try again.</p>}
+      {addmsg === 'none' && <p className="partner-notice" role="alert">No email addresses found in what you pasted.</p>}
+      {(addmsg === 'start' || addmsg === 'invite') && (
+        <p className="partner-notice" role="status">
+          Added {added} new {added === '1' ? 'person' : 'people'}
+          {existing !== '0' ? `, updated ${existing} already on the list` : ''}.{' '}
+          {addmsg === 'start'
+            ? 'They’ll get the daily study starting with the next 5 AM send.'
+            : `Sent ${invited} confirm ${invited === '1' ? 'invite' : 'invites'}. They’ll start once they tap “Yes, start my daily study.”`}
+          {skipped ? ` Skipped: ${skipped}.` : ''}
+        </p>
+      )}
+      <details className="admin-add" open={!!addmsg && addmsg !== 'start' && addmsg !== 'invite'}>
+        <summary>Add people</summary>
+        <form action="/api/admin/subscribers" method="post" className="partner-form" style={{ maxWidth: 620 }}>
+          <input type="hidden" name="action" value="add" />
+          <label htmlFor="add-emails">Email addresses (one per line, or separated by commas)</label>
+          <textarea
+            id="add-emails"
+            name="emails"
+            rows={4}
+            required
+            placeholder={'friend@example.com\nmom@example.com'}
+            style={{ fontFamily: 'var(--ui)', fontSize: 16, padding: 12, border: '1px solid var(--rule)', borderRadius: 6 }}
+          />
+          <label htmlFor="add-tz">Time zone (optional, e.g. America/New_York; blank uses Pacific)</label>
+          <input id="add-tz" name="timezone" />
+          <label className="partner-check">
+            <input type="checkbox" name="premium" />
+            <span>Give them Premium, free for life</span>
+          </label>
+          <p className="admin-add-buttons">
+            <button type="submit" name="mode" value="invite">Send confirm invite</button>
+            <button type="submit" name="mode" value="start" className="button-secondary">Start them right away</button>
+          </p>
+          <p className="form-note">
+            <strong>Send confirm invite</strong> emails them “Rob signed you up for Morning Lamp” with a button; nothing else
+            arrives until they tap it. <strong>Start them right away</strong> skips that step, so only use it for people who
+            already told you they want it. People who unsubscribed before are never re-added.
+          </p>
+        </form>
+      </details>
       <form className="partner-row" action="/admin/subscribers" method="get">
         <input name="q" defaultValue={q} placeholder="Search by email" aria-label="Search by email" />
         {f !== 'all' && <input type="hidden" name="filter" value={f} />}

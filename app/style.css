@@ -604,3 +604,10 @@ details p { color: var(--muted); font-size: 19px; margin: -4px 0 24px; max-width
 .beta-cta .beta-price { font-family: var(--ui); font-size: 13px; letter-spacing: 0.01em; color: #8d9aa1; margin: 18px 0 0; }
 .signup-form .form-note { font-size: 12px; line-height: 1.5; margin-top: 10px; }
 .beta-cta .beta-cta-title { font-family: var(--book); font-size: 30px; color: #f6efe1; margin: 0 0 10px; }
+
+/* Admin: Add people */
+.admin-add { margin: 0 0 24px; padding: 14px 18px; border: 1px solid var(--rule); border-radius: 8px; background: #fff; }
+.admin-add summary { cursor: pointer; font-weight: 600; font-family: var(--ui); }
+.admin-add[open] summary { margin-bottom: 12px; }
+.admin-add-buttons { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0 0; }
+.admin-add .button-secondary { background: transparent; color: var(--navy, #182c39); border: 1px solid currentColor; }

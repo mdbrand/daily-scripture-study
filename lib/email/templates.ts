@@ -523,7 +523,24 @@ export function renderLamplighterFeedback(o: { footer: MailFooter; weekIndex: nu
 }
 
 // ---------- Confirm your email (double opt-in) ----------
-export function renderConfirmEmail(o: { link: string; lamplighter?: boolean }): { subject: string; html: string; text: string } {
+export function renderConfirmEmail(o: { link: string; lamplighter?: boolean; invite?: { premium: boolean } }): { subject: string; html: string; text: string } {
+  if (o.invite) {
+    // Someone on the Morning Lamp team added this person by hand; nothing else goes out until they tap the button.
+    const r = simpleEmail({
+      kicker: 'You’re invited',
+      title: 'Rob signed you up for Morning Lamp',
+      preheader: 'A free three-minute Bible study, every morning. Tap to start.',
+      lines: [
+        'Rob thought you’d enjoy Morning Lamp: a short Bible study in your inbox every morning at 5 AM your time. One passage, the history behind it, and a voice from 2,000 years of faith. It takes about three minutes.',
+        ...(o.invite.premium
+          ? ['He also gave you Premium, free for life. Each evening we’ll ask how your day went, and the next morning brings Last Night’s Lamp: a study written in response to what you shared.']
+          : []),
+        'Tap the button to start. Nothing else will arrive until you do. Not interested? Just ignore this email, and you won’t hear from us again.',
+      ],
+      button: { label: 'Yes, start my daily study', url: o.link },
+    });
+    return { subject: 'Rob signed you up for Morning Lamp', ...r };
+  }
   const lines = o.lamplighter
     ? [
         'Thank you for applying to be a Lamplighter. Please confirm your email so we can reach you. We read every application and will write back within a few days.',
