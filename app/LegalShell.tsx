@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Crest from './Crest';
+import BackToTop from './BackToTop';
 import { LEGAL } from '@/lib/legal';
 
 // Shared frame for the Privacy, Terms, and Contact pages.
@@ -7,10 +8,12 @@ export default function LegalShell({
   title,
   intro,
   children,
+  backToTop = true,
 }: {
   title: string;
   intro?: React.ReactNode;
   children: React.ReactNode;
+  backToTop?: boolean;
 }) {
   return (
     <main className="legal-page">
@@ -32,6 +35,7 @@ export default function LegalShell({
         {children}
       </article>
       <SiteFooter />
+      {backToTop && <BackToTop />}
     </main>
   );
 }

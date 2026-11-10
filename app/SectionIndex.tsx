@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { TopBar } from './ArticleView';
 import { SiteFooter } from './LegalShell';
+import BackToTop from './BackToTop';
 import type { Article } from '@/lib/articles/types';
 import { SECTION_NAMES, articlePath, articlesIn } from '@/lib/articles';
 import { jsonLd, sectionSchema } from '@/lib/articles/schema';
@@ -27,6 +28,7 @@ export default function SectionIndex({ section, intro }: { section: Article['sec
         </ul>
       </section>
       <SiteFooter />
+      <BackToTop />
     </main>
   );
 }

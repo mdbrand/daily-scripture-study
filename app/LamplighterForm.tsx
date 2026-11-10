@@ -13,7 +13,7 @@ export default function LamplighterForm({ open }: { open: boolean }) {
   const [shownAt] = useState(() => Date.now());
 
   if (!open) {
-    return <p className="lamp-note">All 100 spots are taken. You can still start the free daily study above.</p>;
+    return <p className="lamp-note">All 100 spots are taken, but the free daily study is still yours. Start it above.</p>;
   }
   if (state === 'done') {
     return (

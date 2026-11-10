@@ -20,7 +20,7 @@ export async function adminEmail() {
 
 export function AdminSignIn({ next = '/admin' }: { next?: string }) {
   return (
-    <LegalShell title="Morning Lamp admin">
+    <LegalShell title="Morning Lamp admin" backToTop={false}>
       <p>Sign in with an admin email address. We’ll send you a one-time link.</p>
       <SignInForm next={next} />
     </LegalShell>
@@ -41,6 +41,7 @@ export default function AdminShell({
   return (
     <LegalShell
       title={title}
+      backToTop={false}
       intro={
         <nav className="admin-nav" aria-label="Admin">
           {ADMIN_TABS.map((t) => (

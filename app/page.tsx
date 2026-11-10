@@ -83,18 +83,25 @@ export default async function Home() {
 
         <div className="title-block">
           <Crest size={96} />
-          <h1>Every verse has a story. Read it in three minutes.</h1>
-          <p className="lede">
-            A free Bible study in your inbox every morning: one passage, the history behind it, and a voice from 2,000
-            years of faith.
-          </p>
-          <SignupForm source="hero" tone="light" hidePlanSelect buttonLabel="Start free" />
+          <h1>Every verse has a story. Let me tell you one each morning.</h1>
+          <div className="letter-open">
+            <p className="salutation">Dear friend,</p>
+            <p>
+              Every verse was written by someone, to someone, at a moment that mattered. Once you know that moment, the
+              words land differently.
+            </p>
+            <p>
+              So each morning at 5 AM, I’ll send you one short passage, the story behind it, and a voice from 2,000
+              years of faith. It takes under three minutes, and it’s free.
+            </p>
+          </div>
+          <SignupForm source="hero" tone="light" hidePlanSelect buttonLabel="Yes, send me the study" />
           {spots.open && (
             <div className="ll-offer">
               <p className="ll-offer-kicker">Limited time only</p>
-              <p className="ll-offer-title">Become a Lamplighter and get Premium free for life.</p>
+              <p className="ll-offer-title">One more thing: I’m looking for {spots.spots} Lamplighters.</p>
               <p className="ll-offer-text">
-                Only the first {spots.spots} get lifetime access. {spots.left} of {spots.spots} spots left.
+                Help shape Morning Lamp and get Premium free for life. Only the first {spots.spots} get lifetime access. {spots.left} of {spots.spots} spots left.
               </p>
               <a className="button gold" href="#lamplighters">
                 Claim my Lamplighter spot
@@ -109,7 +116,11 @@ export default async function Home() {
         <div className="container split see-it">
           <EmailPreview />
           <div>
-            <h2>Here’s what you’ll get.</h2>
+            <h2>Here’s what a morning with me looks like.</h2>
+            <p className="letter-lead">
+              That one is on Psalm 46:10. Most of us read “be still” as “relax.” In its first setting, it meant “stop
+              fighting.” That’s the kind of thing I’ll show you.
+            </p>
             <ol className="anatomy">
               {anatomy.map((a) => (
                 <li key={a.title}>
@@ -125,7 +136,10 @@ export default async function Home() {
       {/* Why it's different */}
       <section className="chapter">
         <div className="container">
-          <h2 className="center">Not just a verse of the day… It’s the world behind it.</h2>
+          <h2 className="center">Not just a verse of the day. The world behind it.</h2>
+          <p className="center letter-lead">
+            You won’t read alone, either. You’ll hear from people like these, who loved the same words long before us:
+          </p>
           <ol className="ages" aria-label="Voices you’ll meet">
             {voices.map((v) => (
               <li key={v.name}>
@@ -135,6 +149,7 @@ export default async function Home() {
               </li>
             ))}
           </ol>
+          <p className="center letter-lead promises-lead">And three promises from me:</p>
           <ul className="promises">
             {promises.map((p) => (
               <li key={p}>{p}</li>
@@ -149,6 +164,10 @@ export default async function Home() {
           <header className="chapter-head on-dark">
             <p className="kicker">{checkoutOpen ? 'Premium · $7 a month or $47 a year' : 'Premium'}</p>
             <h2>Last Night’s Lamp: a study written for your day.</h2>
+            <p>
+              Some mornings you don’t need just any verse. You need one for the conversation that went badly, the news
+              you’re waiting on, or the thing you can’t stop being grateful for. That’s what Last Night’s Lamp is for.
+            </p>
           </header>
 
           <ol className="lamp-steps">
@@ -160,6 +179,11 @@ export default async function Home() {
               </li>
             ))}
           </ol>
+
+          <p className="season-note">
+            Quiet night? Tap the season you’re in, like Waiting, Grieving or Grateful, and your next study is written
+            for that.
+          </p>
 
           <div className="example">
             <p className="reply">
@@ -184,14 +208,15 @@ export default async function Home() {
           {checkoutOpen ? (
             <>
               <PremiumPlans />
-              <p className="fine on-dark-fine">Includes everything in the free study.</p>
+              <p className="fine on-dark-fine">Your free morning study comes with it.</p>
             </>
           ) : (
             // During the beta, the first 100 Lamplighters get Premium free for life instead of a paid waitlist.
             <div className="beta-cta">
-              <p className="beta-cta-title">Get Premium free for life.</p>
+              <p className="beta-cta-title">Right now, you can have it free for life.</p>
               <p>
-                Be one of the first 100 Lamplighters. {spots.left} of {spots.spots} spots left.
+                I’m inviting the first {spots.spots} Lamplighters to use Premium free, for good. {spots.left} of{' '}
+                {spots.spots} spots left.
               </p>
               <a className="button gold" href="#lamplighters">
                 Apply to be a Lamplighter
@@ -209,10 +234,10 @@ export default async function Home() {
             <p className="kicker">
               Lamplighters · {spots.left} of {spots.spots} spots left
             </p>
-            <h2>Be one of the first 100.</h2>
+            <h2>Would you be one of the first 100?</h2>
             <p className="lamp-lede">
-              Get Premium free for life. In return, tell us honestly what works and what doesn’t: one short question
-              a week.
+              Here’s the deal, plainly. You get Premium free for life. In return, you tell me honestly what works and
+              what doesn’t. I’ll ask one short question a week.
             </p>
           </div>
           <LamplighterForm open={spots.open} />
@@ -222,7 +247,7 @@ export default async function Home() {
       {/* Questions */}
       <section className="chapter tinted">
         <div className="container narrow">
-          <h2 className="center">Questions</h2>
+          <h2 className="center">You might be wondering</h2>
           <div className="faq">
             {faqs.map((f) => (
               <details key={f.q}>
@@ -243,7 +268,24 @@ export default async function Home() {
             <figcaption>Psalm 119:105</figcaption>
           </figure>
           <h2>Start your mornings in the Word.</h2>
-          <SignupForm source="closing" tone="dark" hidePlanSelect buttonLabel="Start free" />
+          <div className="letter-close">
+            <p>
+              That’s the whole idea: a few quiet minutes each morning with one verse, and the story that brings it to
+              life. I’d be glad to send it to you.
+            </p>
+            <p className="signoff">
+              Warmly,
+              <span className="signature">Ezra Lampwright</span>
+              <a className="penname" href="/authors/ezra-lampwright">
+                The pen name of the Morning Lamp writing desk
+              </a>
+            </p>
+            <p className="ps">
+              <strong>P.S.</strong> Your first study can be waiting for you at 5 AM. Add your email below, tap “Confirm
+              my email” when my note arrives, and that’s it. It’s free, and it always will be.
+            </p>
+          </div>
+          <SignupForm source="closing" tone="dark" hidePlanSelect buttonLabel="Yes, send me the study" />
         </div>
       </section>
 

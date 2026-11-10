@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Crest from './Crest';
 import SignupForm from './SignupForm';
 import { SiteFooter } from './LegalShell';
+import BackToTop from './BackToTop';
 import type { Article } from '@/lib/articles/types';
 import {
   SECTION_NAMES,
@@ -261,6 +262,7 @@ export default function ArticleView({ a }: { a: Article }) {
         )}
       </article>
       <SiteFooter />
+      <BackToTop />
     </main>
   );
 }

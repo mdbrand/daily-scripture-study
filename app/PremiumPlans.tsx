@@ -26,7 +26,7 @@ export default function PremiumPlans() {
     <div className="plans" id="pricing">
       <div className="plans-head">
         <p className="plans-kicker">Premium pricing</p>
-        <h3>Choose how you’d like to pay.</h3>
+        <h3>Pick whatever’s easiest for you.</h3>
       </div>
 
       <div className="plan-options" role="radiogroup" aria-label="Billing">

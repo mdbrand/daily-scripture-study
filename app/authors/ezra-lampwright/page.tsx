@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { TopBar } from '../../ArticleView';
 import AuthorAvatar from '../../AuthorAvatar';
 import { SiteFooter } from '../../LegalShell';
+import BackToTop from '../../BackToTop';
 import { AUTHOR } from '@/lib/articles/author';
 import { ARTICLES, articlePath } from '@/lib/articles';
 import { authorSchema, jsonLd } from '@/lib/articles/schema';
@@ -45,6 +46,7 @@ export default function AuthorPage() {
         </ul>
       </section>
       <SiteFooter />
+      <BackToTop />
     </main>
   );
 }

@@ -157,7 +157,7 @@ export default function SignupForm({
       <p className="form-note">
         {plan === 'premium'
           ? premiumNote || 'Premium is $7/month or $47/year when it opens. No payment today.'
-          : 'Free, always. Arrives at 5 AM your time. We never sell or share your email.'}{' '}
+          : 'Free, always. It arrives at 5 AM your time. Your email stays with us: never sold, never shared.'}{' '}
         By joining, you agree to our <a className="linklike" href="/terms">Terms</a> and{' '}
         <a className="linklike" href="/privacy">Privacy Policy</a>.
       </p>

@@ -444,6 +444,7 @@ details p { color: var(--muted); font-size: 19px; margin: -4px 0 24px; max-width
   .toplinks { gap: 18px; }
   .toplinks a { font-size: 16px; }
   .toplinks a:first-child { display: none; }
+  .title-page .toplinks a:nth-child(2) { display: none; }
   .wordmark span { font-size: 18px; }
   .title-block { padding: 40px 20px 88px; }
   .lede { font-size: 20px; }
@@ -716,3 +717,26 @@ details p { color: var(--muted); font-size: 19px; margin: -4px 0 24px; max-width
 .author-head h1 { margin-bottom: 4px; }
 .author-head .byline { margin: 0; }
 .section-intro { font-size: 20px; color: var(--muted); }
+
+/* ---------- Home page as a letter ---------- */
+.letter-open { max-width: 620px; margin: 0 auto 34px; text-align: left; }
+.letter-open p { font-size: 22px; line-height: 1.55; color: var(--ink); margin: 0 0 16px; }
+.letter-open .salutation { font-style: italic; color: var(--navy); margin-bottom: 12px; }
+.letter-lead { font-size: 20px; line-height: 1.55; color: var(--muted); margin: 0 0 26px; }
+.center.letter-lead { max-width: 640px; margin-left: auto; margin-right: auto; margin-top: 14px; }
+.promises-lead { margin: 40px auto 12px !important; font-size: 18px; }
+.chapter-head.on-dark h2 + p { margin-top: 18px; font-size: 21px; line-height: 1.55; }
+.season-note { max-width: 640px; margin: 34px auto 0; text-align: center; font-style: italic; font-size: 19px; color: var(--on-dark-muted); }
+.letter-close { max-width: 560px; margin: 22px auto 30px; text-align: left; }
+.letter-close p { font-size: 20px; line-height: 1.6; color: var(--on-dark); margin: 0 0 18px; }
+.signoff { line-height: 1.4 !important; }
+.signoff .signature { display: block; margin-top: 6px; font-style: italic; font-size: 30px; color: var(--brass-light); }
+.signoff .penname { display: block; margin-top: 4px; font-family: var(--ui); font-size: 13px; color: var(--on-dark-muted); text-decoration: none; }
+.signoff .penname:hover { text-decoration: underline; }
+.ps { border-top: 1px solid rgba(217, 192, 143, 0.3); padding-top: 18px; }
+.ps strong { color: var(--brass-light); font-weight: 600; }
+@media (max-width: 720px) {
+  .letter-open p { font-size: 19px; }
+  .letter-close p { font-size: 18px; }
+}
+.data-table td:nth-child(2) { white-space: nowrap; }
