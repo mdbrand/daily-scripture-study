@@ -4,6 +4,7 @@ import { rpc } from '@/lib/supabaseRpc';
 import { gate } from '@/lib/partners';
 import { writeReflection, type Reflection } from '@/lib/reflectionWriter';
 import { anthropicKey } from '@/lib/studyWriter';
+import { pacificDate } from '@/lib/daily';
 
 export const metadata: Metadata = { title: 'Premium replies | Morning Lamp', robots: { index: false, follow: false } };
 export const dynamic = 'force-dynamic';
@@ -17,16 +18,25 @@ const STATUS: Record<string, string> = {
   skipped: 'No reflection',
   failed: 'Failed',
 };
+const MSG: Record<string, string> = {
+  written: 'Written. It will appear in that morning’s email.',
+  'written-sent': 'Written and sent. Check their inbox.',
+  missing: 'Fill in the email, date, and what they wrote.',
+  'no-key': 'No Anthropic API key is set on this server.',
+  failed: 'The writer failed. Try again.',
+  error: 'Something went wrong. Check the logs.',
+};
+
 const KIND: Record<string, string> = {
   question: 'it was a Bible question',
   care: 'possible crisis: you were emailed to follow up personally',
   other: 'nothing to reflect on',
 };
 
-export default async function Reflections({ searchParams }: { searchParams: Promise<{ try?: string }> }) {
+export default async function Reflections({ searchParams }: { searchParams: Promise<{ try?: string; msg?: string }> }) {
   const email = await adminEmail();
   if (!email) return <AdminSignIn next="/admin/reflections" />;
-  const { try: sample } = await searchParams;
+  const { try: sample, msg } = await searchParams;
 
   let tried: Reflection | null = null;
   let tryError = '';
@@ -50,6 +60,32 @@ export default async function Reflections({ searchParams }: { searchParams: Prom
         questions, unsubscribe notes, and anything that sounds like a crisis are not turned into reflections. Crisis
         replies are emailed to you for a personal follow-up.
       </p>
+
+      {msg && <p className="form-note" style={{ textAlign: 'left' }}><strong>{MSG[msg] ?? msg}</strong></p>}
+
+      <h2>Write one for a reader</h2>
+      <p>
+        For a note that never reached us (for example, a reply that went to the wrong inbox). Claude writes that
+        morning’s Last Night’s Lamp from it, replacing anything already written for that date.
+      </p>
+      <form action="/api/admin/reflections" method="post" className="partner-form" style={{ maxWidth: 620 }}>
+        <label htmlFor="lamp-email">Reader’s email</label>
+        <input id="lamp-email" name="email" type="email" required />
+        <label htmlFor="lamp-date">For which morning’s email</label>
+        <input id="lamp-date" name="date" type="date" required defaultValue={pacificDate(0)} />
+        <label htmlFor="lamp-note">What they wrote</label>
+        <textarea
+          id="lamp-note"
+          name="note"
+          rows={5}
+          required
+          style={{ fontFamily: 'var(--ui)', fontSize: 16, padding: 12, border: '1px solid var(--rule)', borderRadius: 6 }}
+        />
+        <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <input type="checkbox" name="resend" defaultChecked /> Send them that morning’s email again with it
+        </label>
+        <button type="submit">Write it</button>
+      </form>
 
       <h2>Try one</h2>
       <form action="/admin/reflections" method="get" className="partner-form" style={{ maxWidth: 620 }}>

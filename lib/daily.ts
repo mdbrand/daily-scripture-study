@@ -273,3 +273,21 @@ export async function welcomeAndToday(emails: string[]) {
   await sendWelcomes(Math.max(10, emails.length + 10), today);
   for (const e of today) await sendTodayTo(e);
 }
+
+// ---------- admin: send one reader a given day's email again ----------
+// Uses whatever is on file now (e.g. a Last Night's Lamp written after their first copy went out).
+// Not recorded as a send; their original send stays on file.
+export async function resendDay(email: string, date: string): Promise<'ok' | 'not_found' | 'not_mailable' | 'no_study' | 'error'> {
+  const postal = postalAddress();
+  if (!postal) return 'error';
+  const info = await rpc<{ status: string; email?: string; unsub_token?: string; premium?: boolean; yesterday?: DailyStudy['yesterday'] | null }>(
+    'dss_resend_info',
+    { p_gate: gate(), p_email: email, p_date: date },
+  );
+  if (info.status !== 'ok' || !info.email || !info.unsub_token) return info.status as 'not_found' | 'not_mailable';
+  const study = await getStudy(date);
+  if (!study) return 'no_study';
+  const m = renderDailyEmail(toDailyStudy(date, study.content, !!info.premium, info.yesterday ?? null), footerFor(info.unsub_token, postal));
+  await sendBatch([{ to: info.email, ...m, unsubscribeUrl: oneClickUrl(info.unsub_token) }]);
+  return 'ok';
+}

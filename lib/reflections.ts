@@ -34,12 +34,20 @@ export async function handleReply(from: string, text: string | null) {
 
   const reader = await rpc<Reader>('dss_reader_lookup', { p_gate: gate(), p_email: email });
   if (!reader?.premium || !reader.mailable) return { handled: false, reason: 'not a Premium reader' };
+  return writeLampFor(email, reply, reader.next_date);
+}
 
-  // Save first (joins with any earlier note today), then write the reflection from everything they shared.
+// Saves what a reader shared (joined with any earlier note for that date), then writes that morning's
+// Last Night's Lamp from everything they shared. Also used by admins to write one for a specific date.
+export async function writeLampFor(email: string, reply: string, forDate: string, opts: { replace?: boolean } = {}) {
+  // replace: start fresh for that date instead of joining with an earlier note.
+  if (opts.replace) {
+    await rpc('dss_reflection_save', { p_gate: gate(), p_email: email, p_for_date: forDate, p_reply: reply, p_content: {}, p_status: 'pending', p_note: null });
+  }
   const merged = await rpc<string>('dss_reflection_save', {
     p_gate: gate(),
     p_email: email,
-    p_for_date: reader.next_date,
+    p_for_date: forDate,
     p_reply: reply,
     p_content: null,
     p_status: 'pending',
@@ -50,27 +58,27 @@ export async function handleReply(from: string, text: string | null) {
     // Use a different historical voice from the one in that morning's main study, if it's written yet.
     const study = await rpc<{ content?: { voices?: { name: string }[] } } | null>('dss_study_get', {
       p_gate: gate(),
-      p_date: reader.next_date,
+      p_date: forDate,
     }).catch(() => null);
     const r = await writeReflection(merged, { avoidVoice: study?.content?.voices?.[0]?.name ?? null });
     const ready = r.kind === 'reflection' && r.passage;
     await rpc('dss_reflection_save', {
       p_gate: gate(),
       p_email: email,
-      p_for_date: reader.next_date,
+      p_for_date: forDate,
       p_reply: merged,
       p_content: ready ? { passage: r.passage, body: r.body, voice: r.voice } : null,
       p_status: ready ? 'ready' : 'skipped',
       p_note: r.kind,
     });
     if (r.kind === 'care') await alertCare(email, merged);
-    return { handled: true, kind: r.kind, for_date: reader.next_date };
+    return { handled: true, kind: r.kind, for_date: forDate };
   } catch (e) {
     console.error('reflection writer', e);
     await rpc('dss_reflection_save', {
       p_gate: gate(),
       p_email: email,
-      p_for_date: reader.next_date,
+      p_for_date: forDate,
       p_reply: merged,
       p_content: null,
       p_status: 'failed',
