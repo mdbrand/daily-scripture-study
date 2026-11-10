@@ -164,7 +164,9 @@ export async function sendCheckins(budgetMs = 60_000) {
     const emails = batch.map((r) => {
       const footer = footerFor(r.unsub_token, postal);
       const dayIndex = Math.floor(new Date(`${r.local_date}T12:00:00Z`).getTime() / 86400000);
-      return { to: r.email, ...renderCheckinEmail({ footer, dayIndex }), unsubscribeUrl: oneClickUrl(r.unsub_token) };
+      // The morning a reply or season tap tonight writes for (dss_season_set: after 5 AM local -> tomorrow).
+      const nextDate = new Date((dayIndex + 1) * 86400000 + 43200000).toISOString().slice(0, 10);
+      return { to: r.email, ...renderCheckinEmail({ footer, dayIndex, nextDate }), unsubscribeUrl: oneClickUrl(r.unsub_token) };
     });
     const ids = await sendBatch(emails);
     await rpc('dss_record_checkins', {
@@ -180,7 +182,7 @@ export async function sendCheckins(budgetMs = 60_000) {
 export async function sendCheckinPreview(to: string) {
   const footer = footerFor('preview', postalAddress() ?? '(mailing address not set yet)');
   const dayIndex = Math.floor(Date.now() / 86400000);
-  await sendBatch([{ to, ...renderCheckinEmail({ footer, dayIndex, isTest: true }), unsubscribeUrl: footer.unsubscribeUrl }]);
+  await sendBatch([{ to, ...renderCheckinEmail({ footer, dayIndex, nextDate: pacificDate(1), isTest: true }), unsubscribeUrl: footer.unsubscribeUrl }]);
 }
 
 // Welcome emails for people who joined but haven't been welcomed yet.

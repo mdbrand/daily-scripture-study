@@ -126,9 +126,14 @@ function isoFromLabel(label: string): string {
 // Today's 7 one-tap seasons for this reader (Premium): 4 hard, 3 good, rotating daily, with the season the
 // reader is already in first. Each links to /s/<token>/<season>, which saves it.
 function seasonsFor(s: DailyStudy, base: string | undefined): Season[] {
-  if (!base) return [];
   const current = s.yesterday?.meta?.source === 'season' ? s.yesterday.meta.season : null;
-  return seasonsForEmail(isoFromLabel(s.dateLabel), base, current);
+  return seasonsOn(isoFromLabel(s.dateLabel), base, current);
+}
+
+// The 7 seasons for one reader on one study date (YYYY-MM-DD). Shared by the morning email and the
+// evening check-in, so a reader sees the same rotation in both. The seed is their /s/<token> base.
+function seasonsOn(date: string, base: string | undefined, current?: string | null): Season[] {
+  return base ? seasonsForEmail(date, base, current) : [];
 }
 
 function seasonChipsHtml(base: string | undefined, size: 'big' | 'small', list: Season[]): string {
@@ -457,10 +462,20 @@ const CHECKIN_SUBJECTS = [
 ];
 const EVENING_IMAGE = 'https://morninglamp.study/email/evening-header.png';
 
+const CHECKIN_SEASONS = 'Too busy to write tonight? Tap the season you’re in, and tomorrow’s Last Night’s Lamp will be written for it.';
+
 // Evening check-in (Premium, 8 PM local). Night look so it reads as the evening half of the loop:
 // tonight you reply -> overnight we find Scripture -> 5 AM Last Night's Lamp.
-export function renderCheckinEmail(o: { footer: MailFooter; dayIndex: number; isTest?: boolean }): { subject: string; html: string; text: string } {
+// `dayIndex` is the reader's local date as days since 1970-01-01 (picks the headline). `nextDate`
+// (YYYY-MM-DD) is the morning the reply or a season tap writes for; the season buttons rotate on it,
+// same as that morning's email. Defaults to the day after `dayIndex`.
+export function renderCheckinEmail(o: { footer: MailFooter; dayIndex: number; nextDate?: string; isTest?: boolean }): { subject: string; html: string; text: string } {
   const subject = CHECKIN_SUBJECTS[((o.dayIndex % CHECKIN_SUBJECTS.length) + CHECKIN_SUBJECTS.length) % CHECKIN_SUBJECTS.length];
+  const nextDate = o.nextDate ?? new Date((o.dayIndex + 1) * 86_400_000 + 43_200_000).toISOString().slice(0, 10);
+  const base = o.footer.seasonBase;
+  const seasonList = seasonsOn(nextDate, base);
+  const seasonsHtml = seasonList.length ? `${p(esc(CHECKIN_SEASONS))}${seasonChipsHtml(base, 'big', seasonList)}` : '';
+  const seasonsText = seasonList.length ? [CHECKIN_SEASONS, ...seasonChipsText(base, seasonList), ''] : [];
   const verse: Passage = { text: 'Your word is a lamp for my feet, a light on my path.', ref: 'Psalm 119:105 (NIV)' };
   const ask = 'Hit reply and tell us how today went, in a sentence or two: a win, a worry, a hard conversation, something you’re grateful for.';
   const why = 'We read what you share, find Scripture for it, and write tomorrow morning’s Last Night’s Lamp just for you: your own words, a passage for how you felt, the story behind it, and a voice from Christian history who walked through the same thing.';
@@ -492,6 +507,7 @@ export function renderCheckinEmail(o: { footer: MailFooter; dayIndex: number; is
       ${steps.map(step).join('')}
     </tr></table>
     ${p(esc(why))}
+    ${seasonsHtml}
     ${p(esc(quiet), `color:${C.muted};font-size:16px;`)}
     ${p('Rest well,<br>Morning Lamp')}
   </td></tr>`;
@@ -500,7 +516,7 @@ export function renderCheckinEmail(o: { footer: MailFooter; dayIndex: number; is
     html: shell(inner, 'Reply with a line about your day. Tomorrow’s Last Night’s Lamp will be written in response to it.', o.isTest, footerHtml(o.footer), 'premium'),
     text: [
       'MORNING LAMP · EVENING: A LAMP FOR YOUR FEET',
-      `"${verse.text}" (${verse.ref})`,
+      `"${verse.text}" (${verse.ref.replace(/ \((\w+)\)$/, ', $1')})`,
       '',
       'LAST NIGHT’S LAMP · EVENING CHECK-IN',
       subject,
@@ -511,6 +527,7 @@ export function renderCheckinEmail(o: { footer: MailFooter; dayIndex: number; is
       '',
       why,
       '',
+      ...seasonsText,
       quiet,
       '',
       'Rest well,',

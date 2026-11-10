@@ -38,6 +38,7 @@ There is **no "A Verse for Your Life"** and no second verse anywhere. It was rem
 - The ask: hit reply and tell us how today went.
 - Three-step path, "Tonight" lit: 1 Tonight: reply and tell us how your day went · 2 Overnight: we find Scripture for what you shared · 3 5 AM: Last Night's Lamp, written for you.
 - Says plainly that what they share becomes tomorrow morning's Last Night's Lamp.
+- **7 one-tap season buttons** (approved by the owner Nov 10, 2026), for readers too busy to reply: "Too busy to write tonight? Tap the season you're in, and tomorrow's Last Night's Lamp will be written for it." then the same 7 rotating buttons (4 hard, 3 good) and styling as the morning email. They rotate on the next morning's date and the reader's token, the same rotation that morning's email uses. Listed as links in the plain-text version too. Same tap behavior as the morning buttons: a tap at 8 PM writes the next morning's Lamp, and a real reply still wins.
 - "Nothing to share tonight? No need to reply. Your daily study still arrives at 5 AM." Then "Rest well, Morning Lamp".
 - Not sent if they already shared something that day.
 
