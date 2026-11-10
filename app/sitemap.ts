@@ -11,6 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE}/`, changeFrequency: 'weekly', priority: 1 },
     { url: `${SITE}/bible-verses`, lastModified: newest('bible-verses'), changeFrequency: 'weekly', priority: 0.8 },
     { url: `${SITE}/books`, lastModified: newest('books'), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${SITE}/topics`, lastModified: newest('topics'), changeFrequency: 'weekly', priority: 0.8 },
     { url: `${SITE}/guides`, lastModified: newest('guides'), changeFrequency: 'weekly', priority: 0.8 },
     ...ARTICLES.map((a) => ({
       url: articleUrl(a),

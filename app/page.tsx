@@ -32,6 +32,13 @@ const guideColumns = [
     label: (a: { title: string }) => (a.title.match(/Book of ([^?:]+)/)?.[1] ?? a.title).trim(),
   },
   {
+    section: 'topics',
+    heading: 'What the Bible says about',
+    more: 'See all',
+    items: ARTICLES.filter((a) => a.section === 'topics').sort(byTitle),
+    label: (a: { title: string }) => (a.title.match(/Say About ([^?:]+)/i)?.[1] ?? a.title).trim(),
+  },
+  {
     section: 'guides',
     heading: 'How to study the Bible',
     more: 'See all',
@@ -319,7 +326,7 @@ export default async function Home() {
             </p>
           </header>
           <div className="guide-index">
-            {guideColumns.map((col) => (
+            {guideColumns.filter((col) => col.items.length > 0).map((col) => (
               <nav className="guide-row" key={col.section} aria-labelledby={`gc-${col.section}`}>
                 <h3 id={`gc-${col.section}`}>
                   <Link href={`/${col.section}`}>{col.heading}</Link>

@@ -28,7 +28,7 @@ export type HistoryVoice = { name: string; dates: string; work: string; body: st
 
 export type Article = {
   slug: string;
-  section: 'bible-verses' | 'books' | 'guides';
+  section: 'bible-verses' | 'books' | 'topics' | 'guides';
   keyword: string; // the search phrase this page targets
   title: string; // H1 (matches the search phrase)
   seoTitle: string; // <title>, ≤ 60 characters

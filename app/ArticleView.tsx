@@ -55,7 +55,7 @@ export function TopBar() {
 export default function ArticleView({ a }: { a: Article }) {
   const season = seasonByKey(a.season);
   // Book guides lead with who wrote it, when and what it's about; the key verses come after.
-  const sectionsFirst = a.section === 'books';
+  const sectionsFirst = a.section === 'books' || a.section === 'topics';
   const groupHeads = (a.groups ?? []).map((g) => g.heading);
   const sectionHeads = (a.sections ?? []).map((s) => s.heading);
   const toc = [
