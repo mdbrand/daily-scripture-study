@@ -4,6 +4,7 @@ import { sendConfirmation } from '@/lib/confirm';
 import { CONSENT_TEXT, normalizeEmail, normalizePlan, normalizeRef } from '@/lib/subscribe';
 import { checkEmail } from '@/lib/emailCheck';
 import { suggestEmail } from '@/lib/emailTypos';
+import { clean, cleanUtm, geoFromHeaders, isNewSubscriber, sendSignupAlert } from '@/lib/signupAlert';
 
 export const runtime = 'nodejs';
 
@@ -64,6 +65,10 @@ export async function POST(req: Request) {
   // Partner link (?ref=code). The database keeps the first referrer.
   const ref = normalizeRef(body.ref);
 
+  // dss_subscribe() returns nothing, so ask first whether this address is already on the list.
+  // Real (non-flagged) first-time signups only; any failure just means no alert.
+  const notify = !suspectedBot && (await isNewSubscriber(email));
+
   const res = await fetch(`${url}/rest/v1/rpc/dss_subscribe`, {
     method: 'POST',
     headers,
@@ -97,6 +102,24 @@ export async function POST(req: Request) {
         console.error('subscribe: confirmation email', e);
       }
     });
+  }
+
+  // Owner alert for a brand-new, saved signup. Errors are caught inside; never affects the signup.
+  if (notify) {
+    const alert = {
+      email,
+      plan,
+      formLocation: clean(body.source, 40),
+      pageUrl: clean(body.page),
+      referrer: clean(body.referrer),
+      ref,
+      utm: cleanUtm(body.utm),
+      timezone: clean(body.timezone, 64),
+      emailFlag: verdict.flag ?? null,
+      geo: geoFromHeaders(req.headers),
+      at: new Date(),
+    };
+    after(() => sendSignupAlert(alert));
   }
 
   return NextResponse.json({ ok: true, plan });

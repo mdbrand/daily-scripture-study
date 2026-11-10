@@ -72,7 +72,7 @@ export default function SignupForm({
       const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, plan, source, website, ref, timezone: browserTimeZone(), t: shownAt }),
+        body: JSON.stringify({ email, plan, source, website, ref, timezone: browserTimeZone(), t: shownAt, ...pageContext() }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -196,5 +196,19 @@ function browserTimeZone(): string | null {
     return Intl.DateTimeFormat().resolvedOptions().timeZone || null;
   } catch {
     return null;
+  }
+}
+
+// Where the signup happened, for the owner alert only (not stored): page URL, referrer, utm_* params.
+function pageContext(): { page?: string; referrer?: string; utm?: Record<string, string> } {
+  try {
+    const u = new URL(window.location.href);
+    const utm: Record<string, string> = {};
+    u.searchParams.forEach((v, k) => {
+      if (k.toLowerCase().startsWith('utm_')) utm[k.toLowerCase()] = v;
+    });
+    return { page: u.origin + u.pathname + u.search, referrer: document.referrer || undefined, utm };
+  } catch {
+    return {};
   }
 }
