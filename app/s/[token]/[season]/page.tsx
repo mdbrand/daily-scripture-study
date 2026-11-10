@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import LegalShell from '../../../LegalShell';
 import AutoSubmit from './AutoSubmit';
-import { seasonByKey } from '@/lib/seasons';
+import { CARE_NOTE, seasonByKey } from '@/lib/seasons';
 import { LEGAL } from '@/lib/legal';
 
 export const metadata: Metadata = { title: 'Your season | Morning Lamp', robots: { index: false, follow: false } };
@@ -36,6 +36,7 @@ export default async function SeasonTap({
           Tomorrow morning’s Last Night’s Lamp will be written for {season.phrase}: a passage for it, the story
           behind that passage, and a voice from Christian history who walked through it too.
         </p>
+        {season.care && <p>{CARE_NOTE}</p>}
         <p>
           Want it to be even more yours? Tonight, reply to the evening check-in with a line about your day, and we’ll
           write tomorrow’s study from your own words.

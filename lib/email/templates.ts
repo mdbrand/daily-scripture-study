@@ -1,6 +1,6 @@
 // APPROVED FORMAT: see docs/email-format.md. Don't add, remove, or rename sections without the owner's sign-off.
 // Email templates for Morning Lamp. Email-safe HTML: tables + inline styles only.
-import { SEASONS, seasonByKey, type LampMeta } from '../seasons';
+import { CARE_NOTE, seasonByKey, seasonsForEmail, type LampMeta, type Season } from '../seasons';
 
 export type Passage = { text: string; ref: string }; // ref includes translation, e.g. "Psalm 46:10 (NIV)"
 export type Voice = { name: string; dates: string; kind: 'Direct commentary' | 'Thematic connection'; body: string; source: string };
@@ -65,13 +65,14 @@ function nightBefore(forDate: string): string {
 }
 
 // How a Lamp introduces itself, depending on how it came about.
-function lampIntro(y: NonNullable<DailyStudy['yesterday']>): { subtitle: string; line: string } {
+function lampIntro(y: NonNullable<DailyStudy['yesterday']>): { subtitle: string; line: string; care?: string } {
   const m = y.meta;
   if (m?.source === 'season') {
     const season = seasonByKey(m.season);
     return {
       subtitle: 'Written for the season you’re in',
       line: `You told us you’re in ${season?.phrase ?? 'a hard season'}. This study is written for it.`,
+      care: season?.care ? CARE_NOTE : undefined,
     };
   }
   if (m?.source === 'followup') {
@@ -116,20 +117,33 @@ const quote = (q: Passage, big = true) =>
        <p style="margin:8px 0 0;font-family:${SANS};font-size:14px;color:${C.muted};">${esc(q.ref)}</p>
      </td></tr></table>`;
 
-// The 7 one-tap seasons (Premium). Each links to /s/<token>/<season>, which saves it.
-function seasonChipsHtml(base: string | undefined, size: 'big' | 'small'): string {
-  if (!base) return '';
+// "Tuesday, November 10, 2026" -> "2026-11-10" (the study date the buttons rotate on).
+function isoFromLabel(label: string): string {
+  const d = new Date(`${label} 12:00 UTC`);
+  return Number.isNaN(d.getTime()) ? new Date().toISOString().slice(0, 10) : d.toISOString().slice(0, 10);
+}
+
+// Today's 7 one-tap seasons for this reader (Premium): 4 hard, 3 good, rotating daily, with the season the
+// reader is already in first. Each links to /s/<token>/<season>, which saves it.
+function seasonsFor(s: DailyStudy, base: string | undefined): Season[] {
+  if (!base) return [];
+  const current = s.yesterday?.meta?.source === 'season' ? s.yesterday.meta.season : null;
+  return seasonsForEmail(isoFromLabel(s.dateLabel), base, current);
+}
+
+function seasonChipsHtml(base: string | undefined, size: 'big' | 'small', list: Season[]): string {
+  if (!base || !list.length) return '';
   const pad = size === 'big' ? '10px 16px' : '7px 12px';
   const font = size === 'big' ? '15px' : '14px';
   const label = size === 'small' ? `<p style="margin:0 0 10px;font-family:${SANS};font-size:14px;color:${C.muted};">Or tap the season you’re in:</p>` : '';
-  return `${label}<p style="margin:0 0 14px;line-height:2.6;">${SEASONS.map(
+  return `${label}<p style="margin:0 0 14px;line-height:2.6;">${list.map(
     (x) =>
       `<a href="${esc(`${base}/${x.key}`)}" style="display:inline-block;margin:0 6px 0 0;padding:${pad};border:1px solid ${C.gold};border-radius:999px;background:#ffffff;font-family:${SANS};font-size:${font};font-weight:bold;line-height:1.2;color:${C.navy};text-decoration:none;white-space:nowrap;">${esc(x.label)}</a>`,
   ).join(' ')}</p>`;
 }
 
-function seasonChipsText(base: string | undefined): string[] {
-  return base ? SEASONS.map((x) => `- ${x.label}: ${base}/${x.key}`) : [];
+function seasonChipsText(base: string | undefined, list: Season[]): string[] {
+  return base ? list.map((x) => `- ${x.label}: ${base}/${x.key}`) : [];
 }
 
 function voicesHtml(voices: Voice[]): string {
@@ -231,7 +245,8 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
         <p style="margin:0;font-family:${SANS};font-size:13px;letter-spacing:2.5px;font-weight:bold;color:${C.gold};">LAST NIGHT’S LAMP</p>
         <p style="margin:6px 0 0;font-family:${SERIF};font-size:16px;font-style:italic;color:#e9e1cf;">${esc(subtitle)}</p>
       </td></tr>`;
-  const chips = (size: 'big' | 'small') => seasonChipsHtml(footer?.seasonBase, size);
+  const seasonList = isPremium ? seasonsFor(s, footer?.seasonBase) : [];
+  const chips = (size: 'big' | 'small') => seasonChipsHtml(footer?.seasonBase, size, seasonList);
   const intro = s.yesterday ? lampIntro(s.yesterday) : null;
   const fromNote = !!s.yesterday && !s.yesterday.meta;
   const yesterday = !isPremium
@@ -240,6 +255,7 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
       ? `${lampBand(intro.subtitle)}
       <tr><td style="background:${C.ivory};padding:26px 32px 12px;">
         ${p(`<em>${esc(intro.line)}</em>`, `color:${C.muted};`)}
+        ${intro.care ? p(esc(intro.care), `font-size:15px;color:${C.muted};`) : ''}
         ${quote(s.yesterday.passage, false)}
         ${h('Behind the Verse')}
         ${s.yesterday.body.slice(0, 3).map((b) => p(rich(b))).join('')}
@@ -309,6 +325,7 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
             'LAST NIGHT’S LAMP',
             intro.subtitle,
             intro.line,
+            ...(intro.care ? [intro.care] : []),
             `"${s.yesterday.passage.text}" (${s.yesterday.passage.ref})`,
             '',
             'BEHIND THE VERSE',
@@ -317,11 +334,11 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
               ? ['', 'VOICES THROUGH HISTORY', `${s.yesterday.voice.name} (${s.yesterday.voice.dates}), ${s.yesterday.voice.kind}: ${s.yesterday.voice.body} Source: ${s.yesterday.voice.source}`]
               : []),
             '',
-            ...(fromNote ? [] : [OWN_WORDS, ...seasonChipsText(footer?.seasonBase), '']),
+            ...(fromNote ? [] : [OWN_WORDS, ...seasonChipsText(footer?.seasonBase, seasonList), '']),
           ]
         : [
             'LAST NIGHT’S LAMP',
-            ...(footer?.seasonBase ? [SEASON_ASK, SEASON_HINT, ...seasonChipsText(footer.seasonBase), '', 'Or tell us about your day'] : ['Tonight, tell us about your day']),
+            ...(footer?.seasonBase ? [SEASON_ASK, SEASON_HINT, ...seasonChipsText(footer.seasonBase, seasonList), '', 'Or tell us about your day'] : ['Tonight, tell us about your day']),
             YESTERDAY_INVITE,
             YESTERDAY_INVITE_2,
             '',
