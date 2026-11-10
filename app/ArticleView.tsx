@@ -43,6 +43,7 @@ export function TopBar() {
         </Link>
         <div className="toplinks">
           <Link href="/bible-verses">Bible Verses</Link>
+          <Link href="/books">Books</Link>
           <Link href="/guides">Guides</Link>
           <Link href="/#premium">Premium</Link>
         </div>
@@ -53,9 +54,12 @@ export function TopBar() {
 
 export default function ArticleView({ a }: { a: Article }) {
   const season = seasonByKey(a.season);
+  // Book guides lead with who wrote it, when and what it's about; the key verses come after.
+  const sectionsFirst = a.section === 'books';
+  const groupHeads = (a.groups ?? []).map((g) => g.heading);
+  const sectionHeads = (a.sections ?? []).map((s) => s.heading);
   const toc = [
-    ...(a.groups ?? []).map((g) => g.heading),
-    ...(a.sections ?? []).map((s) => s.heading),
+    ...(sectionsFirst ? [...sectionHeads, ...groupHeads] : [...groupHeads, ...sectionHeads]),
     ...(a.voice ? ['A voice from church history'] : []),
     'Common questions',
   ];
@@ -109,6 +113,84 @@ export default function ArticleView({ a }: { a: Article }) {
           </ol>
         </nav>
 
+        {sectionsFirst ? (
+          <>
+        {(a.sections ?? []).map((s) => (
+          <section key={s.heading} aria-labelledby={slugify(s.heading)}>
+            <h2 id={slugify(s.heading)}>{s.heading}</h2>
+            {(s.paragraphs ?? []).map((p, i) => (
+              <p key={i}>{p}</p>
+            ))}
+            {s.list && (
+              <ul>
+                {s.list.map((li) => (
+                  <li key={li}>{li}</li>
+                ))}
+              </ul>
+            )}
+            {s.steps && (
+              <ol className="steps">
+                {s.steps.map((st) => (
+                  <li key={st.name}>
+                    <strong>{st.name}.</strong> {st.text}
+                  </li>
+                ))}
+              </ol>
+            )}
+            {s.table && (
+              <div className="table-wrap">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      {s.table.head.map((h) => (
+                        <th key={h} scope="col">
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {s.table.rows.map((r, i) => (
+                      <tr key={i}>
+                        {r.map((c, j) => (j === 0 ? <th key={j} scope="row">{c}</th> : <td key={j}>{c}</td>))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        ))}
+
+        {(a.groups ?? []).map((g) => (
+          <section key={g.heading} aria-labelledby={slugify(g.heading)}>
+            <h2 id={slugify(g.heading)}>{g.heading}</h2>
+            {g.intro && <p>{g.intro}</p>}
+            {g.verses.map((v) => (
+              <div className="verse-card" key={`${v.ref}-${v.translation}`}>
+                <h3>
+                  {v.ref} <span className="tr">({v.translation})</span>
+                </h3>
+                <blockquote>
+                  <p>
+                    “<Scripture text={v.text} />”
+                  </p>
+                  <cite>
+                    {v.ref}, {v.translation}
+                  </cite>
+                </blockquote>
+                <p className="story">
+                  <strong>The story behind it: </strong>
+                  {v.story}
+                </p>
+              </div>
+            ))}
+          </section>
+        ))}
+
+          </>
+        ) : (
+          <>
         {(a.groups ?? []).map((g) => (
           <section key={g.heading} aria-labelledby={slugify(g.heading)}>
             <h2 id={slugify(g.heading)}>{g.heading}</h2>
@@ -181,6 +263,9 @@ export default function ArticleView({ a }: { a: Article }) {
             )}
           </section>
         ))}
+
+          </>
+        )}
 
         {a.voice && (
           <section aria-labelledby="a-voice-from-church-history">

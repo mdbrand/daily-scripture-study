@@ -9,6 +9,16 @@ import newBeginnings from './content/new-beginnings';
 import friendship from './content/friendship';
 import howToStudy from './content/how-to-study-the-bible';
 import readingPlan2027 from './content/2027-bible-reading-plan';
+import psalms from './content/psalms';
+import ecclesiastes from './content/ecclesiastes';
+import john from './content/john';
+import acts from './content/acts';
+import revelation from './content/revelation';
+import forgiveness from './content/forgiveness';
+import comfort from './content/comfort';
+import hope from './content/hope';
+import joy from './content/joy';
+import grief from './content/grief';
 
 // Every published article. Add new ones here (one file per article in ./content).
 export const ARTICLES: Article[] = [
@@ -22,6 +32,16 @@ export const ARTICLES: Article[] = [
   friendship,
   howToStudy,
   readingPlan2027,
+  psalms,
+  ecclesiastes,
+  john,
+  acts,
+  revelation,
+  forgiveness,
+  comfort,
+  hope,
+  joy,
+  grief,
 ];
 
 export const SITE = 'https://morninglamp.study';
@@ -37,6 +57,7 @@ export const relatedTo = (a: Article) =>
 
 export const SECTION_NAMES: Record<Article['section'], string> = {
   'bible-verses': 'Bible Verses',
+  books: 'Books of the Bible',
   guides: 'Guides',
 };
 
