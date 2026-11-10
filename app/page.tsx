@@ -19,22 +19,22 @@ const byTitle = (a: { title: string }, b: { title: string }) => a.title.localeCo
 const guideColumns = [
   {
     section: 'bible-verses',
-    heading: 'Bible verses about…',
-    more: 'All Bible verse guides',
+    heading: 'Bible verses about',
+    more: 'See all',
     items: ARTICLES.filter((a) => a.section === 'bible-verses').sort(byTitle),
     label: (a: { title: string }) => a.title.replace(/^Bible Verses About /, '').replace(/:.*$/, ''),
   },
   {
     section: 'books',
     heading: 'Books of the Bible',
-    more: 'All book guides',
+    more: 'See all',
     items: ARTICLES.filter((a) => a.section === 'books').sort(byTitle),
     label: (a: { title: string }) => (a.title.match(/Book of ([^?:]+)/)?.[1] ?? a.title).trim(),
   },
   {
     section: 'guides',
     heading: 'How to study the Bible',
-    more: 'All guides',
+    more: 'See all',
     items: ARTICLES.filter((a) => a.section === 'guides').sort(byTitle),
     label: (a: { title: string }) => a.title.replace(/:.*$/, ''),
   },
@@ -318,24 +318,26 @@ export default async function Home() {
               Can’t wait until tomorrow morning? Start with one of these. Each verse comes with the story behind it.
             </p>
           </header>
-          <div className="guide-cols">
+          <div className="guide-index">
             {guideColumns.map((col) => (
-              <nav className={`guide-col guide-col-${col.section}`} key={col.section} aria-labelledby={`gc-${col.section}`}>
+              <nav className="guide-row" key={col.section} aria-labelledby={`gc-${col.section}`}>
                 <h3 id={`gc-${col.section}`}>
                   <Link href={`/${col.section}`}>{col.heading}</Link>
                 </h3>
-                <ul>
-                  {col.items.map((a) => (
-                    <li key={a.slug}>
-                      <Link href={articlePath(a)} title={a.title}>
-                        {col.label(a)}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-                <Link className="guide-all" href={`/${col.section}`}>
-                  {col.more} <span aria-hidden="true">→</span>
-                </Link>
+                <div className="guide-row-body">
+                  <ul>
+                    {col.items.map((a) => (
+                      <li key={a.slug}>
+                        <Link href={articlePath(a)} title={a.title}>
+                          {col.label(a)}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link className="guide-all" href={`/${col.section}`}>
+                    {col.more} <span aria-hidden="true">→</span>
+                  </Link>
+                </div>
               </nav>
             ))}
           </div>
