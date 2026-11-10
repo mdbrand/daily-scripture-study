@@ -23,7 +23,12 @@ Sections 1–5 above (no Premium box), then **Last Night's Lamp**:
 - **Behind the Verse**: no more than 3 paragraphs, unpacking that passage and connecting it to their day.
 - **Voices Through History**: **one voice** who wrote about or lived through the same feeling. Must be a different person from the voice in the main study.
 
-If the reader didn't share anything: subtitle *A study written in response to your day*, heading "Tonight, tell us about your day", and an invitation to reply to tonight's check-in.
+**When the reader didn't reply last night** (approved by the owner Nov 10, 2026), the section is never wasted:
+- **Season** (they tapped a season more recently than their last note): subtitle *Written for the season you're in*, "You told us you're in a season of waiting. This study is written for it.", then the same passage / Behind the Verse / one voice, written for that season. Written as soon as they tap, or overnight.
+- **Follow-up** (they shared a note in the last 21 days): subtitle *Picking up where you left off*, "On Saturday night you wrote: '…'", then a fresh study that picks up from that note (different passage, asks how things have moved, one next step, one voice). Written overnight, 2–4 AM their time.
+- Both end with a line inviting tonight's reply and the 7 season buttons, smaller ("Or tap the season you're in").
+- **Nothing to go on** (never shared, no season): subtitle *A study written in response to your day*, heading "What season are you in?" with the **7 one-tap season buttons** (Anxious, Waiting, Grieving, Stretched thin, Starting over, Far from God, Grateful), then "Or tell us about your day" and the invitation to reply to tonight's check-in.
+- A season button opens morninglamp.study/s/<token>/<season>, which saves the season and writes tomorrow's Lamp for it (unless they already shared something for tomorrow). A real reply always wins over a season.
 
 There is **no "A Verse for Your Life"** and no second verse anywhere. It was removed on purpose.
 

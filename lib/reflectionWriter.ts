@@ -48,7 +48,26 @@ Classify first:
 - If there is any sign of crisis, self-harm, suicidal thoughts, abuse, or danger, use kind "care" and write nothing else; a person on our team will follow up.
 - If there is nothing to reflect on (unsubscribe, billing, spam, a one-word reply), or the reply is feedback about Morning Lamp itself (what they like, what to change, answers to a beta-tester question), use kind "other".`;
 
-export async function writeReflection(reply: string, opts: { avoidVoice?: string | null } = {}): Promise<Reflection> {
+// How this Lamp is prompted:
+// - reply: they wrote back last night (the normal case).
+// - season: they didn't write last night, but tapped a "season" button (e.g. Waiting). Write for that season.
+// - followup: they didn't write last night or pick a season; pick up the last note they shared a few days ago.
+export type LampMode = { kind: 'reply' } | { kind: 'season'; season: string } | { kind: 'followup'; daysAgo: number };
+
+function userMessage(reply: string, mode: LampMode): string {
+  if (mode.kind === 'season') {
+    return `This reader did not reply last night. Earlier, they tapped a button in their email to tell us they are ${mode.season}. That is all they shared; there is no note. Write a reflection (kind "reflection") for someone in that season: find the feeling underneath it, choose the passage and the voice for that feeling, and in Behind the Verse speak to the season kindly and specifically without inventing details about their life.`;
+  }
+  if (mode.kind === 'followup') {
+    return `This reader did not reply last night. ${mode.daysAgo <= 1 ? 'Two nights ago' : `About ${mode.daysAgo + 1} nights ago`}, they shared the note below, and we already wrote them one study for it. Write a fresh follow-up (kind "reflection") that picks up where that left off: a different passage than the obvious one, Behind the Verse that gently asks how things have moved since then (without assuming how it turned out) and offers one next step, and one voice from history for that next step.\n\n<earlier_note>\n${reply}\n</earlier_note>`;
+  }
+  return `The reader wrote:\n\n<reply>\n${reply}\n</reply>`;
+}
+
+export async function writeReflection(
+  reply: string,
+  opts: { avoidVoice?: string | null; mode?: LampMode } = {},
+): Promise<Reflection> {
   const key = anthropicKey();
   const client = key ? new Anthropic({ apiKey: key }) : new Anthropic();
   const avoid = opts.avoidVoice
@@ -60,7 +79,7 @@ export async function writeReflection(reply: string, opts: { avoidVoice?: string
     thinking: { type: 'adaptive' },
     output_config: { effort: 'high', format: zodOutputFormat(ReflectionSchema) },
     system: SYSTEM,
-    messages: [{ role: 'user', content: `The reader wrote:\n\n<reply>\n${reply}\n</reply>${avoid}` }],
+    messages: [{ role: 'user', content: `${userMessage(reply, opts.mode ?? { kind: 'reply' })}${avoid}` }],
   });
   if (response.stop_reason === 'refusal') return { kind: 'care', passage: null, body: [], voice: null };
   const out = response.parsed_output;

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { dailySettings, generateStudy, getStudy, pacificDate, sendCheckins, sendDue } from '@/lib/daily';
 import { anthropicKey } from '@/lib/studyWriter';
 import { sendEmail } from '@/lib/email/send';
+import { writeFallbacks } from '@/lib/reflections';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
@@ -20,6 +21,7 @@ export async function GET(req: Request) {
   if (!settings.send_open) return NextResponse.json({ ok: true, skipped: 'sending is not switched on' });
 
   const today = pacificDate(0);
+  const started = Date.now();
   try {
     // Safety net: if yesterday's writing failed, try again before anyone's 5 AM passes.
     if (anthropicKey() && !(await getStudy(today))) await generateStudy(today).catch((e) => console.error('fallback writer', e));
@@ -30,7 +32,14 @@ export async function GET(req: Request) {
       console.error('checkins', e);
       return 0;
     });
-    return NextResponse.json({ ok: true, ...result, checkins });
+    // Premium readers who didn't reply (2–4 AM their time): write this morning's Lamp from their season or
+    // an earlier note, with whatever time this run has left.
+    const left = 260_000 - (Date.now() - started);
+    const fallbacks = left > 30_000 ? await writeFallbacks(left).catch((e) => {
+      console.error('fallbacks', e);
+      return 0;
+    }) : 0;
+    return NextResponse.json({ ok: true, ...result, checkins, fallbacks });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error('daily send', e);

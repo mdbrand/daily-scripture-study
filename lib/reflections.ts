@@ -1,7 +1,8 @@
 import { rpc } from './supabaseRpc';
 import { gate } from './partners';
 import { sendEmail } from './email/send';
-import { writeReflection } from './reflectionWriter';
+import { writeReflection, type LampMode } from './reflectionWriter';
+import { seasonByKey, type LampMeta } from './seasons';
 import { anthropicKey } from './studyWriter';
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://morninglamp.study';
@@ -39,7 +40,12 @@ export async function handleReply(from: string, text: string | null) {
 
 // Saves what a reader shared (joined with any earlier note for that date), then writes that morning's
 // Last Night's Lamp from everything they shared. Also used by admins to write one for a specific date.
-export async function writeLampFor(email: string, reply: string, forDate: string, opts: { replace?: boolean } = {}) {
+export async function writeLampFor(
+  email: string,
+  reply: string,
+  forDate: string,
+  opts: { replace?: boolean; mode?: LampMode; meta?: LampMeta } = {},
+) {
   // replace: start fresh for that date instead of joining with an earlier note.
   if (opts.replace) {
     await rpc('dss_reflection_save', { p_gate: gate(), p_email: email, p_for_date: forDate, p_reply: reply, p_content: {}, p_status: 'pending', p_note: null });
@@ -60,14 +66,14 @@ export async function writeLampFor(email: string, reply: string, forDate: string
       p_gate: gate(),
       p_date: forDate,
     }).catch(() => null);
-    const r = await writeReflection(merged, { avoidVoice: study?.content?.voices?.[0]?.name ?? null });
+    const r = await writeReflection(merged, { avoidVoice: study?.content?.voices?.[0]?.name ?? null, mode: opts.mode });
     const ready = r.kind === 'reflection' && r.passage;
     await rpc('dss_reflection_save', {
       p_gate: gate(),
       p_email: email,
       p_for_date: forDate,
       p_reply: merged,
-      p_content: ready ? { passage: r.passage, body: r.body, voice: r.voice } : null,
+      p_content: ready ? { passage: r.passage, body: r.body, voice: r.voice, ...(opts.meta ? { meta: opts.meta } : {}) } : null,
       p_status: ready ? 'ready' : 'skipped',
       p_note: r.kind,
     });
@@ -86,6 +92,70 @@ export async function writeLampFor(email: string, reply: string, forDate: string
     });
     return { handled: false, reason: 'writer failed' };
   }
+}
+
+// ---------- seasons and no-reply mornings ----------
+
+// A Premium reader tapped a season in their email. Saves it and, unless they already shared something for
+// tomorrow morning, writes tomorrow's Last Night's Lamp for that season.
+export async function tapSeason(token: string, key: string) {
+  const season = seasonByKey(key);
+  if (!season) return { status: 'bad_season' as const };
+  const r = await rpc<{ status: string; email?: string; next_date?: string; has_note?: boolean }>('dss_season_set', {
+    p_gate: gate(),
+    p_token: token,
+    p_season: season.key,
+  });
+  if (r.status !== 'ok' || !r.email || !r.next_date) return { status: r.status };
+  if (r.has_note || !anthropicKey()) return { status: 'ok' as const, season, write: null };
+  return {
+    status: 'ok' as const,
+    season,
+    write: () =>
+      writeLampFor(r.email!, `Season: ${season.label}`, r.next_date!, {
+        replace: true,
+        mode: { kind: 'season', season: season.prompt },
+        meta: { source: 'season', season: season.key },
+      }),
+  };
+}
+
+type Candidate = { email: string; for_date: string; season: string | null; season_at: string | null; last_note: string | null; last_note_date: string | null; last_note_at: string | null };
+
+// Overnight (2–4 AM the reader's time), for Premium readers who didn't reply: write this morning's Lamp
+// from the season they tapped, or pick up their latest note. Whichever they gave us more recently wins.
+export async function writeFallbacks(budgetMs = 150_000) {
+  if (!anthropicKey()) return 0;
+  const started = Date.now();
+  let written = 0;
+  // Each batch can take ~1–2 minutes (Claude writes them in parallel), so only start one with time to finish.
+  while (Date.now() - started < budgetMs - 110_000) {
+    const batch = await rpc<Candidate[]>('dss_fallback_candidates', { p_gate: gate(), p_limit: 4 });
+    if (batch.length === 0) break;
+    await Promise.all(
+      batch.map(async (c) => {
+        const season = seasonByKey(c.season);
+        const seasonNewer = season && (!c.last_note_at || (c.season_at ?? '') > c.last_note_at);
+        if (season && (seasonNewer || !c.last_note)) {
+          return writeLampFor(c.email, `Season: ${season.label}`, c.for_date, {
+            replace: true,
+            mode: { kind: 'season', season: season.prompt },
+            meta: { source: 'season', season: season.key },
+          });
+        }
+        if (c.last_note && c.last_note_date) {
+          const daysAgo = Math.round((Date.parse(c.for_date) - Date.parse(c.last_note_date)) / 86400000);
+          return writeLampFor(c.email, c.last_note, c.for_date, {
+            replace: true,
+            mode: { kind: 'followup', daysAgo },
+            meta: { source: 'followup', from_date: c.last_note_date },
+          });
+        }
+      }),
+    );
+    written += batch.length;
+  }
+  return written;
 }
 
 // Someone may be in crisis: a person should follow up, not an automated reflection.

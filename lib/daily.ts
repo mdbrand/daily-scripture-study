@@ -35,7 +35,7 @@ export function postalAddress(): string | null {
 }
 
 export function footerFor(token: string, postal: string): MailFooter {
-  return { unsubscribeUrl: `${SITE}/u/${token}`, postalAddress: postal };
+  return { unsubscribeUrl: `${SITE}/u/${token}`, postalAddress: postal, seasonBase: `${SITE}/s/${token}` };
 }
 // The List-Unsubscribe header target: mail apps POST here for one-click unsubscribe.
 export const oneClickUrl = (token: string) => `${SITE}/api/unsubscribe/${token}`;
