@@ -28,6 +28,18 @@ export const lampSteps = [
 
 export const faqs = [
   {
+    q: 'What is Morning Lamp?',
+    a: 'Morning Lamp is a free daily Bible study by email. Every morning at 5 AM your time, you get one short passage, the story behind it (who wrote it, when, and why), one detail you might miss, and a voice from church history. It takes under three minutes to read.',
+  },
+  {
+    q: 'Is it a devotional or a Bible study?',
+    a: 'A bit of both. Like a devotional, it’s short and made for every morning. Like a Bible study, it explains what the passage meant to the people who first heard it, with real history and sources, before what it means for you.',
+  },
+  {
+    q: 'Who writes it?',
+    a: 'I do, under the pen name Ezra Lampwright. Scripture is quoted word for word, the voices from history are real people with real sources, and when scholars disagree, I say so.',
+  },
+  {
     q: 'Is it really free?',
     a: 'Yes. The daily study is free, and it always will be. Premium adds Last Night’s Lamp for $7 a month or $47 a year.',
   },

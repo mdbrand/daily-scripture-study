@@ -4,6 +4,7 @@ import LegalShell from '../../../LegalShell';
 import AutoSubmit from './AutoSubmit';
 import { CARE_NOTE, seasonByKey } from '@/lib/seasons';
 import { LEGAL } from '@/lib/legal';
+import TrackOnce from '../../../TrackOnce';
 
 export const metadata: Metadata = { title: 'Your season | Morning Lamp', robots: { index: false, follow: false } };
 
@@ -32,6 +33,7 @@ export default async function SeasonTap({
   if (done === '1') {
     return (
       <LegalShell title={`Got it: ${season.phrase}`}>
+        <TrackOnce event="season_tap" params={{ season: season.key, season_tone: season.tone }} onceKey={`season_${token}_${season.key}`} />
         <p>
           Tomorrow morning’s Last Night’s Lamp will be written for {season.phrase}: a passage for it, the story
           behind that passage, and a voice from Christian history who walked through it too.

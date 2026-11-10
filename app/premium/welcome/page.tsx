@@ -3,6 +3,7 @@ import Link from 'next/link';
 import LegalShell from '../../LegalShell';
 import { stripe } from '@/lib/stripe';
 import { LEGAL } from '@/lib/legal';
+import TrackOnce from '../../TrackOnce';
 
 export const metadata: Metadata = {
   title: 'Welcome to Premium | Morning Lamp',
@@ -50,6 +51,16 @@ export default async function PremiumWelcome({ searchParams }: { searchParams: P
   const email = s!.customer_details?.email ?? s!.metadata?.email;
   return (
     <LegalShell title="Welcome to Premium.">
+      <TrackOnce
+        event="purchase"
+        onceKey={`purchase_${session_id}`}
+        params={{
+          transaction_id: session_id,
+          currency: 'USD',
+          value: s!.amount_total / 100,
+          items: [{ item_id: `premium_${yearly ? 'yearly' : 'monthly'}`, item_name: `Premium ${yearly ? 'yearly' : 'monthly'}`, price: s!.amount_total / 100, quantity: 1 }],
+        }}
+      />
       <div className="contact-card">
         <p className="contact-lede">
           Thank you. Your {yearly ? 'yearly' : 'monthly'} Premium membership is active:{' '}

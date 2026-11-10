@@ -163,5 +163,49 @@ export function authorSchema() {
   };
 }
 
+// Home page: who we are, the page itself (with speakable summary), and the visible FAQ.
+export function homeSchema(faqs: { q: string; a: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      organization,
+      website,
+      author,
+      {
+        '@type': 'WebPage',
+        '@id': `${SITE}/#webpage`,
+        url: SITE,
+        name: 'Free Daily Bible Study by Email | Morning Lamp',
+        description:
+          'A free daily Bible study by email: one passage, the story behind it, one detail you might miss, and a voice from church history. Under three minutes, every morning at 5 AM.',
+        isPartOf: { '@id': SITE_ID },
+        about: { '@type': 'Thing', name: 'Daily Bible study' },
+        author: { '@id': AUTHOR_ID },
+        publisher: { '@id': ORG_ID },
+        inLanguage: 'en-US',
+        speakable: { '@type': 'SpeakableSpecification', cssSelector: ['.letter-open', '.faq'] },
+      },
+      {
+        '@type': 'Service',
+        '@id': `${SITE}/#service`,
+        name: 'Morning Lamp daily Bible study email',
+        serviceType: 'Daily Bible study by email',
+        provider: { '@id': ORG_ID },
+        areaServed: 'Worldwide',
+        offers: [
+          { '@type': 'Offer', name: 'Daily study', price: '0', priceCurrency: 'USD' },
+          { '@type': 'Offer', name: 'Premium (monthly)', price: '7', priceCurrency: 'USD' },
+          { '@type': 'Offer', name: 'Premium (yearly)', price: '47', priceCurrency: 'USD' },
+        ],
+      },
+      {
+        '@type': 'FAQPage',
+        '@id': `${SITE}/#faq`,
+        mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+      },
+    ],
+  };
+}
+
 // Safe for a <script type="application/ld+json"> tag.
 export const jsonLd = (data: unknown) => JSON.stringify(data).replace(/</g, '\\u003c');

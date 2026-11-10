@@ -3,6 +3,7 @@ import Link from 'next/link';
 import LegalShell from '../../LegalShell';
 import { stripe } from '@/lib/stripe';
 import { LEGAL } from '@/lib/legal';
+import TrackOnce from '../../TrackOnce';
 
 export const metadata: Metadata = {
   title: 'Welcome, Founder | Morning Lamp',
@@ -52,6 +53,16 @@ export default async function FoundersWelcome({
   const email = session!.customer_details?.email ?? session!.metadata?.email;
   return (
     <LegalShell title="Welcome, Founder.">
+      <TrackOnce
+        event="purchase"
+        onceKey={`purchase_${session_id}`}
+        params={{
+          transaction_id: session_id,
+          currency: 'USD',
+          value: session!.amount_total / 100,
+          items: [{ item_id: 'founders', item_name: 'Founders Membership', price: session!.amount_total / 100, quantity: 1 }],
+        }}
+      />
       <div className="contact-card">
         <p className="contact-lede">
           Thank you. Your Founders Membership is confirmed: lifetime Morning Lamp Premium for a single

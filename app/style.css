@@ -745,3 +745,10 @@ details p { color: var(--muted); font-size: 19px; margin: -4px 0 24px; max-width
 .letter-from strong { color: var(--navy); font-weight: 600; }
 .letter-from small { font-size: 13px; color: var(--muted); }
 .letter-from:hover strong { text-decoration: underline; }
+.hero-kicker { margin: 18px 0 14px; }
+.guides-strip { padding: 88px 0; }
+.guides-strip h2 { margin-bottom: 12px; }
+.guide-links { list-style: none; padding: 0; margin: 26px auto 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; max-width: 760px; }
+.guide-links a { display: inline-block; padding: 10px 18px; border: 1px solid var(--brass-light); border-radius: 999px; background: var(--paper); font-family: var(--ui); font-size: 15px; color: var(--navy); text-decoration: none; }
+.guide-links a:hover { border-color: var(--brass); background: #fff; }
+@media (max-width: 720px) { .guides-strip { padding: 64px 0; } .guide-links a { font-size: 14px; } }

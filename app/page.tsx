@@ -8,8 +8,18 @@ import { SiteFooter } from './LegalShell';
 import { anatomy, faqs, lampSteps, promises, voices } from './content';
 import { lamplighterStats } from '@/lib/lamplighters';
 import { premiumCheckoutOpen } from '@/lib/premium';
-import { jsonLd, siteSchema } from '@/lib/articles/schema';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { homeSchema, jsonLd } from '@/lib/articles/schema';
+import { ARTICLES, articlePath } from '@/lib/articles';
 import AuthorAvatar from './AuthorAvatar';
+
+export const metadata: Metadata = {
+  title: 'Free Daily Bible Study by Email | Morning Lamp',
+  description:
+    'A free daily Bible study and devotional by email: one passage, the story behind it, and a voice from church history. Under three minutes, every morning at 5 AM.',
+  alternates: { canonical: '/' },
+};
 
 export const revalidate = 300; // refresh the Lamplighter spots count every few minutes
 
@@ -55,7 +65,7 @@ export default async function Home() {
 
   return (
     <main>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(siteSchema()) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(homeSchema(faqs)) }} />
       {/* Lamplighter offer: top bar (only while spots remain) */}
       {spots.open && (
         <p className="ll-bar">
@@ -84,6 +94,7 @@ export default async function Home() {
 
         <div className="title-block">
           <Crest size={96} />
+          <p className="kicker hero-kicker">A free daily Bible study by email</p>
           <h1>Every verse has a story. Let me tell you one each morning.</h1>
           <div className="letter-open">
             <a className="letter-from" href="/authors/ezra-lampwright">
@@ -269,6 +280,23 @@ export default async function Home() {
               </details>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Free guides: internal links to the article library */}
+      <section className="chapter guides-strip">
+        <div className="container narrow center">
+          <h2>Free Bible study guides</h2>
+          <p className="letter-lead">
+            Can’t wait until tomorrow morning? Start with one of these. Each verse comes with the story behind it.
+          </p>
+          <ul className="guide-links">
+            {ARTICLES.map((a) => (
+              <li key={a.slug}>
+                <Link href={articlePath(a)}>{a.title.replace(/:.*$/, '')}</Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 

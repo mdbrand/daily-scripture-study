@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import LegalShell from '../../LegalShell';
 import { LEGAL } from '@/lib/legal';
+import TrackOnce from '../../TrackOnce';
 
 export const metadata: Metadata = { title: 'Confirm your email | Morning Lamp', robots: { index: false, follow: false } };
 
@@ -18,6 +19,7 @@ export default async function Confirm({
   if (done === '1') {
     return (
       <LegalShell title="You’re in.">
+        <TrackOnce event="email_confirmed" params={{ method: 'email' }} onceKey={`confirm_${token}`} />
         <p>Your email is confirmed. Your first study arrives at 5 AM your time.</p>
         <p className="form-note" style={{ textAlign: 'left' }}>
           If you don’t see it, check your Promotions or Spam folder and move it to your inbox, so the rest find you.
