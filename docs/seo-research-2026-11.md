@@ -123,3 +123,26 @@ verse of the day (450,000) and daily devotional (165,000): searchers want BibleG
 Hard seasons: strength 90,500/29 · healing 40,500/18 · anxiety 40,500/31 · forgiveness 33,100/15 · faith 27,100/28 · marriage 27,100/22 · comfort 27,100/30 · grief 18,100/16 · hope 18,100/18 · protection 18,100/26 · depression 14,800/11 · trusting god 14,800/12 · patience 14,800/29 · peace 12,100/17 · waiting on god 5,400/13 · waiting on the lord 5,400/25 · heartbreak 8,100/26 · fear 6,600/13 · loneliness 6,600/15 · money 6,600/22 · new beginnings 6,600/17 (Jan 14,800) · rest 4,400/13 · temptation 4,400/25 · doubt 1,900/16 · purpose 1,900/35 · guidance 1,300/21 · overwhelmed 720/18 · "when you feel far from god" 30/22.
 
 Positive seasons: love 135,000/22 (Feb 246,000) · encouragement 135,000/27 · friendship 49,500/16 · gratitude 18,100/21 (Nov 49,500) · birthdays 14,800/33 · graduation 14,800/31 (May 90,500) · family 12,100/28 (Dec 18,100) · joy 12,100/24 (Dec 22,200) · blessings 6,600/31 · courage 6,600/16 · growth 4,400/21 · pregnancy 2,900/25 · success 2,900/22 · god's faithfulness 2,400/21 · worship 2,400/31 · praise 1,900/22 · celebration 880/17 · answered prayer 590/7.
+
+## 8. Book guides: Catholic and other books (added Nov 10 2026, Rob asked to include them)
+
+Plan: book guides cover the 66 Protestant books PLUS the 7 deuterocanonical books in Catholic Bibles (Tobit, Judith, 1 & 2 Maccabees, Wisdom, Sirach, Baruch, plus the Greek additions to Esther and Daniel), plus a short set of well-known books that are NOT in any Western canon (clearly labeled), because search demand is large.
+
+| Keyword | Vol | SD |
+|---|---|---|
+| how many books are in the catholic bible | 9,900 | 32 |
+| deuterocanonical books | 5,400 | 45 |
+| book of sirach | 3,600 | 26 |
+| who wrote the book of wisdom | 480 | 36 |
+| who wrote the book of sirach | 390 | 38 |
+| who wrote the book of maccabees | 320 | 44 |
+| who wrote the book of tobit | 140 | 37 |
+| who wrote the book of judith | 110 | 38 |
+| book of enoch (in the Ethiopian Orthodox canon only) | 135,000 | 36 |
+| who wrote the book of enoch | 6,600 | 43 |
+| who wrote the book of jubilees | 480 | 34 |
+| who wrote the book of jasher | 320 | 34 |
+
+Hub pages: "How many books are in the Catholic Bible?" (73 vs 66, with a comparison table: Catholic, Protestant, Orthodox) and "What are the deuterocanonical books?".
+Tone: describe each tradition fairly in its own terms (Catholic and Orthodox Christians accept these books as Scripture; Protestants generally do not, and call them the Apocrypha). Don't take sides.
+Translation note: none of the site's five translations (NIV, CSB, ESV, NLT, BSB) includes these books in their standard editions. For quotes from them, use the public-domain World English Bible (WEB), which includes the deuterocanon, or keep quotes minimal and summarize.

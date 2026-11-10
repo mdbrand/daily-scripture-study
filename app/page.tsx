@@ -8,6 +8,7 @@ import { SiteFooter } from './LegalShell';
 import { anatomy, faqs, lampSteps, promises, voices } from './content';
 import { lamplighterStats } from '@/lib/lamplighters';
 import { premiumCheckoutOpen } from '@/lib/premium';
+import { jsonLd, siteSchema } from '@/lib/articles/schema';
 
 export const revalidate = 300; // refresh the Lamplighter spots count every few minutes
 
@@ -53,6 +54,7 @@ export default async function Home() {
 
   return (
     <main>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(siteSchema()) }} />
       {/* Lamplighter offer: top bar (only while spots remain) */}
       {spots.open && (
         <p className="ll-bar">
@@ -72,6 +74,7 @@ export default async function Home() {
             <span>Morning Lamp</span>
           </a>
           <div className="toplinks">
+            <a href="/bible-verses">Bible Verses</a>
             <a href="#sample">Sample</a>
             <a href="#premium">Premium</a>
             <a href="#lamplighters">Lamplighters</a>
