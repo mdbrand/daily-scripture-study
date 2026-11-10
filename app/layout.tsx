@@ -15,6 +15,8 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-ui', display: 'swap'
 export const metadata: Metadata = {
   metadataBase: new URL('https://morninglamp.study'),
   alternates: { canonical: '/' },
+  // Bing Webmaster Tools site verification.
+  verification: { other: { 'msvalidate.01': '1062370FD5889BC16C5A53CFC7466776' } },
   title: 'Morning Lamp: a daily Bible study by email',
   description:
     'Every verse has a story. A free Bible study by email each morning: one passage, the history behind it, and a voice from 2,000 years of faith, in under three minutes.',
