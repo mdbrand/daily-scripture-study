@@ -449,7 +449,7 @@ export function renderWelcomeEmail(o: { premium: boolean; footer: MailFooter; to
   return {
     subject: 'Welcome to Morning Lamp',
     html: shell(inner, when, false, footerHtml(o.footer), o.premium ? 'premium' : 'free'),
-    text: ['Welcome to Morning Lamp', '', ...lines.flatMap((l) => [l, '']), `"${verse.text}" (${verse.ref})`, '', 'Grace and peace,', 'Morning Lamp', ...footerText(o.footer)].join('\n'),
+    text: ['Welcome to Morning Lamp', '', ...lines.flatMap((l) => [l, '']), `"${verse.text}" (${verse.ref.replace(/ \((\w+)\)$/, ", $1")})`, '', 'Grace and peace,', 'Morning Lamp', ...footerText(o.footer)].join('\n'),
   };
 }
 
