@@ -27,6 +27,17 @@ export async function lamplighterStats(): Promise<LamplighterStats> {
 export const listApplications = () => rpc<Application[]>('dss_lamplighter_list', { p_gate: gate() });
 
 
+// One opt-in: called right after someone confirms their email. The first N to confirm become
+// Founding Lamplighters automatically (Premium free for life). Never throws.
+export async function grantFounding(email: string): Promise<{ status: string; number?: number }> {
+  try {
+    return await rpc<{ status: string; number?: number }>('dss_lamplighter_autogrant', { p_gate: gate(), p_email: email });
+  } catch (e) {
+    console.error('lamplighter autogrant', e);
+    return { status: 'error' };
+  }
+}
+
 // Accept (free Premium for life + welcome email) or decline (no email).
 export async function decide(email: string, accept: boolean) {
   const r = await rpc<{ ok: boolean; error?: string }>('dss_lamplighter_decide', { p_gate: gate(), p_email: email, p_accept: accept });

@@ -1,7 +1,7 @@
 import { rpc } from './supabaseRpc';
 import { gate } from './partners';
 import { resendKey } from './email/send';
-import { renderCheckinEmail, renderDailyEmail, renderWelcomeEmail, type DailyStudy, type MailFooter } from './email/templates';
+import { renderCheckinEmail, renderDailyEmail, renderWelcomeEmail, type DailyStudy, type MailFooter, renderLamplighterAccepted } from './email/templates';
 import { PILLARS, writeStudy, type RecentStudy, type StudyContent } from './studyWriter';
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://morninglamp.study';
@@ -266,6 +266,23 @@ export async function sendTodayTo(email: string, manual = false): Promise<TodayR
 
 // Right after someone confirms (or is started by an admin): welcome first, then today's study if they
 // joined after their 5 AM and it's before 8 PM their time. Does nothing while daily sending is off.
+// A brand-new Founding Lamplighter: their welcome IS the Lamplighter welcome (Premium for life),
+// then today's study if it's still today's window. Marks them welcomed so the generic welcome doesn't follow.
+export async function welcomeFounding(email: string) {
+  const postal = postalAddress();
+  if (!postal || !(await dailySettings()).send_open) return;
+  const me = (await rpc<{ email: string; unsub_token: string }[]>('dss_lamplighters_active', { p_gate: gate() })).find(
+    (a) => a.email === email.toLowerCase(),
+  );
+  if (!me) return welcomeAndToday([email]);
+  const today = (await todayCheck(email)).status === 'ok';
+  await sendBatch([
+    { to: me.email, ...renderLamplighterAccepted({ footer: footerFor(me.unsub_token, postal), todayNext: today }), unsubscribeUrl: oneClickUrl(me.unsub_token) },
+  ]);
+  await rpc('dss_mark_welcomed', { p_gate: gate(), p_emails: [me.email] });
+  if (today) await sendTodayTo(email);
+}
+
 export async function welcomeAndToday(emails: string[]) {
   if (!(await dailySettings()).send_open) return;
   const today = new Set<string>();

@@ -287,7 +287,7 @@ export default function ArticleView({ a }: { a: Article }) {
             One passage, the history behind it, and a voice from 2,000 years of faith. Free, in your inbox at 5 AM,
             under three minutes to read.
           </p>
-          <SignupForm source={`article-${a.slug}`} tone="light" hidePlanSelect buttonLabel="Start free" />
+          <SignupForm source={`article-${a.slug}`} tone="light" hidePlanSelect buttonLabel="Become a Lamplighter" />
         </aside>
 
         <section aria-labelledby="common-questions">

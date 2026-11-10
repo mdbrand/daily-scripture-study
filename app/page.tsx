@@ -3,7 +3,6 @@ import Crest from './Crest';
 import BackToTop from './BackToTop';
 import FoundersOffer from './FoundersOffer';
 import PremiumPlans from './PremiumPlans';
-import LamplighterForm from './LamplighterForm';
 import { SiteFooter } from './LegalShell';
 import { anatomy, faqs, lampSteps, promises, voices } from './content';
 import { lamplighterStats } from '@/lib/lamplighters';
@@ -152,17 +151,15 @@ export default async function Home() {
               years of faith. It takes under three minutes, and it’s free.
             </p>
           </div>
-          <SignupForm source="hero" tone="light" hidePlanSelect buttonLabel="Yes, send me the study" />
+          <SignupForm source="hero" tone="light" hidePlanSelect buttonLabel="Become a Lamplighter" foundingOpen={spots.open} />
           {spots.open && (
             <div className="ll-offer">
               <p className="ll-offer-kicker">Limited time only</p>
-              <p className="ll-offer-title">One more thing: I’m looking for {spots.spots} Lamplighters.</p>
+              <p className="ll-offer-title">The first {spots.spots} Lamplighters get Premium free for life.</p>
               <p className="ll-offer-text">
-                Help shape Morning Lamp and get Premium free for life. Only the first {spots.spots} get lifetime access. {spots.left} of {spots.spots} spots left.
+                Join above and confirm your email. If you’re one of the first {spots.spots}, you’re a Founding
+                Lamplighter, and Premium is yours, free, for good. {spots.left} of {spots.spots} spots left.
               </p>
-              <a className="button gold" href="#lamplighters">
-                Claim my Lamplighter spot
-              </a>
             </div>
           )}
         </div>
@@ -272,11 +269,11 @@ export default async function Home() {
             <div className="beta-cta">
               <p className="beta-cta-title">Right now, you can have it free for life.</p>
               <p>
-                I’m inviting the first {spots.spots} Lamplighters to use Premium free, for good. {spots.left} of{' '}
-                {spots.spots} spots left.
+                The first {spots.spots} Lamplighters get Premium free, for good. Just join and confirm your email.{' '}
+                {spots.left} of {spots.spots} spots left.
               </p>
               <a className="button gold" href="#lamplighters">
-                Apply to be a Lamplighter
+                Become a Lamplighter
               </a>
               <p className="beta-price">After the beta, Premium is $7 a month or $47 a year.</p>
             </div>
@@ -289,15 +286,18 @@ export default async function Home() {
         <div className="container lamp-wrap">
           <div>
             <p className="kicker">
-              Lamplighters · {spots.left} of {spots.spots} spots left
+              Lamplighters{spots.open ? ` · ${spots.left} of ${spots.spots} founding spots left` : ''}
             </p>
-            <h2>Would you be one of the first 100?</h2>
+            <h2>{spots.open ? 'Would you be one of the first 100?' : 'Become a Lamplighter.'}</h2>
             <p className="lamp-lede">
-              Here’s the deal, plainly. You get Premium free for life. In return, you tell me honestly what works and
-              what doesn’t. I’ll ask one short question a week.
+              Everyone who reads Morning Lamp is a Lamplighter: one lamp lit each morning, one verse and the story
+              behind it.
+              {spots.open
+                ? ` The first ${spots.spots} to join and confirm their email are Founding Lamplighters, with Premium free for life. In return, you tell me honestly what works and what doesn’t. I’ll ask one short question a week.`
+                : ''}
             </p>
           </div>
-          <LamplighterForm open={spots.open} />
+          <SignupForm source="lamplighters" tone="light" hidePlanSelect buttonLabel="Become a Lamplighter" foundingOpen={spots.open} />
         </div>
       </section>
 
@@ -375,9 +375,10 @@ export default async function Home() {
             <p className="ps">
               <strong>P.S.</strong> Your first study can be waiting for you at 5 AM. Add your email below, tap “Confirm
               my email” when my note arrives, and that’s it. It’s free, and it always will be.
+              {spots.open ? ` And if you’re one of the first ${spots.spots}, you’re a Founding Lamplighter, with Premium free for life.` : ''}
             </p>
           </div>
-          <SignupForm source="closing" tone="dark" hidePlanSelect buttonLabel="Yes, send me the study" />
+          <SignupForm source="closing" tone="dark" hidePlanSelect buttonLabel="Become a Lamplighter" foundingOpen={spots.open} />
         </div>
       </section>
 

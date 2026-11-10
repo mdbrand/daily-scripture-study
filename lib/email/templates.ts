@@ -580,7 +580,7 @@ export function renderLamplighterReceived(): { subject: string; html: string; te
   };
 }
 
-export function renderLamplighterAccepted(o: { footer: MailFooter }): { subject: string; html: string; text: string } {
+export function renderLamplighterAccepted(o: { footer: MailFooter; todayNext?: boolean }): { subject: string; html: string; text: string } {
   return {
     subject: 'You’re a Lamplighter. Welcome.',
     ...simpleEmail({
@@ -591,7 +591,9 @@ export function renderLamplighterAccepted(o: { footer: MailFooter }): { subject:
       footer: o.footer,
       lines: [
         'You’re one of the first Lamplighters. Premium is on for you, free, for life. As long as Morning Lamp is running, you’ll never pay for it.',
+        ...(o.todayNext ? ['Today’s study is in the next email.'] : []),
         'Each morning at 5 AM your time, your study arrives. Each evening around 8 PM, we’ll check in to ask how your day went. Reply with a line or two, and the next morning brings Last Night’s Lamp: a study written in response to your day.',
+        'One small favor: hit reply and tell us in a line why you joined. We read every answer.',
         'Once a week we’ll send you one short question about how it’s going. Honest answers, good and bad, are the whole point. Just hit reply.',
         'If you ever share your experience publicly, please mention that you received Premium free as a beta tester. If we ever quote you, we’ll ask first and note the same.',
       ],
@@ -621,7 +623,7 @@ export function renderLamplighterFeedback(o: { footer: MailFooter; weekIndex: nu
 }
 
 // ---------- Confirm your email (double opt-in) ----------
-export function renderConfirmEmail(o: { link: string; lamplighter?: boolean; invite?: { premium: boolean } }): { subject: string; html: string; text: string } {
+export function renderConfirmEmail(o: { link: string; lamplighter?: boolean; foundingOpen?: boolean; invite?: { premium: boolean } }): { subject: string; html: string; text: string } {
   if (o.invite) {
     // Someone on the Morning Lamp team added this person by hand; nothing else goes out until they tap the button.
     const r = simpleEmail({
@@ -645,7 +647,10 @@ export function renderConfirmEmail(o: { link: string; lamplighter?: boolean; inv
         'Confirming also starts your free daily study: one passage, the history behind it, and a voice from history, at 5 AM your time.',
       ]
     : [
-        'Tap the button to confirm your email and start your free daily study: one passage, the history behind it, and a voice from history, at 5 AM your time.',
+        'Tap the button to confirm your email and become a Lamplighter. Your free daily study starts at 5 AM your time: one passage, the history behind it, and a voice from history.',
+        ...(o.foundingOpen
+          ? ['You’re early. The first 100 Lamplighters to confirm get Premium free for life, and there are still spots open.']
+          : []),
       ];
   const r = simpleEmail({
     kicker: o.lamplighter ? 'Lamplighters' : 'One quick step',

@@ -12,6 +12,7 @@ type Props = {
   buttonLabel?: string;
   hidePlanSelect?: boolean; // used where the plan is already chosen (e.g. the Premium plan picker)
   premiumNote?: string;
+  foundingOpen?: boolean; // Founding Lamplighter spots still open (shown in the success message)
 };
 
 export default function SignupForm({
@@ -21,6 +22,7 @@ export default function SignupForm({
   buttonLabel,
   hidePlanSelect = false,
   premiumNote,
+  foundingOpen = false,
 }: Props) {
   const id = useId();
   const [email, setEmail] = useState('');
@@ -100,7 +102,11 @@ export default function SignupForm({
             opens. Nothing is charged today.
           </p>
         ) : (
-          <p>Check your inbox and tap “Confirm my email” to start. If it’s not there in a minute, look in Promotions or Spam.</p>
+          <p>
+            Check your inbox and tap “Confirm my email” to become a Lamplighter.
+            {foundingOpen ? ' Confirm soon: the first 100 to confirm get Premium free for life.' : ''} If it’s not there
+            in a minute, look in Promotions or Spam.
+          </p>
         )}
       </div>
     );

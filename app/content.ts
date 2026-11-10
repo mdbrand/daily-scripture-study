@@ -36,6 +36,10 @@ export const faqs = [
     a: 'A bit of both. Like a devotional, it’s short and made for every morning. Like a Bible study, it explains what the passage meant to the people who first heard it, with real history and sources, before what it means for you.',
   },
   {
+    q: 'What is a Lamplighter?',
+    a: 'Everyone who reads Morning Lamp is a Lamplighter: one lamp lit each morning, with one verse and the story behind it. The first 100 people to join and confirm their email are Founding Lamplighters and get Premium free for life.',
+  },
+  {
     q: 'Who writes it?',
     a: 'I do, under the pen name Ezra Lampwright. Scripture is quoted word for word, the voices from history are real people with real sources, and when scholars disagree, I say so.',
   },

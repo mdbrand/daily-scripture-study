@@ -1,6 +1,7 @@
 import { rpc } from './supabaseRpc';
 import { sendEmail } from './email/send';
 import { renderConfirmEmail } from './email/templates';
+import { lamplighterStats } from './lamplighters';
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://morninglamp.study';
 
@@ -15,6 +16,7 @@ export async function sendConfirmation(
   const r = await rpc<{ send: boolean; token?: string }>('dss_confirm_prepare', { p_gate: gate, p_email: email });
   if (!r.send || !r.token) return false;
   const base = opts.origin?.startsWith('http://localhost') ? opts.origin : SITE;
-  await sendEmail({ to: email, ...renderConfirmEmail({ link: `${base}/confirm/${r.token}`, lamplighter: opts.lamplighter, invite: opts.invite }) });
+  const foundingOpen = !opts.invite && !opts.lamplighter && (await lamplighterStats()).open;
+  await sendEmail({ to: email, ...renderConfirmEmail({ link: `${base}/confirm/${r.token}`, lamplighter: opts.lamplighter, invite: opts.invite, foundingOpen }) });
   return true;
 }
