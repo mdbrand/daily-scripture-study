@@ -14,6 +14,32 @@ import { homeSchema, jsonLd } from '@/lib/articles/schema';
 import { ARTICLES, articlePath } from '@/lib/articles';
 import AuthorAvatar from './AuthorAvatar';
 
+// The home page's guide library, grouped so each link can be short. Column headings carry the search phrase.
+const byTitle = (a: { title: string }, b: { title: string }) => a.title.localeCompare(b.title);
+const guideColumns = [
+  {
+    section: 'bible-verses',
+    heading: 'Bible verses about…',
+    more: 'All Bible verse guides',
+    items: ARTICLES.filter((a) => a.section === 'bible-verses').sort(byTitle),
+    label: (a: { title: string }) => a.title.replace(/^Bible Verses About /, '').replace(/:.*$/, ''),
+  },
+  {
+    section: 'books',
+    heading: 'Books of the Bible',
+    more: 'All book guides',
+    items: ARTICLES.filter((a) => a.section === 'books').sort(byTitle),
+    label: (a: { title: string }) => (a.title.match(/Book of ([^?:]+)/)?.[1] ?? a.title).trim(),
+  },
+  {
+    section: 'guides',
+    heading: 'How to study the Bible',
+    more: 'All guides',
+    items: ARTICLES.filter((a) => a.section === 'guides').sort(byTitle),
+    label: (a: { title: string }) => a.title.replace(/:.*$/, ''),
+  },
+] as const;
+
 export const metadata: Metadata = {
   title: 'Free Daily Bible Study by Email | Morning Lamp',
   description:
@@ -285,18 +311,34 @@ export default async function Home() {
 
       {/* Free guides: internal links to the article library */}
       <section className="chapter guides-strip">
-        <div className="container narrow center">
-          <h2>Free Bible study guides</h2>
-          <p className="letter-lead">
-            Can’t wait until tomorrow morning? Start with one of these. Each verse comes with the story behind it.
-          </p>
-          <ul className="guide-links">
-            {ARTICLES.map((a) => (
-              <li key={a.slug}>
-                <Link href={articlePath(a)}>{a.title.replace(/:.*$/, '')}</Link>
-              </li>
+        <div className="container">
+          <header className="center guides-head">
+            <h2>Free Bible study guides</h2>
+            <p className="letter-lead">
+              Can’t wait until tomorrow morning? Start with one of these. Each verse comes with the story behind it.
+            </p>
+          </header>
+          <div className="guide-cols">
+            {guideColumns.map((col) => (
+              <nav className={`guide-col guide-col-${col.section}`} key={col.section} aria-labelledby={`gc-${col.section}`}>
+                <h3 id={`gc-${col.section}`}>
+                  <Link href={`/${col.section}`}>{col.heading}</Link>
+                </h3>
+                <ul>
+                  {col.items.map((a) => (
+                    <li key={a.slug}>
+                      <Link href={articlePath(a)} title={a.title}>
+                        {col.label(a)}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                <Link className="guide-all" href={`/${col.section}`}>
+                  {col.more} <span aria-hidden="true">→</span>
+                </Link>
+              </nav>
             ))}
-          </ul>
+          </div>
         </div>
       </section>
 
