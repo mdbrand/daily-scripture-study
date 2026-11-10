@@ -740,3 +740,8 @@ details p { color: var(--muted); font-size: 19px; margin: -4px 0 24px; max-width
   .letter-close p { font-size: 18px; }
 }
 .data-table td:nth-child(2) { white-space: nowrap; }
+.letter-from { display: inline-flex; align-items: center; gap: 14px; margin: 0 0 26px; text-decoration: none; color: var(--ink); }
+.letter-from span { display: flex; flex-direction: column; font-family: var(--ui); font-size: 15px; line-height: 1.35; }
+.letter-from strong { color: var(--navy); font-weight: 600; }
+.letter-from small { font-size: 13px; color: var(--muted); }
+.letter-from:hover strong { text-decoration: underline; }

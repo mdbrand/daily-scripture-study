@@ -9,6 +9,7 @@ import { anatomy, faqs, lampSteps, promises, voices } from './content';
 import { lamplighterStats } from '@/lib/lamplighters';
 import { premiumCheckoutOpen } from '@/lib/premium';
 import { jsonLd, siteSchema } from '@/lib/articles/schema';
+import AuthorAvatar from './AuthorAvatar';
 
 export const revalidate = 300; // refresh the Lamplighter spots count every few minutes
 
@@ -85,7 +86,19 @@ export default async function Home() {
           <Crest size={96} />
           <h1>Every verse has a story. Let me tell you one each morning.</h1>
           <div className="letter-open">
+            <a className="letter-from" href="/authors/ezra-lampwright">
+              <AuthorAvatar size={52} />
+              <span>
+                A letter from <strong>Ezra Lampwright</strong>
+                <small>Writer of Morning Lamp</small>
+              </span>
+            </a>
             <p className="salutation">Dear friend,</p>
+            <p>
+              I’m Ezra, and I write Morning Lamp. My name comes from Ezra, the scribe who read God’s
+              word aloud to his people “from daybreak till noon” (Nehemiah 8:3). Mornings with Scripture are an old
+              idea. I’d like to share them with you.
+            </p>
             <p>
               Every verse was written by someone, to someone, at a moment that mattered. Once you know that moment, the
               words land differently.
