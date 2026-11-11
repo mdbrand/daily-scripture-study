@@ -3,6 +3,7 @@ import { gate } from './partners';
 import { resendKey } from './email/send';
 import { renderCheckinEmail, renderDailyEmail, renderWelcomeEmail, type DailyStudy, type MailFooter, renderLamplighterAccepted } from './email/templates';
 import { PILLARS, writeStudy, type RecentStudy, type StudyContent } from './studyWriter';
+import { recordSent, withTracking, type TrackRef } from './emailEvents';
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://morninglamp.study';
 const TZ = 'America/Los_Angeles';
@@ -83,7 +84,8 @@ export function toDailyStudy(date: string, c: StudyContent, premium: boolean, ye
 }
 
 // ---------- sending (Resend batch API: up to 100 emails per call) ----------
-type Outgoing = { to: string; subject: string; html: string; text: string; unsubscribeUrl: string };
+// track: set on real subscriber emails so opens and clicks can be measured. Previews and test copies leave it off.
+type Outgoing = { to: string; subject: string; html: string; text: string; unsubscribeUrl: string; track?: TrackRef };
 
 export async function sendBatch(emails: Outgoing[]): Promise<string[]> {
   const key = resendKey();
@@ -98,7 +100,7 @@ export async function sendBatch(emails: Outgoing[]): Promise<string[]> {
         from,
         to: [e.to],
         subject: e.subject,
-        html: e.html,
+        html: e.track ? withTracking(e.html, e.track) : e.html,
         text: e.text,
         ...(replyTo ? { reply_to: replyTo } : {}),
         // One-click unsubscribe (required by Gmail and Yahoo for bulk senders).
@@ -108,7 +110,9 @@ export async function sendBatch(emails: Outgoing[]): Promise<string[]> {
   });
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(`Resend batch ${res.status}: ${JSON.stringify(body).slice(0, 300)}`);
-  return ((body.data ?? []) as { id: string }[]).map((d) => d.id);
+  const ids = ((body.data ?? []) as { id: string }[]).map((d) => d.id);
+  await recordSent(emails.flatMap((e, i) => (e.track ? [{ track: e.track, resendId: ids[i] }] : [])));
+  return ids;
 }
 
 type Recipient = { email: string; unsub_token: string; premium: boolean };
@@ -132,7 +136,7 @@ export async function sendDue(budgetMs = 240_000) {
       const study = studies.get(r.study_date)!;
       const footer = footerFor(r.unsub_token, postal);
       const m = renderDailyEmail(toDailyStudy(r.study_date, study.content, r.premium, r.yesterday), footer);
-      return { to: r.email, ...m, unsubscribeUrl: oneClickUrl(r.unsub_token) };
+      return { to: r.email, ...m, unsubscribeUrl: oneClickUrl(r.unsub_token), track: { token: r.unsub_token, kind: 'study' as const, date: r.study_date } };
     });
     const ids = await sendBatch(emails);
     // Record per date (a batch can span two local dates near midnight UTC).
@@ -166,7 +170,12 @@ export async function sendCheckins(budgetMs = 60_000) {
       const dayIndex = Math.floor(new Date(`${r.local_date}T12:00:00Z`).getTime() / 86400000);
       // The morning a reply or season tap tonight writes for (dss_season_set: after 5 AM local -> tomorrow).
       const nextDate = new Date((dayIndex + 1) * 86400000 + 43200000).toISOString().slice(0, 10);
-      return { to: r.email, ...renderCheckinEmail({ footer, dayIndex, nextDate }), unsubscribeUrl: oneClickUrl(r.unsub_token) };
+      return {
+        to: r.email,
+        ...renderCheckinEmail({ footer, dayIndex, nextDate }),
+        unsubscribeUrl: oneClickUrl(r.unsub_token),
+        track: { token: r.unsub_token, kind: 'checkin' as const, date: r.local_date },
+      };
     });
     const ids = await sendBatch(emails);
     await rpc('dss_record_checkins', {
@@ -194,7 +203,12 @@ export async function sendWelcomes(limit = 100, todayFor?: Set<string>) {
   if (pending.length === 0) return 0;
   const emails = pending.map((r) => {
     const footer = footerFor(r.unsub_token, postal);
-    return { to: r.email, ...renderWelcomeEmail({ premium: r.premium, footer, todayNext: todayFor?.has(r.email.toLowerCase()) }), unsubscribeUrl: oneClickUrl(r.unsub_token) };
+    return {
+      to: r.email,
+      ...renderWelcomeEmail({ premium: r.premium, footer, todayNext: todayFor?.has(r.email.toLowerCase()) }),
+      unsubscribeUrl: oneClickUrl(r.unsub_token),
+      track: { token: r.unsub_token, kind: 'welcome' as const, date: pacificDate(0) },
+    };
   });
   await sendBatch(emails);
   await rpc('dss_mark_welcomed', { p_gate: gate(), p_emails: pending.map((r) => r.email) });
@@ -254,7 +268,9 @@ export async function sendTodayTo(email: string, manual = false): Promise<TodayR
     const study = await getStudy(c.study_date);
     if (!study) throw new Error('study vanished');
     const m = renderDailyEmail(toDailyStudy(c.study_date, study.content, !!c.premium, c.yesterday), footerFor(c.unsub_token, postal));
-    const [id] = await sendBatch([{ to: c.email, ...m, unsubscribeUrl: oneClickUrl(c.unsub_token) }]);
+    const [id] = await sendBatch([
+      { to: c.email, ...m, unsubscribeUrl: oneClickUrl(c.unsub_token), track: { token: c.unsub_token, kind: 'study', date: c.study_date } },
+    ]);
     await rpc('dss_today_finish', { p_gate: gate(), p_email: c.email, p_date: c.study_date, p_resend_id: id ?? null, p_ok: true });
     return { status: 'ok', study_date: c.study_date };
   } catch (e) {
@@ -277,7 +293,12 @@ export async function welcomeFounding(email: string) {
   if (!me) return welcomeAndToday([email]);
   const today = (await todayCheck(email)).status === 'ok';
   await sendBatch([
-    { to: me.email, ...renderLamplighterAccepted({ footer: footerFor(me.unsub_token, postal), todayNext: today }), unsubscribeUrl: oneClickUrl(me.unsub_token) },
+    {
+      to: me.email,
+      ...renderLamplighterAccepted({ footer: footerFor(me.unsub_token, postal), todayNext: today }),
+      unsubscribeUrl: oneClickUrl(me.unsub_token),
+      track: { token: me.unsub_token, kind: 'welcome', date: pacificDate(0) },
+    },
   ]);
   await rpc('dss_mark_welcomed', { p_gate: gate(), p_emails: [me.email] });
   if (today) await sendTodayTo(email);
@@ -307,6 +328,6 @@ export async function resendDay(email: string, date: string): Promise<'ok' | 'no
   const study = await getStudy(date);
   if (!study) return 'no_study';
   const m = renderDailyEmail(toDailyStudy(date, study.content, !!info.premium, info.yesterday ?? null), footerFor(info.unsub_token, postal));
-  await sendBatch([{ to: info.email, ...m, unsubscribeUrl: oneClickUrl(info.unsub_token) }]);
+  await sendBatch([{ to: info.email, ...m, unsubscribeUrl: oneClickUrl(info.unsub_token), track: { token: info.unsub_token, kind: 'study', date } }]);
   return 'ok';
 }

@@ -71,8 +71,8 @@ export default function PrivacyPage() {
           your signup.
         </li>
         <li>
-          <strong>Email engagement</strong>, such as whether an email was delivered or opened, reported
-          by our email provider.
+          <strong>Email engagement</strong>, such as whether an email was delivered or opened and
+          which links in it were clicked. We do not store your IP address with this.
         </li>
       </ul>
 

@@ -1,5 +1,6 @@
 import { after, NextResponse } from 'next/server';
-import { handleReply } from '@/lib/reflections';
+import { handleReply, senderAddress } from '@/lib/reflections';
+import { recordReply, recordWebhook } from '@/lib/emailEvents';
 import { verifyResendWebhook } from '@/lib/webhookVerify';
 import { LEGAL } from '@/lib/legal';
 
@@ -8,12 +9,16 @@ export const maxDuration = 120;
 
 type ReceivedEvent = { type: string; data: { email_id: string; from: string; to: string[]; subject: string } };
 
+const FROM_US = /@morninglamp\.study\b/i;
+
 function escapeHtml(s: string) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 // Resend calls this when mail arrives at @morninglamp.study. We relay it to the owner's inbox,
 // with Reply-To set to the original sender so replies go straight back to them.
+// It also sends delivery news (delivered, bounced, marked as spam) for emails we sent, which we keep
+// for the admin engagement page.
 export async function POST(req: Request) {
   const body = await req.text();
   const secret = process.env.RESEND_WEBHOOK_SECRET;
@@ -28,7 +33,12 @@ export async function POST(req: Request) {
   }
 
   const event = JSON.parse(body) as ReceivedEvent;
-  if (event.type !== 'email.received') return NextResponse.json({ ok: true, skipped: event.type });
+  if (event.type !== 'email.received') {
+    // The Resend account is shared with other sites; only our own emails are looked up.
+    const ours = FROM_US.test(event.data?.from || '');
+    const saved = ours ? await recordWebhook(event.type, event.data?.email_id, req.headers.get('svix-id')) : false;
+    return NextResponse.json({ ok: true, type: event.type, saved });
+  }
 
   const H = { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' };
   const got = await fetch(`https://api.resend.com/emails/receiving/${event.data.email_id}`, { headers: H });
@@ -67,6 +77,8 @@ export async function POST(req: Request) {
   }
   // A Premium reader's note about their day becomes tomorrow's "Yesterday" reflection.
   after(async () => {
+    // Any note back from a subscriber counts as a reply on the engagement page.
+    await recordReply(senderAddress(sender), `reply-${event.data.email_id}`);
     try {
       const r = await handleReply(sender, email.text);
       if (r.handled) console.log('inbound: reflection', r);
