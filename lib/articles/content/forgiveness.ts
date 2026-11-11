@@ -9,7 +9,7 @@ const article: Article = {
   description:
     '16 Bible verses about forgiveness, from 1 John 1:9 to Ephesians 4:32, each with the story behind it, plus honest help for when someone has hurt you deeply.',
   published: '2026-11-10',
-  updated: '2026-11-10',
+  updated: '2026-11-11',
   season: 'forgive',
   quickAnswer:
     'The best-known Bible verses about forgiveness are Ephesians 4:32, “forgiving each other, just as in Christ God forgave you” (NIV), and 1 John 1:9, which promises that God “will forgive us our sins” when we confess. Matthew 6:14–15, Colossians 3:13 and Psalm 103:12 fill out the picture: forgiven people learn to forgive.',
@@ -161,6 +161,23 @@ const article: Article = {
       ],
     },
   ],
+  sections: [
+    {
+      heading: 'What does the Bible say about forgiveness?',
+      paragraphs: [
+        'The Bible says forgiveness starts with God. Again and again, Scripture describes God as the one who forgives first and forgives fully: “If we confess our sins, he is faithful and righteous to forgive us our sins and to cleanse us from all unrighteousness” (1 John 1:9, CSB). Our forgiveness of other people grows out of that. Paul puts the two side by side: “Be kind to one another, tenderhearted, forgiving one another, as God in Christ forgave you” (Ephesians 4:32, ESV).',
+        'The Bible is also honest that forgiving is hard. Peter asked Jesus whether forgiving someone seven times was enough, and Jesus answered, “I do not say to you seven times, but seventy-seven times” (Matthew 18:22, ESV). Then he told a story about a servant who was forgiven a debt he could never repay and still refused to forgive a small one (Matthew 18:23–35). The point is not a number. It is that people who know how much they have been forgiven become people who forgive.',
+        'Forgiveness in the Bible is not the same as pretending nothing happened, and it does not always mean the relationship goes back to how it was. Scripture keeps justice in view (Romans 12:19) and asks for peace “as far as it depends on you” (Romans 12:18, NIV). A short summary of what the Bible teaches:',
+      ],
+      list: [
+        'God forgives those who confess and turn to him, completely and freely (Psalm 103:12, 1 John 1:9).',
+        'Those who are forgiven are called to forgive others, and Jesus tied the two together in the Lord’s Prayer (Matthew 6:12).',
+        'Forgiveness has no limit on how many times (Matthew 18:21–22).',
+        'Forgiving means giving up revenge, not excusing harm. Judgment is left to God (Romans 12:19).',
+        'Reconciliation is the goal where it is possible, but it takes repentance and rebuilt trust (Luke 17:3).',
+      ],
+    },
+  ],
   voice: {
     name: 'Desmond Tutu',
     dates: '1931–2021',
@@ -194,7 +211,7 @@ const article: Article = {
       a: 'Jesus put forgiveness at the center of the Lord’s Prayer: “And forgive us our debts, as we also have forgiven our debtors” (Matthew 6:12, NIV). He told Peter to forgive “seventy-seven times” (Matthew 18:22, NIV), and from the cross he prayed, “Father, forgive them, for they do not know what they are doing” (Luke 23:34, BSB). He taught it and lived it.',
     },
   ],
-  related: ['love', 'healing', 'friendship'],
+  related: ['love', 'anger', 'humility', 'friendship'],
   sources: [
     { label: 'Berean Standard Bible (public domain)', url: 'https://berean.bible/' },
     { label: 'Desmond Tutu, biographical, NobelPrize.org', url: 'https://www.nobelprize.org/prizes/peace/1984/tutu/biographical/' },

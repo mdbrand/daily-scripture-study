@@ -187,7 +187,7 @@ const article: Article = {
       a: 'Yes. Anxiety can be a health condition, not only a spiritual struggle, and seeing a doctor or licensed counselor is a wise and caring step. Prayer and treatment are not rivals; the Bible values both healing and wise help. If anxiety is constant, affects sleep or daily life, or comes with panic, please reach out. In the U.S., you can call or text 988 anytime.',
     },
   ],
-  related: ['strength', 'encouragement', 'healing'],
+  related: ['psalm-46-10', 'trusting-god', 'strength', 'encouragement'],
   sources: [
     { label: 'Berean Standard Bible (public domain)', url: 'https://berean.bible/' },
     { label: 'Søren Kierkegaard, Stanford Encyclopedia of Philosophy', url: 'https://plato.stanford.edu/entries/kierkegaard/' },

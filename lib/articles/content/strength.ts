@@ -194,7 +194,7 @@ const article: Article = {
       a: 'Ephesians 6:10 is short and easy to memorize: “Finally, be strong in the Lord and in His mighty power” (BSB). Other short options are Psalm 46:1, Philippians 4:13, and Exodus 15:2, which begins “The LORD is my strength and my song.” A short verse is easy to repeat when you are too tired to read much more.',
     },
   ],
-  related: ['anxiety', 'encouragement', 'healing'],
+  related: ['isaiah-40-31', 'philippians-4-13', 'perseverance', 'encouragement'],
   sources: [
     { label: 'Berean Standard Bible (public domain)', url: 'https://berean.bible/' },
     { label: 'Corrie ten Boom House, Haarlem', url: 'https://www.corrietenboom.com/en/home' },

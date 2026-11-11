@@ -181,7 +181,7 @@ const article: Article = {
       a: 'The exact words “God is love” appear twice, both in 1 John 4 (verses 8 and 16). John writes, “Whoever does not love does not know God, because God is love” (1 John 4:8, BSB). He does not mean that love is God, but that everything God does flows from love, shown most clearly in sending his Son (1 John 4:9–10).',
     },
   ],
-  related: ['friendship', 'gratitude', 'encouragement'],
+  related: ['1-corinthians-13', 'friendship', 'gratitude', 'encouragement'],
   sources: [
     { label: 'Berean Standard Bible (public domain)', url: 'https://berean.bible/' },
     { label: 'Bernard of Clairvaux, On Loving God (Christian Classics Ethereal Library)', url: 'https://www.ccel.org/ccel/bernard/loving_god.html' },

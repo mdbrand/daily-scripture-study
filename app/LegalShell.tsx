@@ -47,6 +47,7 @@ export function SiteFooter() {
         <p className="colophon-name">{LEGAL.brand}</p>
         <nav className="footer-links" aria-label="Footer">
           <Link href="/bible-verses">Bible Verses</Link>
+          <Link href="/verse-meaning">Verse Meanings</Link>
           <Link href="/guides">Guides</Link>
           <Link href="/privacy">Privacy Policy</Link>
           <Link href="/terms">Terms</Link>

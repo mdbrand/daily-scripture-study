@@ -8,6 +8,7 @@ import {
   SECTION_NAMES,
   TRANSLATION_NOTICES,
   articlePath,
+  meaningFor,
   readingMinutes,
   relatedTo,
   translationsUsed,
@@ -31,6 +32,17 @@ const longDate = (d: string) =>
 function Scripture({ text }: { text: string }) {
   const parts = text.split(/\b(LORD)\b/);
   return <>{parts.map((p, i) => (p === 'LORD' ? <span key={i} className="sc">Lord</span> : p))}</>;
+}
+
+// "What does Jeremiah 29:11 mean?" under a verse card, when that verse has its own meaning page.
+function MeaningLink({ ref_, self }: { ref_: string; self: string }) {
+  const m = meaningFor(ref_);
+  if (!m || m.slug === self) return null;
+  return (
+    <p className="meaning-link">
+      <Link href={articlePath(m)}>What does {m.verseRef} mean? Read the full story →</Link>
+    </p>
+  );
 }
 
 export function TopBar() {
@@ -64,6 +76,10 @@ export default function ArticleView({ a }: { a: Article }) {
     'Common questions',
   ];
   const related = relatedTo(a);
+  // The signup box near the top: a line that fits the page, then the same single Lamplighter opt-in.
+  const topHeading =
+    a.topCta ??
+    (season ? `A short Bible study for ${season.phrase}, every morning.` : 'Every verse has a story. Get one each morning.');
   const notices = translationsUsed(a);
 
   return (
@@ -97,6 +113,22 @@ export default function ArticleView({ a }: { a: Article }) {
             ))}
           </ul>
         </section>
+
+        <aside className="top-cta" aria-label="Get Morning Lamp">
+          {a.download && (
+            <div className="top-download">
+              <a className="btn-download" href={a.download.href} download>
+                {a.download.label}
+              </a>
+              <p>{a.download.note}</p>
+            </div>
+          )}
+          <p className="top-cta-head">{topHeading}</p>
+          <p className="top-cta-sub">
+            One passage and the story behind it, free in your inbox at 5 AM. Under three minutes to read.
+          </p>
+          <SignupForm source={`article-top-${a.slug}`.slice(0, 40)} tone="light" hidePlanSelect buttonLabel="Become a Lamplighter" />
+        </aside>
 
         {a.intro.map((p, i) => (
           <p key={i}>{p}</p>
@@ -183,6 +215,7 @@ export default function ArticleView({ a }: { a: Article }) {
                   <strong>The story behind it: </strong>
                   {v.story}
                 </p>
+                <MeaningLink ref_={v.ref} self={a.slug} />
               </div>
             ))}
           </section>
@@ -212,6 +245,7 @@ export default function ArticleView({ a }: { a: Article }) {
                   <strong>The story behind it: </strong>
                   {v.story}
                 </p>
+                <MeaningLink ref_={v.ref} self={a.slug} />
               </div>
             ))}
           </section>

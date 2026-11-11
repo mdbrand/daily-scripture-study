@@ -194,7 +194,7 @@ const article: Article = {
       a: 'There is no set timeline. Grief often comes in waves for years, especially around anniversaries. But if months later you can barely function, sleep or eat, a grief counselor or a grief support group can help; many churches and hospices offer them. Seeking help is not weak faith. If you have thoughts of harming yourself, call or text 988 in the U.S.',
     },
   ],
-  related: ['comfort', 'hope', 'healing'],
+  related: ['broken-heart', 'comfort', 'hope', 'healing'],
   sources: [
     { label: 'Berean Standard Bible (public domain)', url: 'https://berean.bible/' },
     { label: 'A Grief Observed, Wikipedia', url: 'https://en.wikipedia.org/wiki/A_Grief_Observed' },

@@ -4,7 +4,7 @@ export const dynamic = 'force-static';
 
 // https://llmstxt.org — a plain map of the site for AI assistants and answer engines.
 export function GET() {
-  const section = (s: 'bible-verses' | 'books' | 'topics' | 'guides') =>
+  const section = (s: 'bible-verses' | 'books' | 'topics' | 'guides' | 'verse-meaning') =>
     [`## ${SECTION_NAMES[s]}`, '', ...articlesIn(s).map((a) => `- [${a.title}](${articleUrl(a)}): ${a.quickAnswer}`), ''].join('\n');
   const body = [
     '# Morning Lamp',
@@ -21,6 +21,7 @@ export function GET() {
     section('bible-verses'),
     section('books'),
     section('topics'),
+    section('verse-meaning'),
     section('guides'),
     '## About',
     '',

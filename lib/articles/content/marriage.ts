@@ -195,7 +195,7 @@ const article: Article = {
       a: 'Ephesians 4:2–3 asks for humility, gentleness and patience, “making allowance for each other’s faults” (NLT). James 1:19 says to be quick to listen and slow to anger, and Colossians 3:13 asks us to forgive as the Lord forgave us. Hard seasons are normal, and praying together, honest talk and a good counselor all help.',
     },
   ],
-  related: ['love', 'family', 'forgiveness'],
+  related: ['1-corinthians-13', 'love', 'family', 'forgiveness'],
   sources: [
     { label: 'The 1549 Book of Common Prayer: Matrimony', url: 'http://justus.anglican.org/resources/bcp/1549/Marriage_1549.htm' },
     { label: 'National Domestic Violence Hotline', url: 'https://www.thehotline.org/' },

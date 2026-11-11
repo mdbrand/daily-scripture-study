@@ -31,6 +31,13 @@ const guideColumns = [
     label: (a: { title: string }) => (a.title.match(/Book of ([^?:]+)/)?.[1] ?? a.title).trim(),
   },
   {
+    section: 'verse-meaning',
+    heading: 'What this verse means',
+    more: 'See all',
+    items: ARTICLES.filter((a) => a.section === 'verse-meaning').sort(byTitle),
+    label: (a: { title: string; verseRef?: string }) => a.verseRef ?? a.title.replace(/ Meaning:.*$/, ''),
+  },
+  {
     section: 'topics',
     heading: 'What the Bible says about',
     more: 'See all',

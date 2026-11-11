@@ -187,7 +187,7 @@ const article: Article = {
       a: 'Biblical hope is confident expectation, not wishful thinking. The Hebrew words for hope come from roots meaning to wait or to stretch toward something, and the Greek word, elpis, means expectation. When the Bible speaks of hope, it means waiting with confidence for something God has promised, because of who God has already shown himself to be.',
     },
   ],
-  related: ['encouragement', 'strength', 'comfort'],
+  related: ['jeremiah-29-11', 'encouragement', 'strength', 'comfort'],
   sources: [
     { label: 'Berean Standard Bible (public domain)', url: 'https://berean.bible/' },
     { label: 'Jürgen Moltmann, Wikipedia', url: 'https://en.wikipedia.org/wiki/J%C3%BCrgen_Moltmann' },

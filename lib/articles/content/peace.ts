@@ -187,7 +187,7 @@ const article: Article = {
       a: 'Scripture asks believers to work at it. Psalm 34:14 says to “seek peace and pursue it” (NIV), and Hebrews 12:14 repeats the call. Romans 12:18 adds an honest limit: “as far as it depends on you” (NIV). Peace takes two people, so you cannot control the outcome, but you can refuse to be the one who keeps the conflict going.',
     },
   ],
-  related: ['anxiety', 'comfort', 'christmas'],
+  related: ['anxiety', 'psalm-46-10', 'comfort', 'christmas'],
   sources: [
     { label: 'Berean Standard Bible (public domain)', url: 'https://berean.bible/' },
     {

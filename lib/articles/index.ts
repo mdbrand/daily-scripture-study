@@ -29,6 +29,22 @@ import marriage from './content/marriage';
 import protection from './content/protection';
 import depression from './content/depression';
 import cremation from './content/cremation';
+import jeremiah2911 from './content/jeremiah-29-11';
+import proverbs356 from './content/proverbs-3-5-6';
+import philippians413 from './content/philippians-4-13';
+import romans828 from './content/romans-8-28';
+import isaiah4031 from './content/isaiah-40-31';
+import joshua19 from './content/joshua-1-9';
+import psalm4610 from './content/psalm-46-10';
+import psalm23 from './content/psalm-23';
+import corinthians13 from './content/1-corinthians-13';
+import proverbs31 from './content/proverbs-31';
+import psalm139 from './content/psalm-139';
+import trustingGod from './content/trusting-god';
+import humility from './content/humility';
+import perseverance from './content/perseverance';
+import anger from './content/anger';
+import brokenHeart from './content/broken-heart';
 
 // Every published article. Add new ones here (one file per article in ./content).
 export const ARTICLES: Article[] = [
@@ -62,6 +78,22 @@ export const ARTICLES: Article[] = [
   protection,
   depression,
   cremation,
+  jeremiah2911,
+  proverbs356,
+  philippians413,
+  romans828,
+  isaiah4031,
+  joshua19,
+  psalm4610,
+  psalm23,
+  corinthians13,
+  proverbs31,
+  psalm139,
+  trustingGod,
+  humility,
+  perseverance,
+  anger,
+  brokenHeart,
 ];
 
 export const SITE = 'https://morninglamp.study';
@@ -72,6 +104,11 @@ export const articleBy = (section: Article['section'], slug: string) =>
   ARTICLES.find((a) => a.section === section && a.slug === slug) ?? null;
 export const articlesIn = (section: Article['section']) =>
   ARTICLES.filter((a) => a.section === section).sort((x, y) => x.title.localeCompare(y.title));
+// The verse-meaning page for a verse card's reference, if one exists ("Psalm 23:4" → the Psalm 23 page).
+export const meaningFor = (ref: string) =>
+  ARTICLES.find(
+    (a) => a.section === 'verse-meaning' && a.verseRef && (ref === a.verseRef || ref.startsWith(`${a.verseRef}:`) || ref.startsWith(`${a.verseRef}–`)),
+  ) ?? null;
 export const relatedTo = (a: Article) =>
   a.related.map((slug) => ARTICLES.find((x) => x.slug === slug)).filter((x): x is Article => !!x);
 
@@ -80,6 +117,7 @@ export const SECTION_NAMES: Record<Article['section'], string> = {
   books: 'Books of the Bible',
   topics: 'What the Bible Says',
   guides: 'Guides',
+  'verse-meaning': 'Bible Verse Meanings',
 };
 
 // Rough reading time for the byline.

@@ -194,7 +194,7 @@ const article: Article = {
       a: 'Mostly by being present. Romans 12:15 says to “weep with those who weep” (CSB), not to fix or explain. Job’s friends helped most when they sat with him in silence. Jesus wept with Mary and Martha before he did anything else (John 11:35). Show up, say little, keep showing up, and offer practical help.',
     },
   ],
-  related: ['grief', 'healing', 'anxiety'],
+  related: ['psalm-23', 'grief', 'healing', 'anxiety'],
   sources: [
     { label: 'Berean Standard Bible (public domain)', url: 'https://berean.bible/' },
     { label: 'Julian of Norwich, Revelations of Divine Love, Christian Classics Ethereal Library', url: 'https://www.ccel.org/ccel/julian/revelations.html' },

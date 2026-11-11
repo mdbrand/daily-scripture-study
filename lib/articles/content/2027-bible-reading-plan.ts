@@ -6,13 +6,19 @@ const article: Article = {
   slug: '2027-bible-reading-plan',
   section: 'guides',
   keyword: '2027 bible reading plan',
-  title: '2027 Bible Reading Plan: Read the Whole Bible in One Year (Free)',
-  seoTitle: '2027 Bible Reading Plan: Whole Bible in a Year (Free)',
+  title: '2027 Bible Reading Plan: Read the Whole Bible in One Year (Free PDF)',
+  seoTitle: '2027 Bible Reading Plan: Whole Bible in a Year (Free PDF)',
   description:
-    'A free 2027 Bible reading plan that covers all 1,189 chapters in 52 weeks, starting January 4. Old Testament, New Testament and a psalm or proverb each week.',
+    'A free, printable 2027 Bible reading plan (PDF) that covers all 1,189 chapters in 52 weeks, starting January 4, with Old and New Testament readings each week.',
   published: '2026-11-10',
-  updated: '2026-11-10',
+  updated: '2026-11-11',
   season: 'growing',
+  topCta: 'Reading through the Bible in 2027? Get one passage explained each morning.',
+  download: {
+    label: 'Download the free PDF',
+    href: '/downloads/morning-lamp-2027-bible-reading-plan.pdf',
+    note: 'Two printable pages with a checkbox for every week. No email needed. Free to share with your church or small group.',
+  },
   howTo: { name: 'How to read the whole Bible in 2027' },
   quickAnswer:
     'This free 2027 Bible reading plan covers all 1,189 chapters of the Bible in 52 weeks, from Monday, January 4, 2027 to Sunday, January 2, 2028. Each week you read 14 or 15 Old Testament chapters, 5 New Testament chapters and 3 or 4 from Psalms or Proverbs: about three chapters a day.',
@@ -37,7 +43,9 @@ const article: Article = {
     },
     {
       heading: 'The 2027 Bible reading plan: all 52 weeks',
-      paragraphs: ['Every chapter of the Bible appears once. Check off each week as you finish it.'],
+      paragraphs: [
+        'Every chapter of the Bible appears once. Check off each week as you finish it. Prefer paper? The same plan is a free two-page printable PDF (link at the top of this page), with a checkbox for every week.',
+      ],
       table: {
         head: ['Week', 'Dates', 'Old Testament', 'New Testament', 'Psalms or Proverbs'],
         rows: [
@@ -161,6 +169,10 @@ const article: Article = {
       'M’Cheyne was the young minister of St Peter’s Church in Dundee, Scotland. In December 1842 he gave his congregation a calendar for the coming year that took them through the Old Testament once and the New Testament and Psalms twice, with some chapters for family worship and some for private reading. He hoped his whole church would read the same passages on the same day, so friends would have something worth talking about when they met. He also warned them honestly about the dangers: reading becoming a lifeless habit, feeling proud for keeping up, and reading carelessly. M’Cheyne died in March 1843, at just 29, but his plan is still used by many Christians today.',
   },
   faqs: [
+    {
+      q: 'Is there a printable PDF of this Bible reading plan?',
+      a: 'Yes. The full 2027 plan is a free two-page PDF you can download from the top of this page, no email needed. It lists all 52 weeks with the Old Testament, New Testament and Psalms or Proverbs readings, plus a checkbox for each week. Print as many copies as you like for your church, class or small group.',
+    },
     {
       q: 'What is a good Bible reading plan?',
       a: 'A good Bible reading plan is one you will actually finish. Look for a realistic daily amount, a mix of Old and New Testament so you get variety, and some flexibility for missed days. This 2027 plan covers the whole Bible in 52 weeks at about three chapters a day. Chronological plans and the classic M’Cheyne calendar are also popular choices.',

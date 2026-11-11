@@ -28,7 +28,7 @@ export type HistoryVoice = { name: string; dates: string; work: string; body: st
 
 export type Article = {
   slug: string;
-  section: 'bible-verses' | 'books' | 'topics' | 'guides';
+  section: 'bible-verses' | 'books' | 'topics' | 'guides' | 'verse-meaning';
   keyword: string; // the search phrase this page targets
   title: string; // H1 (matches the search phrase)
   seoTitle: string; // <title>, ≤ 60 characters
@@ -44,6 +44,9 @@ export type Article = {
   voice?: HistoryVoice; // one voice from church history
   faqs: Faq[]; // People Also Ask questions, answered
   season?: string; // season key (lib/seasons.ts) for the signup box
+  verseRef?: string; // verse-meaning pages: the passage explained ("Jeremiah 29:11", "Psalm 23"); verse cards elsewhere link here
+  topCta?: string; // optional heading for the signup box near the top (defaults from the season)
+  download?: { label: string; href: string; note: string }; // a free file offered in the top box (e.g. a printable PDF)
   related: string[]; // other article slugs
   sources?: { label: string; url: string }[];
 };
