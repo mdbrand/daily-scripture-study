@@ -79,6 +79,7 @@ export function toDailyStudy(date: string, c: StudyContent, premium: boolean, ye
     voices: (c.voices ?? []).slice(0, 1),
     readMore: c.readMore.map((l) => ({ label: l.label, url: l.passage_ref ? gatewayUrl(l.passage_ref) : undefined })),
     edition: premium ? 'premium' : 'free',
+    shareUrl: `${SITE}/studies/${date}`,
     yesterday: premium && yesterday ? yesterday : undefined,
   };
 }

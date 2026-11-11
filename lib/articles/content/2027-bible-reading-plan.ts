@@ -14,10 +14,10 @@ const article: Article = {
   updated: '2026-11-11',
   season: 'growing',
   topCta: 'Reading through the Bible in 2027? Get one passage explained each morning.',
-  download: {
-    label: 'Download the free PDF',
-    href: '/downloads/morning-lamp-2027-bible-reading-plan.pdf',
-    note: 'Two printable pages with a checkbox for every week. No email needed. Free to share with your church or small group.',
+  gift: {
+    key: '2027',
+    heading: 'Get the 2027 reading plan to print',
+    note: 'Two pages with a checkbox for every week. Tell us where to send it, and it opens as soon as you confirm your email. Free to share with your church or small group.',
   },
   howTo: { name: 'How to read the whole Bible in 2027' },
   quickAnswer:
@@ -44,7 +44,7 @@ const article: Article = {
     {
       heading: 'The 2027 Bible reading plan: all 52 weeks',
       paragraphs: [
-        'Every chapter of the Bible appears once. Check off each week as you finish it. Prefer paper? The same plan is a free two-page printable PDF (link at the top of this page), with a checkbox for every week.',
+        'Every chapter of the Bible appears once. Check off each week as you finish it. Prefer paper? The same plan is a free two-page printable PDF (ask for it at the top of this page), with a checkbox for every week.',
       ],
       table: {
         head: ['Week', 'Dates', 'Old Testament', 'New Testament', 'Psalms or Proverbs'],
@@ -171,7 +171,7 @@ const article: Article = {
   faqs: [
     {
       q: 'Is there a printable PDF of this Bible reading plan?',
-      a: 'Yes. The full 2027 plan is a free two-page PDF you can download from the top of this page, no email needed. It lists all 52 weeks with the Old Testament, New Testament and Psalms or Proverbs readings, plus a checkbox for each week. Print as many copies as you like for your church, class or small group.',
+      a: 'Yes. The full 2027 plan is a free two-page PDF. Enter your email at the top of this page and it opens as soon as you confirm. It lists all 52 weeks with the Old Testament, New Testament and Psalms or Proverbs readings, plus a checkbox for each week. Print as many copies as you like for your church, class or small group.',
     },
     {
       q: 'What is a good Bible reading plan?',

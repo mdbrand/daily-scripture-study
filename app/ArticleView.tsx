@@ -115,19 +115,22 @@ export default function ArticleView({ a }: { a: Article }) {
         </section>
 
         <aside className="top-cta" aria-label="Get Morning Lamp">
-          {a.download && (
-            <div className="top-download">
-              <a className="btn-download" href={a.download.href} download>
-                {a.download.label}
-              </a>
-              <p>{a.download.note}</p>
-            </div>
+          {a.gift ? (
+            <>
+              <p className="top-cta-kicker">Free printable PDF</p>
+              <p className="top-cta-head">{a.gift.heading}</p>
+              <p className="top-cta-sub">{a.gift.note}</p>
+              <SignupForm source={`plan-${a.gift.key}`} gift={a.gift.key} tone="light" hidePlanSelect buttonLabel="Email me the plan" />
+            </>
+          ) : (
+            <>
+              <p className="top-cta-head">{topHeading}</p>
+              <p className="top-cta-sub">
+                One passage and the story behind it, free in your inbox at 5 AM. Under three minutes to read.
+              </p>
+              <SignupForm source={`article-top-${a.slug}`.slice(0, 40)} tone="light" hidePlanSelect buttonLabel="Become a Lamplighter" />
+            </>
           )}
-          <p className="top-cta-head">{topHeading}</p>
-          <p className="top-cta-sub">
-            One passage and the story behind it, free in your inbox at 5 AM. Under three minutes to read.
-          </p>
-          <SignupForm source={`article-top-${a.slug}`.slice(0, 40)} tone="light" hidePlanSelect buttonLabel="Become a Lamplighter" />
         </aside>
 
         {a.intro.map((p, i) => (

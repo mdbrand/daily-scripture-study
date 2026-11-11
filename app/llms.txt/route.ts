@@ -26,6 +26,8 @@ export function GET() {
     '## About',
     '',
     '- [Morning Lamp home](https://morninglamp.study/): what the daily study includes and a sample email',
+    '- [Daily Bible studies](https://morninglamp.study/studies): every daily study after it has gone out by email, one page per day',
+    '- [For churches](https://morninglamp.study/churches): free printable reading plans and ready-to-paste wording for pastors and church newsletters',
     '- [Privacy policy](https://morninglamp.study/privacy)',
     '- [Terms](https://morninglamp.study/terms)',
     '',

@@ -49,6 +49,8 @@ export function SiteFooter() {
           <Link href="/bible-verses">Bible Verses</Link>
           <Link href="/verse-meaning">Verse Meanings</Link>
           <Link href="/guides">Guides</Link>
+          <Link href="/studies">Daily Studies</Link>
+          <Link href="/churches">For Churches</Link>
           <Link href="/privacy">Privacy Policy</Link>
           <Link href="/terms">Terms</Link>
           <Link href="/contact">Contact</Link>

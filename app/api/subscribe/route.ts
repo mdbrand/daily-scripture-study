@@ -3,6 +3,7 @@ import { looksLikeBot, signupAllowed, tooFast } from '@/lib/spam';
 import { sendConfirmation } from '@/lib/confirm';
 import { CONSENT_TEXT, normalizeEmail, normalizePlan, normalizeRef } from '@/lib/subscribe';
 import { checkEmail } from '@/lib/emailCheck';
+import { giftKey } from '@/lib/gifts';
 import { suggestEmail } from '@/lib/emailTypos';
 import { clean, cleanUtm, geoFromHeaders, isNewSubscriber, sendSignupAlert } from '@/lib/signupAlert';
 
@@ -97,7 +98,7 @@ export async function POST(req: Request) {
   if (!suspectedBot && process.env.DSS_DB_GATE) {
     after(async () => {
       try {
-        await sendConfirmation(email, { origin: new URL(req.url).origin });
+        await sendConfirmation(email, { origin: new URL(req.url).origin, gift: giftKey(body.gift) });
       } catch (e) {
         console.error('subscribe: confirmation email', e);
       }

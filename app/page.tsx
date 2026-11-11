@@ -101,6 +101,8 @@ function EmailPreview() {
 
 export default async function Home() {
   const [spots, checkoutOpen] = await Promise.all([lamplighterStats(), premiumCheckoutOpen().catch(() => false)]);
+  // A big "spots left" number early on only tells visitors how few have joined. Show it once it creates urgency.
+  const showCount = spots.left <= 30;
 
   return (
     <main>
@@ -156,9 +158,7 @@ export default async function Home() {
           {spots.open && (
             <p className="hero-founding">
               The first {spots.spots} Lamplighters get Premium free for life.{' '}
-              <strong>
-                {spots.left} of {spots.spots} spots left.
-              </strong>
+              <strong>{showCount ? `${spots.left} of ${spots.spots} spots left.` : 'Founding spots are open.'}</strong>
             </p>
           )}
         </div>
@@ -373,7 +373,8 @@ export default async function Home() {
         <div className="container lamp-wrap">
           <div>
             <p className="kicker">
-              Lamplighters{spots.open ? ` · ${spots.left} of ${spots.spots} founding spots left` : ''}
+              Lamplighters
+              {spots.open ? (showCount ? ` · ${spots.left} of ${spots.spots} founding spots left` : ' · founding spots open') : ''}
             </p>
             <h2>There’s a place for you here.</h2>
             <p className="lamp-lede">

@@ -32,6 +32,11 @@ Sections 1–5 above (no Premium box), then **Last Night's Lamp**:
 
 There is **no "A Verse for Your Life"** and no second verse anywhere. It was removed on purpose.
 
+## Share line: every morning study (approved by the owner Nov 11, 2026)
+One small centered line after the "Have a Bible question?" box, above the footer. It links to that day's public page, morninglamp.study/studies/<date>.
+- Free edition: "Know one person who'd like this? Forward this email, or send them today's study."
+- Premium edition: "Know one person who'd like this? Send them today's study." Premium is never asked to forward the email, because it holds their own Last Night's Lamp.
+
 ## Evening check-in: Premium only (8 PM in the reader's time zone)
 - Night look so it reads as the evening half of the loop: under the "Morning Lamp" header, a night-sky picture with a glowing clay oil lamp (`public/email/evening-header.png`, drawn from `scripts/evening-header.svg`), then a dark band: "Evening · A lamp for your feet" and Psalm 119:105 (NIV).
 - Small label: "Last Night's Lamp · Evening check-in". Rotating headline ("How did today go?", "Before you rest: how was today?", ...).

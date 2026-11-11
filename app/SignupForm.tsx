@@ -4,6 +4,7 @@ import { useEffect, useId, useState } from 'react';
 import type { Plan } from '@/lib/subscribe';
 import { suggestEmail } from '@/lib/emailTypos';
 import { track } from '@/lib/track';
+import { GIFTS, type GiftKey } from '@/lib/gifts';
 
 type Props = {
   source: string;
@@ -13,6 +14,7 @@ type Props = {
   hidePlanSelect?: boolean; // used where the plan is already chosen (e.g. the Premium plan picker)
   premiumNote?: string;
   foundingOpen?: boolean; // Founding Lamplighter spots still open (shown in the success message)
+  gift?: GiftKey; // a free printable plan that opens when they confirm (see lib/gifts.ts)
 };
 
 export default function SignupForm({
@@ -23,6 +25,7 @@ export default function SignupForm({
   hidePlanSelect = false,
   premiumNote,
   foundingOpen = false,
+  gift,
 }: Props) {
   const id = useId();
   const [email, setEmail] = useState('');
@@ -74,7 +77,7 @@ export default function SignupForm({
       const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, plan, source, website, ref, timezone: browserTimeZone(), t: shownAt, ...pageContext() }),
+        body: JSON.stringify({ email, plan, source, gift, website, ref, timezone: browserTimeZone(), t: shownAt, ...pageContext() }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -85,7 +88,7 @@ export default function SignupForm({
       }
       setState('done');
       // GA4 recommended event name; plan + form location as parameters.
-      track('sign_up', { method: 'email', plan, form_location: source });
+      track('sign_up', { method: 'email', plan, form_location: source, ...(gift ? { gift } : {}) });
     } catch {
       setState('error');
       setMessage('Could not connect. Please check your internet and try again.');
@@ -96,7 +99,12 @@ export default function SignupForm({
     return (
       <div className={`signup-done ${tone}`} role="status">
         <p className="done-title">Almost there.</p>
-        {plan === 'premium' ? (
+        {gift ? (
+          <p>
+            Check your inbox and tap the button in our email. Your {GIFTS[gift].name} opens right after, ready to print.
+            If it’s not there in a minute, look in Promotions or Spam.
+          </p>
+        ) : plan === 'premium' ? (
           <p>
             Check your inbox and tap “Confirm my email.” You picked <strong>Premium</strong>; we’ll email you before it
             opens. Nothing is charged today.
@@ -161,7 +169,9 @@ export default function SignupForm({
       </div>
 
       <p className="form-note">
-        {plan === 'premium'
+        {gift
+          ? 'Free. You’ll get the plan, plus Morning Lamp, a free three-minute Bible study each morning at 5 AM your time. Unsubscribe any time. Your email stays with us: never sold, never shared.'
+          : plan === 'premium'
           ? premiumNote || 'Premium is $7/month or $47/year when it opens. No payment today.'
           : 'Free, always. It arrives at 5 AM your time. Your email stays with us: never sold, never shared.'}{' '}
         By joining, you agree to our <a className="linklike" href="/terms">Terms</a> and{' '}

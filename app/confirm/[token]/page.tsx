@@ -3,6 +3,21 @@ import Link from 'next/link';
 import LegalShell from '../../LegalShell';
 import { LEGAL } from '@/lib/legal';
 import TrackOnce from '../../TrackOnce';
+import { GIFTS, giftKey } from '@/lib/gifts';
+
+// The printable plan they asked for when they signed up, handed over the moment they confirm.
+function GiftBox({ gift }: { gift: keyof typeof GIFTS }) {
+  const g = GIFTS[gift];
+  return (
+    <div className="gift-box">
+      <p className="gift-title">Your {g.name} is ready.</p>
+      <p>{g.about} Print as many copies as you like.</p>
+      <a className="button" href={g.href} target="_blank" rel="noopener">
+        Open my plan (PDF)
+      </a>
+    </div>
+  );
+}
 
 export const metadata: Metadata = { title: 'Confirm your email | Morning Lamp', robots: { index: false, follow: false } };
 
@@ -11,16 +26,18 @@ export default async function Confirm({
   searchParams,
 }: {
   params: Promise<{ token: string }>;
-  searchParams: Promise<{ done?: string; founding?: string }>;
+  searchParams: Promise<{ done?: string; founding?: string; gift?: string }>;
 }) {
   const { token } = await params;
-  const { done, founding } = await searchParams;
+  const { done, founding, gift: rawGift } = await searchParams;
+  const gift = giftKey(rawGift);
 
   if (done === '1' && founding !== undefined) {
     const n = Number(founding);
     return (
       <LegalShell title="Welcome, Founding Lamplighter.">
         <TrackOnce event="email_confirmed" params={{ method: 'email', lamplighter: 'founding' }} onceKey={`confirm_${token}`} />
+        {gift && <GiftBox gift={gift} />}
         <p>
           You’re in{Number.isFinite(n) && n > 0 ? `, and you’re Founding Lamplighter #${n}` : ''}. Premium is on for you,
           free, for life.
@@ -39,6 +56,7 @@ export default async function Confirm({
     return (
       <LegalShell title="You’re in.">
         <TrackOnce event="email_confirmed" params={{ method: 'email' }} onceKey={`confirm_${token}`} />
+        {gift && <GiftBox gift={gift} />}
         <p>Your email is confirmed. Your first study arrives at 5 AM your time.</p>
         <p className="form-note" style={{ textAlign: 'left' }}>
           If you don’t see it, check your Promotions or Spam folder and move it to your inbox, so the rest find you.
@@ -51,7 +69,8 @@ export default async function Confirm({
   }
   if (done === '0') {
     return (
-      <LegalShell title="That link didn’t work">
+      <LegalShell title={gift ? 'You’re already confirmed' : 'That link didn’t work'}>
+        {gift && <GiftBox gift={gift} />}
         <p>
           It may be old or already used. <Link href="/">Sign up again</Link> to get a fresh link, or write to{' '}
           <a href={`mailto:${LEGAL.email}`}>{LEGAL.email}</a>.
@@ -61,9 +80,13 @@ export default async function Confirm({
   }
   return (
     <LegalShell title="Confirm your email">
-      <p>One tap and you’re set. Your free daily study arrives at 5 AM your time.</p>
-      <form action={`/api/confirm/${token}`} method="post">
-        <button type="submit" className="button">Confirm my email</button>
+      <p>
+        {gift
+          ? `One tap and your ${GIFTS[gift].name} opens. Your free daily study also starts at 5 AM your time.`
+          : 'One tap and you’re set. Your free daily study arrives at 5 AM your time.'}
+      </p>
+      <form action={`/api/confirm/${token}${gift ? `?gift=${gift}` : ''}`} method="post">
+        <button type="submit" className="button">{gift ? 'Confirm and open my plan' : 'Confirm my email'}</button>
       </form>
     </LegalShell>
   );

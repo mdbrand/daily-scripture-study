@@ -46,7 +46,7 @@ export type Article = {
   season?: string; // season key (lib/seasons.ts) for the signup box
   verseRef?: string; // verse-meaning pages: the passage explained ("Jeremiah 29:11", "Psalm 23"); verse cards elsewhere link here
   topCta?: string; // optional heading for the signup box near the top (defaults from the season)
-  download?: { label: string; href: string; note: string }; // a free file offered in the top box (e.g. a printable PDF)
+  gift?: { key: 'advent' | '2027'; heading: string; note: string }; // a free printable plan (lib/gifts.ts) emailed from the top box
   related: string[]; // other article slugs
   sources?: { label: string; url: string }[];
 };

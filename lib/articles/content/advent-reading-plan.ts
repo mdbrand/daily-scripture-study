@@ -8,12 +8,17 @@ const article: Article = {
   section: 'guides',
   keyword: 'advent bible reading plan',
   title: 'Advent Bible Reading Plan 2026: A Free Daily Plan for Advent',
-  seoTitle: 'Advent Bible Reading Plan 2026: Free Daily Readings',
+  seoTitle: 'Advent Bible Reading Plan 2026 (Free Printable PDF)',
   description:
-    'A free Advent Bible reading plan for 2026: one short passage a day from November 29 to Christmas Day, with weekly themes of hope, peace, joy and love.',
+    'A free Advent Bible reading plan for 2026 with a printable PDF: one short passage a day from November 29 to Christmas Day, on hope, peace, joy and love.',
   published: '2026-11-10',
-  updated: '2026-11-10',
+  updated: '2026-11-11',
   season: 'waiting',
+  gift: {
+    key: 'advent',
+    heading: 'Get the Advent plan to print',
+    note: 'One page with all 27 readings and a box to check each day. Tell us where to send it, and it opens as soon as you confirm your email. Free to copy for your family or church.',
+  },
   howTo: { name: 'How to use an Advent Bible reading plan', totalTime: 'PT10M' },
   quickAnswer:
     'This free Advent Bible reading plan runs 27 days, from the first Sunday of Advent on November 29, 2026 to Christmas Day, Friday, December 25. Each day has one short passage of 5 to 14 verses, moving from God’s first promises through the prophets, John the Baptist and Mary to the birth of Jesus in Luke 2.',
@@ -123,7 +128,7 @@ const article: Article = {
         },
         {
           name: 'Mark off each day',
-          text: 'Print the plan or bookmark this page, and check off each day. On Christmas morning you will have walked the whole road from the first promise to the manger.',
+          text: 'Print the free one-page PDF (ask for it at the top of this page) or bookmark this page, and check off each day. On Christmas morning you will have walked the whole road from the first promise to the manger.',
         },
       ],
     },
@@ -164,6 +169,10 @@ const article: Article = {
       'Wichern was a Lutheran theologian in Hamburg, Germany. In 1833 he opened the Rauhes Haus, a home for poor and neglected children, where they lived in small groups like families. According to the Rauhes Haus’s own history, in 1839 he set up a wreath in the prayer hall with one candle for every day until Christmas Eve: large white candles for the Sundays and small red ones for the weekdays. The story is often told that he did it because the children kept asking how long it was until Christmas. Over time the wreath shrank to the four Sunday candles most churches light today, and it spread from German homes around the world. Wichern later helped found Germany’s Inner Mission, a movement of practical care for the poor.',
   },
   faqs: [
+    {
+      q: 'Is there a printable PDF of this Advent reading plan?',
+      a: 'Yes. The whole 2026 plan fits on one printable page, with all 27 readings, the four weekly themes and a box to check each day. Enter your email at the top of this page and it opens as soon as you confirm. Print as many copies as you like for your family, church or small group.',
+    },
     {
       q: 'What is Advent and why do Christians celebrate it?',
       a: 'Advent is the four-week season of preparation before Christmas. The word comes from the Latin adventus, meaning “coming.” Christians use it to remember the long wait for the Messiah before Jesus was born, and to look forward to his promised return. It is marked by Scripture reading, prayer, and often an Advent wreath with one more candle lit each Sunday.',

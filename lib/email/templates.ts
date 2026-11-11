@@ -19,6 +19,7 @@ export type DailyStudy = {
   voices: Voice[];
   readMore: Link[];
   premiumUrl?: string; // where the free email's Upgrade button points
+  shareUrl?: string; // this study's public page, for the one-line "send it to someone" note above the footer
   // Premium only: a short study on what the reader shared yesterday (verse, Behind the Verse, one voice).
   // meta says how it came about: their reply (none), a season they tapped, or a follow-up on an earlier note.
   yesterday?: { reply: string; passage: Passage; body: string[]; voice?: Voice | null; meta?: LampMeta | null };
@@ -300,8 +301,21 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
     </td></tr></table>
   </td></tr>`;
 
+  // One quiet line above the footer. Premium emails hold the reader's own Last Night's Lamp, so they
+  // are pointed at the public study page and never asked to forward the email itself.
+  const shareLead = 'Know one person who’d like this?';
+  const share = s.shareUrl
+    ? `<tr><td style="background:${C.page};padding:18px 12px 0;text-align:center;">
+    <p style="margin:0;font-family:${SANS};font-size:14px;line-height:1.6;color:${C.muted};">${shareLead} ${
+      isPremium
+        ? `<a href="${esc(s.shareUrl)}" style="color:${C.goldDark};">Send them today’s study</a>.`
+        : `Forward this email, or <a href="${esc(s.shareUrl)}" style="color:${C.goldDark};">send them today’s study</a>.`
+    }</p>
+  </td></tr>`
+    : '';
+
   const edition: Edition = isPremium ? 'premium' : 'free';
-  const html = shell(study + yesterday + verse, s.intro, s.isTest, footerHtml(footer), edition);
+  const html = shell(study + yesterday + verse + share, s.intro, s.isTest, footerHtml(footer), edition);
 
   const text = [
     s.isTest ? 'TEST SEND · not a live subscription email\n' : '',
@@ -358,6 +372,9 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
         ]),
     'Have a Bible question? Just hit reply and ask, one question a day.',
     '',
+    ...(s.shareUrl
+      ? [isPremium ? `${shareLead} Send them today’s study: ${s.shareUrl}` : `${shareLead} Forward this email, or send them today’s study: ${s.shareUrl}`, '']
+      : []),
     'Scripture quotations are from the Holy Bible, New International Version (NIV).',
     ...footerText(footer),
   ].join('\n');
@@ -623,7 +640,7 @@ export function renderLamplighterFeedback(o: { footer: MailFooter; weekIndex: nu
 }
 
 // ---------- Confirm your email (double opt-in) ----------
-export function renderConfirmEmail(o: { link: string; lamplighter?: boolean; foundingOpen?: boolean; invite?: { premium: boolean } }): { subject: string; html: string; text: string } {
+export function renderConfirmEmail(o: { link: string; lamplighter?: boolean; foundingOpen?: boolean; invite?: { premium: boolean }; gift?: string }): { subject: string; html: string; text: string } {
   if (o.invite) {
     // Someone on the Morning Lamp team added this person by hand; nothing else goes out until they tap the button.
     const r = simpleEmail({
@@ -640,6 +657,24 @@ export function renderConfirmEmail(o: { link: string; lamplighter?: boolean; fou
       button: { label: 'Yes, start my daily study', url: o.link },
     });
     return { subject: 'Rob signed you up for Morning Lamp', ...r };
+  }
+  if (o.gift) {
+    // They asked for a free printable plan. Confirming opens it, and starts the daily study.
+    const r = simpleEmail({
+      kicker: 'One quick step',
+      title: `Your ${o.gift} is ready`,
+      preheader: 'Tap to confirm your email and open your plan.',
+      lines: [
+        `Tap the button to confirm your email. Your ${o.gift} opens right after, ready to print.`,
+        'You’ll also get Morning Lamp, a free daily Bible study, at 5 AM your time: one passage, the history behind it, and a voice from history. It takes about three minutes, and you can unsubscribe any time.',
+        ...(o.foundingOpen
+          ? ['You’re early. The first 100 Lamplighters to confirm get Premium free for life, and there are still spots open.']
+          : []),
+        'If you didn’t ask for this, you can ignore this email. You won’t hear from us again.',
+      ],
+      button: { label: 'Confirm and open my plan', url: o.link },
+    });
+    return { subject: `Confirm your email to open your ${o.gift}`, ...r };
   }
   const lines = o.lamplighter
     ? [
@@ -660,4 +695,20 @@ export function renderConfirmEmail(o: { link: string; lamplighter?: boolean; fou
     button: { label: 'Confirm my email', url: o.link },
   });
   return { subject: o.lamplighter ? 'Confirm your email for Lamplighters' : 'Confirm your email for Morning Lamp', ...r };
+}
+
+// A reader who is already confirmed asked for a printable plan: send it straight to them.
+export function renderGiftEmail(o: { name: string; about: string; link: string }): { subject: string; html: string; text: string } {
+  const r = simpleEmail({
+    kicker: 'Free to print',
+    title: `Here’s your ${o.name}`,
+    preheader: 'Your printable plan is one tap away.',
+    lines: [
+      `You asked for the ${o.name}. ${o.about}`,
+      'Print as many copies as you like for your family, church or small group.',
+      'If you didn’t ask for this, you can ignore this email.',
+    ],
+    button: { label: 'Open my plan (PDF)', url: o.link },
+  });
+  return { subject: `Your ${o.name}`, ...r };
 }
