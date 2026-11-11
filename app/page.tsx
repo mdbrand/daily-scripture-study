@@ -103,12 +103,28 @@ export default async function Home() {
   const [spots, checkoutOpen] = await Promise.all([lamplighterStats(), premiumCheckoutOpen().catch(() => false)]);
   // A big "spots left" number early on only tells visitors how few have joined. Show it once it creates urgency.
   const showCount = spots.left <= 30;
+  // The top bar follows the calendar: the Advent plan until just after Advent begins, then the 2027 plan
+  // through January. The page refreshes every few minutes, so the switch happens without a deploy.
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Los_Angeles', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+  const promo =
+    today <= '2026-12-01'
+      ? { lead: 'Advent 2026:', text: 'one short Bible reading a day until Christmas. Free to print.', cta: 'Get the Advent plan', href: '/guides/advent-reading-plan' }
+      : today <= '2027-01-31'
+        ? { lead: 'Read the whole Bible in 2027.', text: 'A free printable plan, about three chapters a day.', cta: 'Get the 2027 plan', href: '/guides/2027-bible-reading-plan' }
+        : null;
 
   return (
     <main>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(homeSchema(faqs)) }} />
-      {/* Lamplighter offer: top bar (only while spots remain) */}
-      {spots.open && (
+      {/* Top bar: the free printable plan in season (Advent, then the new year), otherwise the Lamplighter offer. */}
+      {promo ? (
+        <p className="ll-bar">
+          <span>
+            <strong>{promo.lead}</strong> {promo.text}
+          </span>
+          <a href={promo.href}>{promo.cta}</a>
+        </p>
+      ) : spots.open && (
         <p className="ll-bar">
           <span>
             <strong>Limited time:</strong> the first {spots.spots} Lamplighters get Premium free for life.
@@ -126,7 +142,7 @@ export default async function Home() {
           </a>
           <div className="toplinks">
             <a href="/bible-verses">Bible Verses</a>
-            <a href="#sample">Sample</a>
+            <a href="/studies">Daily Studies</a>
             <a href="#premium">Premium</a>
             <a href="#lamplighters">Lamplighters</a>
           </div>
@@ -142,13 +158,6 @@ export default async function Home() {
               Morning Lamp is a free daily Bible study that brings together Scripture, the life and teachings of Jesus,
               and the voices of Christians throughout history.
             </p>
-            <p>
-              From the early Church Fathers to pastors, reformers, missionaries, and writers, you’ll discover how people
-              across the centuries understood and lived out God’s Word.
-            </p>
-            <p>
-              And with Premium, you can connect that same biblical wisdom to what’s happening in your own life.
-            </p>
             <p className="hero-facts">
               Every morning at <strong>5 AM</strong>. Under <strong>three minutes</strong> to read. Delivered right to
               your inbox.
@@ -163,6 +172,32 @@ export default async function Home() {
           )}
         </div>
       </header>
+
+      {/* A morning with Morning Lamp */}
+      <section className="chapter tinted" id="sample">
+        <div className="container split see-it">
+          <div>
+            <h2>Here’s what a morning with Morning Lamp looks like.</h2>
+            <div className="prose">
+              <p>At 5 AM, your study arrives in your inbox.</p>
+              <p>
+                You open it, read the day’s Scripture, discover the story behind the passage, and hear from a Christian
+                who reflected on the same words centuries ago.
+              </p>
+              <p>If you have Premium, Last Night’s Lamp follows, written for what you shared the night before.</p>
+              <p>All in under three minutes.</p>
+              <p className="sample-note">
+                The study shown here is on Psalm 46:10. Most of us read “be still” as “relax.” The Hebrew word means to
+                let go, and in its first setting many scholars hear it as a call to warring nations to stop.
+              </p>
+            </div>
+            <a className="text-link" href="#sample-email">
+              Read a real Morning Lamp study <span aria-hidden="true">↓</span>
+            </a>
+          </div>
+          <EmailPreview />
+        </div>
+      </section>
 
       {/* The world behind the verse */}
       <section className="chapter" id="world">
@@ -196,8 +231,8 @@ export default async function Home() {
               experiences give us a remarkable window into the history of our faith.
             </p>
             <p>
-              We use real sources and real dates, and we never make up a quote. When something is uncertain or scholars
-              disagree, we say so.
+              Each study is drafted with the help of AI, then reviewed before it reaches you. We use real sources and
+              real dates, and we never make up a quote. When something is uncertain or scholars disagree, we say so.
             </p>
             <p className="prose-strong">No made-up quotes. No opinions dressed up as Scripture.</p>
             <p>
@@ -262,6 +297,10 @@ export default async function Home() {
               your life.
             </p>
             <p>
+              And so you know how it’s made: Last Night’s Lamp is written overnight with the help of AI, from the note
+              you send. Your note is used only to write your studies. It is never sold and never shared.
+            </p>
+            <p>
               And it doesn’t replace prayer, your pastor, or your own time with God. It’s simply another way to spend
               meaningful time in His Word.
             </p>
@@ -291,32 +330,6 @@ export default async function Home() {
           ) : (
             <p className="fine on-dark-fine">Premium is $7 a month or $47 a year. The daily study is always free.</p>
           )}
-        </div>
-      </section>
-
-      {/* A morning with Morning Lamp */}
-      <section className="chapter tinted" id="sample">
-        <div className="container split see-it">
-          <div>
-            <h2>Here’s what a morning with Morning Lamp looks like.</h2>
-            <div className="prose">
-              <p>At 5 AM, your study arrives in your inbox.</p>
-              <p>
-                You open it, read the day’s Scripture, discover the story behind the passage, and hear from a Christian
-                who reflected on the same words centuries ago.
-              </p>
-              <p>If you have Premium, Last Night’s Lamp follows, written for what you shared the night before.</p>
-              <p>All in under three minutes.</p>
-              <p className="sample-note">
-                The study shown here is on Psalm 46:10. Most of us read “be still” as “relax.” The Hebrew word means to
-                let go, and in its first setting many scholars hear it as a call to warring nations to stop.
-              </p>
-            </div>
-            <a className="text-link" href="#sample-email">
-              Read a real Morning Lamp study <span aria-hidden="true">↓</span>
-            </a>
-          </div>
-          <EmailPreview />
         </div>
       </section>
 

@@ -69,7 +69,7 @@ const FAQS = [
   },
   {
     q: 'Who writes it?',
-    a: `The studies are published under the pen name ${AUTHOR.name}, the pen name of Morning Lamp’s founder. You can read more on the author page.`,
+    a: `The studies are published under the pen name ${AUTHOR.name}, the pen name of Morning Lamp’s founder. Each one is drafted with the help of AI and reviewed before it goes out. You can read more on the author page.`,
   },
 ];
 

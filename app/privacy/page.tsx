@@ -92,8 +92,9 @@ export default function PrivacyPage() {
 
       <h2>4. AI assistance</h2>
       <p>
-        Some content, including Premium emails and answers to Bible questions, is prepared with the
-        help of artificial intelligence services. When needed to write your email or answer, the
+        Our content, including the daily study, Premium emails and answers to Bible questions, is
+        prepared with the help of artificial intelligence services. Replies you send us arrive in
+        our inbox and can be read by the Morning Lamp team. When needed to write your email or answer, the
         relevant parts of what you shared are sent to those services for that purpose only.
       </p>
 

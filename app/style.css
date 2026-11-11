@@ -723,6 +723,7 @@ details p { color: var(--muted); font-size: 19px; margin: -4px 0 24px; max-width
   .top-cta { padding: 18px 16px 16px; }
   .toplinks { gap: 16px; }
   .toplinks a { font-size: 16px; }
+  .legal-top .toplinks .nav-wide { display: none; }
 }
 .byline { display: flex; align-items: center; gap: 12px; }
 .byline p { margin: 0; font-family: var(--ui); font-size: 15px; color: var(--muted); }

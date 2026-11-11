@@ -41,7 +41,11 @@ export const faqs = [
   },
   {
     q: 'Who writes it?',
-    a: 'I do, under the pen name Ezra Lampwright. Scripture is quoted word for word, the voices from history are real people with real sources, and when scholars disagree, I say so.',
+    a: 'Morning Lamp is run by its founder, who writes here as Ezra Lampwright. Each study is drafted with the help of AI and reviewed before it goes out. Scripture is quoted word for word, the voices from history are real people with real sources, and when scholars disagree, I say so.',
+  },
+  {
+    q: 'Does Morning Lamp use AI?',
+    a: 'Yes, and I’d rather say so plainly. Each daily study is drafted with the help of AI, then reviewed before it’s sent. Last Night’s Lamp, the Premium study, is written overnight by AI from the note you send. Your note is used only to write your studies and is never sold or shared. If a note sounds like someone is in crisis, a person writes back instead.',
   },
   {
     q: 'Is it really free?',

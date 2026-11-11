@@ -57,7 +57,10 @@ export function TopBar() {
           <Link href="/bible-verses">Bible Verses</Link>
           <Link href="/books">Books</Link>
           <Link href="/guides">Guides</Link>
-          <Link href="/#premium">Premium</Link>
+          <Link href="/studies">
+            <span className="nav-wide">Daily </span>Studies
+          </Link>
+          <Link className="nav-wide" href="/#premium">Premium</Link>
         </div>
       </nav>
     </header>
