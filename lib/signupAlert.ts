@@ -20,7 +20,15 @@ export type SignupAlertInput = {
   geo: { city: string | null; region: string | null; country: string | null };
   at: Date;
   total: number | null;
+  // Founding Lamplighter spots right now (null when the lookup failed: the row is then left out).
+  lamplighter?: { spots: number; accepted: number; left: number; open: boolean } | null;
 };
+
+// One opt-in: confirming is what makes someone a Founding Lamplighter, so say what will happen.
+export function lamplighterLine(l: NonNullable<SignupAlertInput['lamplighter']>): string {
+  if (!l.open || l.left <= 0) return `All ${l.spots} Founding spots are taken: they stay on the free daily email after confirming`;
+  return `Becomes Founding Lamplighter #${l.accepted + 1} if they confirm next (Premium free for life). ${l.left} of ${l.spots} spots open`;
+}
 
 export function esc(v: unknown): string {
   return String(v ?? '')
@@ -86,6 +94,10 @@ export function renderSignupAlert(a: SignupAlertInput): { subject: string; html:
   if (theirs) rows.push([`When (their time, ${a.timezone})`, theirs, esc(theirs)]);
   else if (a.timezone) rows.push(['Their timezone', a.timezone, esc(a.timezone)]);
   rows.push(['Plan', planLabel, esc(planLabel)]);
+  if (a.lamplighter) {
+    const line = lamplighterLine(a.lamplighter);
+    rows.push(['Lamplighter', line, esc(line)]);
+  }
   rows.push(['Form', a.formLocation ?? 'not reported', esc(a.formLocation ?? 'not reported')]);
   rows.push(['Page', a.pageUrl ?? 'not reported', esc(a.pageUrl ?? 'not reported')]);
   if (a.referrer) rows.push(['Referrer', a.referrer, esc(a.referrer)]);
@@ -111,7 +123,7 @@ ${rows.map(([k, , h]) => `<tr><td style="padding:6px 12px 6px 0;color:#7a6f60;ve
 }
 
 // Looks up the running total, renders and sends. Never throws.
-export async function sendSignupAlert(input: Omit<SignupAlertInput, 'total'>): Promise<void> {
+export async function sendSignupAlert(input: Omit<SignupAlertInput, 'total' | 'lamplighter'>): Promise<void> {
   try {
     const to = process.env.DSS_SIGNUP_NOTIFY_TO?.trim() || DEFAULT_TO;
     let total: number | null = null;
@@ -124,7 +136,15 @@ export async function sendSignupAlert(input: Omit<SignupAlertInput, 'total'>): P
         console.error('signup alert: total lookup failed', e);
       }
     }
-    await sendEmail({ to, ...renderSignupAlert({ ...input, total }) });
+    // Real numbers only: if the lookup fails the Lamplighter row is skipped, never guessed.
+    let lamplighter: SignupAlertInput['lamplighter'] = null;
+    try {
+      const s = await rpc<NonNullable<SignupAlertInput['lamplighter']>>('dss_lamplighter_stats');
+      if (s && typeof s.accepted === 'number' && typeof s.left === 'number' && typeof s.spots === 'number') lamplighter = s;
+    } catch (e) {
+      console.error('signup alert: lamplighter stats lookup failed', e);
+    }
+    await sendEmail({ to, ...renderSignupAlert({ ...input, total, lamplighter }) });
   } catch (e) {
     console.error('signup alert: send failed', e);
   }
