@@ -69,15 +69,15 @@ function EmailPreview() {
       </div>
       <div className="mail-body">
         <p className="mail-kicker">Today’s Bible Study</p>
-        <p className="mail-title">“Be still” was first a command to stop fighting</p>
+        <p className="mail-title">“Be still” first meant “let go”</p>
         <blockquote className="mail-verse">
           “Be still, and know that I am God; I will be exalted among the nations, I will be exalted in the earth.”
           <cite>Psalm 46:10</cite>
         </blockquote>
         <p className="mail-h">Behind the Verse</p>
         <p className="mail-p">
-          The Hebrew word behind “be still” means to let go or stop. God is speaking to warring nations: put down your
-          weapons, and recognize who is God.
+          The Hebrew word behind “be still” means to let go or stop. Many scholars hear verse 10 as God speaking to the
+          warring nations around it: put down your weapons, and recognize who is God.
         </p>
         <div className="mail-voice">
           <p className="mail-voice-name">
@@ -102,8 +102,7 @@ export default async function Home() {
       {spots.open && (
         <p className="ll-bar">
           <span>
-            <strong>Limited time:</strong> the first {spots.spots} Lamplighters get Premium free for life.{' '}
-            <span className="ll-bar-left">{spots.left} spots left.</span>
+            <strong>Limited time:</strong> the first {spots.spots} Lamplighters get Premium free for life.
           </span>
           <a href="#lamplighters">Become a Lamplighter</a>
         </p>
@@ -221,8 +220,8 @@ export default async function Home() {
               thankful for, what’s bothering you, what’s on your heart.
             </p>
             <p>
-              The next morning, your study includes <strong>Last Night’s Lamp</strong>: a short study written for what
-              you shared. You still receive Scripture, the history behind it, and wisdom from the Church through the
+              Everyone gets the same daily study. Premium adds one thing on top of it: the next morning, your study
+              includes <strong>Last Night’s Lamp</strong>, a short study written for what you shared. You still receive Scripture, the history behind it, and wisdom from the Church through the
               centuries, now connected to what you’re actually living.
             </p>
           </div>
@@ -275,7 +274,7 @@ export default async function Home() {
                 Right now, the first {spots.spots} Lamplighters receive Premium free for life.
               </p>
               <p>
-                {spots.left} of {spots.spots} spots left. Join and confirm your email to claim yours.
+                Join and confirm your email to claim yours.
               </p>
               <a className="button gold" href="#lamplighters">
                 Become a Lamplighter
@@ -302,8 +301,8 @@ export default async function Home() {
               <p>If you have Premium, Last Night’s Lamp follows, written for what you shared the night before.</p>
               <p>All in under three minutes.</p>
               <p className="sample-note">
-                The study shown here is on Psalm 46:10. Most of us read “be still” as “relax.” In its first setting, it
-                meant “stop fighting.”
+                The study shown here is on Psalm 46:10. Most of us read “be still” as “relax.” The Hebrew word means to
+                let go, and in its first setting many scholars hear it as a call to warring nations to stop.
               </p>
             </div>
             <a className="text-link" href="#sample-email">
@@ -454,7 +453,9 @@ export default async function Home() {
           </figure>
           <h2>Morning Lamp</h2>
           <p className="closing-tagline">Every verse has a story.</p>
-          <SignupForm source="closing" tone="dark" hidePlanSelect buttonLabel="Become a Lamplighter" foundingOpen={spots.open} />
+          <a className="button gold" href="#lamplighters">
+            Become a Lamplighter
+          </a>
         </div>
       </section>
 

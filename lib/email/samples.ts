@@ -6,7 +6,7 @@ export const sampleFreeStudy: DailyStudy = {
   dateLabel: 'Sunday, November 8, 2026',
   subject: 'Be still: what it meant the first time (Psalm 46)',
   pillar: 'Perseverance, peace, and trust',
-  title: '“Be still” was first a command to stop fighting',
+  title: '“Be still” first meant “let go”',
   passage: {
     text: 'He says, ‘Be still, and know that I am God; I will be exalted among the nations, I will be exalted in the earth.’',
     ref: 'Psalm 46:10 (NIV)',
@@ -15,7 +15,7 @@ export const sampleFreeStudy: DailyStudy = {
     'Most of us read “be still” as an invitation to quiet time. That meaning is real, but in its first setting the words land somewhere surprising: in the middle of a war.',
   behind: [
     'Psalm 46 is labeled “Of the Sons of Korah.” They were a family of Levites who served as singers and musicians at the temple. The psalm opens with the whole world shaking: the earth gives way, mountains fall into the sea, and nations are in uproar (verses 2–6). Through all of it, God’s city stands.',
-    'The Hebrew word behind “be still” (rāphāh) means to let go, loosen your grip, or stop. In verse 10, God is speaking to the warring nations of the verses just before it. In plain words: put down your weapons, and recognize who is God.',
+    'The Hebrew word behind “be still” (rāphāh) means to let go, loosen your grip, or stop. Many scholars hear verse 10 as God speaking to the warring nations of the verses just before it. In plain words: put down your weapons, and recognize who is God.',
     'The psalm does not say when it was written. Many readers have connected it to 701 BC, when the Assyrian army surrounded Jerusalem and then withdrew without taking the city (2 Kings 18–19). That connection is a reasonable guess, not something the text states.',
   ],
   detail:

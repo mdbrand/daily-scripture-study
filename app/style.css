@@ -805,3 +805,4 @@ details p { color: var(--muted); font-size: 19px; margin: -4px 0 24px; max-width
   .ezra-note { padding: 28px 22px 24px; }
   .ezra-note p { font-size: 18.5px; }
 }
+.funnel-table td:first-child { white-space: nowrap; } .funnel-table code { font-size: 13px; }

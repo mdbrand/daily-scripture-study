@@ -31,15 +31,76 @@ function Stat({ label, value, href }: { label: string; value: React.ReactNode; h
 }
 const list = (filter: string) => `/admin/subscribers?filter=${filter}`;
 
+type FunnelRow = Record<
+  'signups' | 'confirmed' | 'premium' | 'got_checkin' | 'replied' | 'engaged' | 'eligible_7d' | 'kept_7d' | 'eligible_30d' | 'kept_30d',
+  number
+>;
+type Funnel = { recent?: FunnelRow; all?: FunnelRow };
+
+const GA4_URL = 'https://analytics.google.com/analytics/web/#/a17591468p563191583/reports/intelligenthome';
+
+// "12 (75%)" where the percent is of the stage before; blank when there's nothing to compare yet.
+function step(n: number | undefined, of: number | undefined) {
+  if (n === undefined) return '–';
+  if (!of) return String(n);
+  return `${n} (${Math.round((n / of) * 100)}%)`;
+}
+function kept(k: number | undefined, eligible: number | undefined) {
+  if (!eligible) return 'Not yet';
+  return `${k ?? 0} of ${eligible} (${Math.round(((k ?? 0) / eligible) * 100)}%)`;
+}
+
+// Sign-up funnel: where people drop off between landing and sticking around.
+function FunnelTable({ f }: { f: Funnel }) {
+  const rows: { label: string; cell: (r?: FunnelRow) => string }[] = [
+    { label: 'Signed up', cell: (r) => step(r?.signups, undefined) },
+    { label: 'Confirmed their email', cell: (r) => step(r?.confirmed, r?.signups) },
+    { label: 'Have Premium (Lamplighters + paid)', cell: (r) => step(r?.premium, r?.confirmed) },
+    { label: 'Got an evening check-in', cell: (r) => step(r?.got_checkin, r?.premium) },
+    { label: 'Replied to a check-in', cell: (r) => step(r?.replied, r?.got_checkin) },
+    { label: 'Replied or tapped a season', cell: (r) => step(r?.engaged, r?.got_checkin) },
+    { label: 'Still subscribed after 7 days', cell: (r) => kept(r?.kept_7d, r?.eligible_7d) },
+    { label: 'Still subscribed after 30 days', cell: (r) => kept(r?.kept_30d, r?.eligible_30d) },
+  ];
+  return (
+    <table className="partner-table funnel-table">
+      <thead>
+        <tr>
+          <th>Stage</th>
+          <th>Signed up in last 30 days</th>
+          <th>Everyone</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Visitors</td>
+          <td colSpan={2}>
+            In GA4 (<a href={GA4_URL} target="_blank" rel="noopener">open reports</a>). Sign-ups by page: event{' '}
+            <code>sign_up</code>, by <code>form_location</code>.
+          </td>
+        </tr>
+        {rows.map((row) => (
+          <tr key={row.label}>
+            <td>{row.label}</td>
+            <td>{row.cell(f.recent)}</td>
+            <td>{row.cell(f.all)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
 export default async function AdminHome() {
   const email = await adminEmail();
   if (!email) return <AdminSignIn next="/admin" />;
 
-  const [o, lamplighters, today, tomorrow] = await Promise.all([
+  const [o, lamplighters, today, tomorrow, funnel] = await Promise.all([
     rpc<Overview>('dss_admin_overview', { p_gate: gate() }),
     rpc<number>('dss_admin_lamplighter_count', { p_gate: gate() }),
     getStudy(pacificDate(0)),
     getStudy(pacificDate(1)),
+    rpc<Funnel>('dss_admin_funnel', { p_gate: gate() }).catch(() => ({}) as Funnel),
   ]);
   const s = o.subscribers;
   const p = o.premium;
@@ -66,6 +127,12 @@ export default async function AdminHome() {
           Last 14 days: {o.signups_by_day.map((d) => `${d.day.slice(5)}: ${d.n}`).join(' · ')}
         </p>
       )}
+
+      <h2>Sign-up funnel</h2>
+      <p className="form-note" style={{ textAlign: 'left' }}>
+        Each percent is of the stage above it. Retention counts confirmed readers old enough to measure.
+      </p>
+      <FunnelTable f={funnel} />
 
       <h2>Premium</h2>
       <dl className="partner-stats">
