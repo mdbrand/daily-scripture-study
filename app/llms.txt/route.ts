@@ -13,7 +13,7 @@ export function GET() {
     '',
     'Every verse on this site is quoted exactly from one of five translations (NIV, CSB, ESV, NLT, BSB) and labeled. Each verse comes with "the story behind it": who wrote it, when, and what it meant to its first readers. Where scholars disagree, the articles say so.',
     '',
-    'Articles are written under the pen name Ezra Lampwright, which stands for Morning Lamp’s writing desk: https://morninglamp.study/authors/ezra-lampwright',
+    'Articles are written under the pen name Ezra Lampwright, the pen name of Morning Lamp’s founder: https://morninglamp.study/authors/ezra-lampwright',
     '',
     '- Sign up (free): https://morninglamp.study/',
     '- Contact: hello@morninglamp.study',

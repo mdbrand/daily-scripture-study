@@ -769,3 +769,39 @@ details p { color: var(--muted); font-size: 19px; margin: -4px 0 24px; max-width
   .guide-row-body { gap: 6px 20px; }
   .guide-row li a { font-size: 18px; }
 }
+
+/* ---------- Home page v3 (Nov 10 2026 copy) ---------- */
+.title-block h1 { margin-bottom: 14px; }
+.hero-sub { font-style: italic; font-size: 25px; line-height: 1.4; color: var(--brass-dark); margin: 0 auto 30px; max-width: 620px; }
+.hero-facts { font-family: var(--ui); font-size: 16px !important; color: var(--muted) !important; letter-spacing: 0.01em; }
+.hero-facts strong { color: var(--navy); font-weight: 600; }
+.hero-founding { margin: 18px auto 0; max-width: 560px; font-family: var(--ui); font-size: 15px; color: var(--muted); }
+.hero-founding strong { color: var(--brass-dark); font-weight: 600; }
+.prose { font-size: 20px; line-height: 1.65; }
+.prose p { margin: 0 0 18px; }
+.narrow-prose { max-width: 680px; margin: 28px auto 0; }
+.prose-strong { font-weight: 600; color: var(--navy); font-size: 21px; }
+.on-dark-prose { color: var(--on-dark); text-align: left; }
+.on-dark-prose strong { color: #f6efe1; }
+#world .ages { margin: 36px auto; }
+.sample-note { font-style: italic; color: var(--muted); font-size: 18px; border-left: 2px solid var(--brass-light); padding-left: 16px; }
+.text-link { font-family: var(--ui); font-size: 15px; font-weight: 600; color: var(--brass-dark); text-decoration: none; }
+.text-link:hover { text-decoration: underline; }
+.ezra-note { background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; padding: 44px 48px 36px; }
+.ezra-note p { font-size: 20px; line-height: 1.7; margin: 0 0 16px; }
+.ezra-note-head { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+.ezra-note-head h2 { margin: 0; font-size: clamp(28px, 3.4vw, 38px); }
+.ezra-sign { margin-top: 26px !important; }
+.ezra-sign .signature { display: block; font-style: italic; font-size: 32px; color: var(--navy); }
+.ezra-sign .penname { display: block; margin-top: 4px; font-family: var(--ui); font-size: 13px; color: var(--muted); text-decoration: none; }
+.ezra-sign .penname:hover { text-decoration: underline; }
+.lamp-lede + .lamp-lede { margin-top: 0; }
+.lamp-fine { font-family: var(--ui); font-size: 14px; color: var(--muted); margin: 12px 0 0; }
+.closing h2 { margin-bottom: 6px; }
+.closing-tagline { font-style: italic; font-size: 22px; color: var(--brass-light); margin: 0 0 30px; }
+@media (max-width: 720px) {
+  .hero-sub { font-size: 21px; }
+  .prose { font-size: 18.5px; }
+  .ezra-note { padding: 28px 22px 24px; }
+  .ezra-note p { font-size: 18.5px; }
+}

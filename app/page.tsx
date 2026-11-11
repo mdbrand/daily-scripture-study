@@ -4,7 +4,7 @@ import BackToTop from './BackToTop';
 import FoundersOffer from './FoundersOffer';
 import PremiumPlans from './PremiumPlans';
 import { SiteFooter } from './LegalShell';
-import { anatomy, faqs, lampSteps, promises, voices } from './content';
+import { faqs, voices } from './content';
 import { lamplighterStats } from '@/lib/lamplighters';
 import { premiumCheckoutOpen } from '@/lib/premium';
 import type { Metadata } from 'next';
@@ -62,7 +62,7 @@ function Lord() {
 // A real morning email, shown instead of described.
 function EmailPreview() {
   return (
-    <div className="mail" aria-label="A sample Morning Lamp email">
+    <div className="mail" id="sample-email" aria-label="A sample Morning Lamp email">
       <div className="mail-bar">
         <span className="mail-brand">Morning Lamp</span>
         <span className="mail-badge">Free edition</span>
@@ -127,73 +127,53 @@ export default async function Home() {
         <div className="title-block">
           <Crest size={96} />
           <p className="kicker hero-kicker">A free daily Bible study by email</p>
-          <h1>Every verse has a story. Let me tell you one each morning.</h1>
+          <h1>Every verse has a story.</h1>
+          <p className="hero-sub">And sometimes, that story is exactly what you need to hear.</p>
           <div className="letter-open">
-            <a className="letter-from" href="/authors/ezra-lampwright">
-              <AuthorAvatar size={52} />
-              <span>
-                A letter from <strong>Ezra Lampwright</strong>
-                <small>Writer of Morning Lamp</small>
-              </span>
-            </a>
-            <p className="salutation">Dear friend,</p>
             <p>
-              I’m Ezra, and I write Morning Lamp. My name comes from Ezra, the scribe who read God’s
-              word aloud to his people “from daybreak till noon” (Nehemiah 8:3). Mornings with Scripture are an old
-              idea. I’d like to share them with you.
+              Morning Lamp is a free daily Bible study that brings together Scripture, the life and teachings of Jesus,
+              and the voices of Christians throughout history.
             </p>
             <p>
-              Every verse was written by someone, to someone, at a moment that mattered. Once you know that moment, the
-              words land differently.
+              From the early Church Fathers to pastors, reformers, missionaries, and writers, you’ll discover how people
+              across the centuries understood and lived out God’s Word.
             </p>
             <p>
-              So each morning at 5 AM, I’ll send you one short passage, the story behind it, and a voice from 2,000
-              years of faith. It takes under three minutes, and it’s free.
+              And with Premium, you can connect that same biblical wisdom to what’s happening in your own life.
+            </p>
+            <p className="hero-facts">
+              Every morning at <strong>5 AM</strong>. Under <strong>three minutes</strong> to read. Delivered right to
+              your inbox.
             </p>
           </div>
           <SignupForm source="hero" tone="light" hidePlanSelect buttonLabel="Become a Lamplighter" foundingOpen={spots.open} />
           {spots.open && (
-            <div className="ll-offer">
-              <p className="ll-offer-kicker">Limited time only</p>
-              <p className="ll-offer-title">The first {spots.spots} Lamplighters get Premium free for life.</p>
-              <p className="ll-offer-text">
-                Join above and confirm your email. If you’re one of the first {spots.spots}, you’re a Founding
-                Lamplighter, and Premium is yours, free, for good. {spots.left} of {spots.spots} spots left.
-              </p>
-            </div>
+            <p className="hero-founding">
+              The first {spots.spots} Lamplighters get Premium free for life.{' '}
+              <strong>
+                {spots.left} of {spots.spots} spots left.
+              </strong>
+            </p>
           )}
         </div>
       </header>
 
-      {/* See it */}
-      <section className="chapter tinted" id="sample">
-        <div className="container split see-it">
-          <EmailPreview />
-          <div>
-            <h2>Here’s what a morning with me looks like.</h2>
-            <p className="letter-lead">
-              That one is on Psalm 46:10. Most of us read “be still” as “relax.” In its first setting, it meant “stop
-              fighting.” That’s the kind of thing I’ll show you.
-            </p>
-            <ol className="anatomy">
-              {anatomy.map((a) => (
-                <li key={a.title}>
-                  <strong>{a.title}</strong>
-                  <span>{a.text}</span>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </div>
-      </section>
-
-      {/* Why it's different */}
-      <section className="chapter">
+      {/* The world behind the verse */}
+      <section className="chapter" id="world">
         <div className="container">
           <h2 className="center">Not just a verse of the day. The world behind it.</h2>
-          <p className="center letter-lead">
-            You won’t read alone, either. You’ll hear from people like these, who loved the same words long before us:
-          </p>
+          <div className="prose narrow-prose">
+            <p>
+              Have you ever read a Bible verse and wondered what was happening when it was written? Or how Christians
+              hundreds of years ago understood those same words?
+            </p>
+            <p>That’s what makes Morning Lamp different.</p>
+            <p>
+              Every study starts with Scripture, quoted word for word from the NIV, with Jesus at the center. Then we
+              look at the history behind the passage and learn from Christians who came before us, people like
+              Augustine, Martin Luther, Matthew Henry, Charles Spurgeon, and Corrie ten Boom.
+            </p>
+          </div>
           <ol className="ages" aria-label="Voices you’ll meet">
             {voices.map((v) => (
               <li key={v.name}>
@@ -203,41 +183,49 @@ export default async function Home() {
               </li>
             ))}
           </ol>
-          <p className="center letter-lead promises-lead">And three promises from me:</p>
-          <ul className="promises">
-            {promises.map((p) => (
-              <li key={p}>{p}</li>
-            ))}
-          </ul>
+          <div className="prose narrow-prose">
+            <p>
+              Some lived nearly 2,000 years ago. Others lived in our grandparents’ lifetime. They faced different
+              challenges, lived in different cultures, and sometimes disagreed. But their writings, sermons, and
+              experiences give us a remarkable window into the history of our faith.
+            </p>
+            <p>
+              We use real sources and real dates, and we never make up a quote. When something is uncertain or scholars
+              disagree, we say so.
+            </p>
+            <p className="prose-strong">No made-up quotes. No opinions dressed up as Scripture.</p>
+            <p>
+              Just God’s Word, its historical setting, and the voices of those who spent their lives studying and
+              following Jesus. A little of that history, every morning, in under three minutes.
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* Premium */}
+      {/* Premium: Last Night's Lamp */}
       <section className="chapter chapel premium-center" id="premium">
         <div className="container">
           <header className="chapter-head on-dark">
             <p className="kicker">{checkoutOpen ? 'Premium · $7 a month or $47 a year' : 'Premium'}</p>
-            <h2>Last Night’s Lamp: a study written for your day.</h2>
-            <p>
-              Some mornings you don’t need just any verse. You need one for the conversation that went badly, the news
-              you’re waiting on, or the thing you can’t stop being grateful for. That’s what Last Night’s Lamp is for.
-            </p>
+            <h2>What if your Bible study also understood what you’re going through?</h2>
           </header>
-
-          <ol className="lamp-steps">
-            {lampSteps.map((s) => (
-              <li key={s.time}>
-                <span className="lamp-time">{s.time}</span>
-                <strong>{s.title}</strong>
-                <span>{s.text}</span>
-              </li>
-            ))}
-          </ol>
-
-          <p className="season-note">
-            Quiet night? Tap the season you’re in, like Waiting, Grieving or Grateful, and your next study is written
-            for that.
-          </p>
+          <div className="prose narrow-prose on-dark-prose">
+            <p>This is my favorite part of Morning Lamp.</p>
+            <p>
+              We all have different things happening in our lives. Maybe you’re worried about your children. Maybe work
+              is stressful. Maybe you’re facing a difficult decision, dealing with disappointment, or simply trying to
+              grow in your faith.
+            </p>
+            <p>
+              With Premium, you can take a moment each evening to share how your day went: what happened, what you’re
+              thankful for, what’s bothering you, what’s on your heart.
+            </p>
+            <p>
+              The next morning, your study includes <strong>Last Night’s Lamp</strong>: a short study written for what
+              you shared. You still receive Scripture, the history behind it, and wisdom from the Church through the
+              centuries, now connected to what you’re actually living.
+            </p>
+          </div>
 
           <div className="example">
             <p className="reply">
@@ -257,6 +245,22 @@ export default async function Home() {
             </article>
           </div>
 
+          <p className="season-note">
+            Busy night? Tap the season you’re in, like Waiting, Grieving or Grateful, and the next morning’s Lamp is
+            written for that.
+          </p>
+
+          <div className="prose narrow-prose on-dark-prose">
+            <p>
+              It’s not about changing Scripture to fit your life. It’s about helping you see how Scripture speaks to
+              your life.
+            </p>
+            <p>
+              And it doesn’t replace prayer, your pastor, or your own time with God. It’s simply another way to spend
+              meaningful time in His Word.
+            </p>
+          </div>
+
           {/* Founders appears only when switched on in the database (dss_config.founders_open). */}
           <FoundersOffer />
           {checkoutOpen ? (
@@ -264,40 +268,129 @@ export default async function Home() {
               <PremiumPlans />
               <p className="fine on-dark-fine">Your free morning study comes with it.</p>
             </>
-          ) : (
+          ) : spots.open ? (
             // During the beta, the first 100 Lamplighters get Premium free for life instead of a paid waitlist.
             <div className="beta-cta">
-              <p className="beta-cta-title">Right now, you can have it free for life.</p>
+              <p className="beta-cta-title">
+                Right now, the first {spots.spots} Lamplighters receive Premium free for life.
+              </p>
               <p>
-                The first {spots.spots} Lamplighters get Premium free, for good. Just join and confirm your email.{' '}
-                {spots.left} of {spots.spots} spots left.
+                {spots.left} of {spots.spots} spots left. Join and confirm your email to claim yours.
               </p>
               <a className="button gold" href="#lamplighters">
                 Become a Lamplighter
               </a>
-              <p className="beta-price">After the beta, Premium is $7 a month or $47 a year.</p>
+              <p className="beta-price">After the first {spots.spots}, Premium is $7 a month or $47 a year.</p>
             </div>
+          ) : (
+            <p className="fine on-dark-fine">Premium is $7 a month or $47 a year. The daily study is always free.</p>
           )}
         </div>
       </section>
 
-      {/* Lamplighters */}
-      <section className="chapter" id="lamplighters">
+      {/* A morning with Morning Lamp */}
+      <section className="chapter tinted" id="sample">
+        <div className="container split see-it">
+          <div>
+            <h2>Here’s what a morning with Morning Lamp looks like.</h2>
+            <div className="prose">
+              <p>At 5 AM, your study arrives in your inbox.</p>
+              <p>
+                You open it, read the day’s Scripture, discover the story behind the passage, and hear from a Christian
+                who reflected on the same words centuries ago.
+              </p>
+              <p>If you have Premium, Last Night’s Lamp follows, written for what you shared the night before.</p>
+              <p>All in under three minutes.</p>
+              <p className="sample-note">
+                The study shown here is on Psalm 46:10. Most of us read “be still” as “relax.” In its first setting, it
+                meant “stop fighting.”
+              </p>
+            </div>
+            <a className="text-link" href="#sample-email">
+              Read a real Morning Lamp study <span aria-hidden="true">↓</span>
+            </a>
+          </div>
+          <EmailPreview />
+        </div>
+      </section>
+
+      {/* A note from Ezra */}
+      <section className="chapter" id="ezra">
+        <div className="container narrow">
+          <article className="ezra-note">
+            <header className="ezra-note-head">
+              <AuthorAvatar size={56} />
+              <h2>A little note from Ezra.</h2>
+            </header>
+            <p>I started Morning Lamp because I wanted something different for my own mornings.</p>
+            <p>
+              I didn’t want another inspirational quote or someone’s personal opinion about what a Bible verse should
+              mean to me.
+            </p>
+            <p>
+              I wanted to understand Scripture better. I wanted to know more about Jesus. And I wanted to learn from the
+              incredible history of people who spent their lives studying, teaching, defending, and living out the
+              Christian faith.
+            </p>
+            <p>
+              The more I explored Church history, the more I realized how much I had never been taught. There were
+              centuries of letters, sermons, books, and stories filled with lessons that still matter today. And I kept
+              thinking, why aren’t more of us reading this stuff?
+            </p>
+            <p>
+              So I started putting together a simple daily study that brought those things into one place. Then I
+              wondered what it would look like if that study could also connect to what was happening in my own life.
+            </p>
+            <p>That’s how Morning Lamp came together.</p>
+            <p>
+              I wanted something simple enough to read with my morning coffee, but meaningful enough to think about
+              throughout the day. Something that would help me understand God’s Word, learn from the people who came
+              before me, and become more intentional about how I live.
+            </p>
+            <p>I’m still learning, too.</p>
+            <p>
+              And that’s really why I’m inviting you. Not because I’ve figured everything out, but because I think
+              there’s something special about learning and growing together.
+            </p>
+            <p className="ezra-sign">
+              <span className="signature">Ezra</span>
+              <a className="penname" href="/authors/ezra-lampwright">
+                Ezra Lampwright is the pen name of Morning Lamp’s founder
+              </a>
+            </p>
+          </article>
+        </div>
+      </section>
+
+      {/* Lamplighters: the one opt-in */}
+      <section className="chapter tinted" id="lamplighters">
         <div className="container lamp-wrap">
           <div>
             <p className="kicker">
               Lamplighters{spots.open ? ` · ${spots.left} of ${spots.spots} founding spots left` : ''}
             </p>
-            <h2>{spots.open ? 'Would you be one of the first 100?' : 'Become a Lamplighter.'}</h2>
+            <h2>There’s a place for you here.</h2>
             <p className="lamp-lede">
-              Everyone who reads Morning Lamp is a Lamplighter: one lamp lit each morning, one verse and the story
-              behind it.
+              I’m calling the people who join Morning Lamp <em>Lamplighters</em>: a small community of people who want
+              to start their mornings with Scripture, learn from the history of our faith, and grow a little each day.
+            </p>
+            <p className="lamp-lede">
+              The daily Bible study is free.
               {spots.open
-                ? ` The first ${spots.spots} to join and confirm their email are Founding Lamplighters, with Premium free for life. In return, you tell me honestly what works and what doesn’t. I’ll ask one short question a week.`
+                ? ` And as a thank-you for helping get this started, the first ${spots.spots} Lamplighters receive Premium free for life.`
                 : ''}
             </p>
+            <p className="lamp-lede">
+              No complicated process. Just enter your email and tap “Confirm” in the note I send you. Your first study
+              arrives at 5 AM. I’d love for you to be part of it.
+            </p>
           </div>
-          <SignupForm source="lamplighters" tone="light" hidePlanSelect buttonLabel="Become a Lamplighter" foundingOpen={spots.open} />
+          <div>
+            <SignupForm source="lamplighters" tone="light" hidePlanSelect buttonLabel="Become a Lamplighter" foundingOpen={spots.open} />
+            <p className="lamp-fine">
+              Free daily Bible study.{spots.open ? ` Premium free for life for the first ${spots.spots}.` : ''}
+            </p>
+          </div>
         </div>
       </section>
 
@@ -357,27 +450,10 @@ export default async function Home() {
           <Crest size={64} />
           <figure className="epigraph on-dark">
             <blockquote>Your word is a lamp for my feet, a light on my path.</blockquote>
-            <figcaption>Psalm 119:105</figcaption>
+            <figcaption>Psalm 119:105 (NIV)</figcaption>
           </figure>
-          <h2>Start your mornings in the Word.</h2>
-          <div className="letter-close">
-            <p>
-              That’s the whole idea: a few quiet minutes each morning with one verse, and the story that brings it to
-              life. I’d be glad to send it to you.
-            </p>
-            <p className="signoff">
-              Warmly,
-              <span className="signature">Ezra Lampwright</span>
-              <a className="penname" href="/authors/ezra-lampwright">
-                The pen name of the Morning Lamp writing desk
-              </a>
-            </p>
-            <p className="ps">
-              <strong>P.S.</strong> Your first study can be waiting for you at 5 AM. Add your email below, tap “Confirm
-              my email” when my note arrives, and that’s it. It’s free, and it always will be.
-              {spots.open ? ` And if you’re one of the first ${spots.spots}, you’re a Founding Lamplighter, with Premium free for life.` : ''}
-            </p>
-          </div>
+          <h2>Morning Lamp</h2>
+          <p className="closing-tagline">Every verse has a story.</p>
           <SignupForm source="closing" tone="dark" hidePlanSelect buttonLabel="Become a Lamplighter" foundingOpen={spots.open} />
         </div>
       </section>

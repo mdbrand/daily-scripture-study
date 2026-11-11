@@ -45,7 +45,7 @@ export const faqs = [
   },
   {
     q: 'Is it really free?',
-    a: 'Yes. The daily study is free, and it always will be. Premium adds Last Night’s Lamp for $7 a month or $47 a year.',
+    a: 'Yes. The daily study is free, and it always will be. Premium adds Last Night’s Lamp, a short study written for what you shared the night before. The first 100 Lamplighters get Premium free for life; after that it’s $7 a month or $47 a year.',
   },
   { q: 'How long does it take?', a: 'Under three minutes. It arrives at 5 AM in your time zone, before your day gets going.' },
   { q: 'Which Bible translation?', a: 'The NIV, so it reads the way people speak today. Every verse is quoted word for word.' },
