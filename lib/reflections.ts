@@ -73,7 +73,7 @@ export async function writeLampFor(
     // Deciding what to remember runs alongside writing the study, so the reader's Lamp isn't slowed down.
     const [r, plan] = await Promise.all([
       writeReflection(merged, { avoidVoice: study?.content?.voices?.[0]?.name ?? null, mode: opts.mode, earlier: memory.on ? memory.items : [] }),
-      memory.on ? planMemory(merged, memory.items) : Promise.resolve(null),
+      memory.on ? planMemory(merged, memory.items, forDate) : Promise.resolve(null),
     ]);
     const ready = r.kind === 'reflection' && r.passage;
     const recalled = ready && r.recall ? memory.items.find((m) => m.id === r.recall) : undefined;

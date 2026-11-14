@@ -92,7 +92,7 @@ For each item:
 - quote: copy one phrase or sentence from tonight's note exactly as written, between 8 and 240 characters. Code checks this against the note, and throws the item away if the words are not there. Choose the words that best name the thing.
 - label: a short plain name for it, under 80 characters, written to the reader, for example "The conversation with your brother" or "Your mother's surgery on Friday". Use only facts stated in the note. No guesses about feelings, causes, or outcomes.
 - question: only when it would be natural and kind for a friend to ask about this a few days later, write one short question to the reader, under 140 characters, such as "How did the conversation with your brother go?" Ask about what they said. Never assume how it turned out, and never mention anything that is not in the note. Use null when a follow-up would feel intrusive or there is nothing to ask. That covers most "thanks" items, and anything very private or painful: abuse, self-harm, a death, a diagnosis, intimate matters.
-- ask_in_days: when question is set, how many days from tonight it makes sense to ask, from 2 to 14. If the note gives a time ("Friday", "next week"), ask shortly after it. Otherwise use 4.
+- ask_in_days: when question is set, how many days from tonight it makes sense to ask, from 2 to 14. If the note gives a time ("Friday", "next week"), work out when that is from tonight's date and ask a day or two after it, never before it has happened. Otherwise use 4.
 
 Earlier items: if tonight's note says, in the reader's own words, that one of them is over or settled, list it under closed with its id and the exact words from tonight's note that show it. If tonight's note is about the same ongoing thing as an earlier item and adds nothing new, don't add a duplicate.
 
@@ -100,7 +100,7 @@ Remember nothing at all when the reader asks us not to keep what they wrote ("do
 
 type Proposed = z.infer<typeof MemorySchema>;
 
-async function propose(note: string, earlier: MemoryItem[]): Promise<Proposed> {
+async function propose(note: string, earlier: MemoryItem[], forDate?: string): Promise<Proposed> {
   const key = anthropicKey();
   const client = key ? new Anthropic({ apiKey: key }) : new Anthropic();
   const list = earlier.length
@@ -114,7 +114,8 @@ async function propose(note: string, earlier: MemoryItem[]): Promise<Proposed> {
     thinking: { type: 'adaptive' },
     output_config: { effort: 'low', format: zodOutputFormat(MemorySchema) },
     system: SYSTEM,
-    messages: [{ role: 'user', content: `Tonight's note:\n\n<note>\n${note}\n</note>${list}` }],
+    // The evening the note was written, so "Saturday" or "next week" in it can be placed on the calendar.
+    messages: [{ role: 'user', content: `${forDate ? `Tonight is ${noteNight(forDate)}.\n\n` : ''}Tonight's note:\n\n<note>\n${note}\n</note>${list}` }],
   });
   // A refusal means the note is not something to keep a memory of.
   if (response.stop_reason === 'refusal' || !response.parsed_output) return { items: [], closed: [] };
@@ -128,10 +129,10 @@ export type MemoryPlan = {
 
 // Reads tonight's note and returns what would be remembered, after the quote check. Saves nothing.
 // Never throws: memory must not get in the way of writing the reader's study.
-export async function planMemory(note: string, earlier: MemoryItem[]): Promise<MemoryPlan | null> {
+export async function planMemory(note: string, earlier: MemoryItem[], forDate?: string): Promise<MemoryPlan | null> {
   if (!anthropicKey()) return null;
   try {
-    const out = await propose(note, earlier);
+    const out = await propose(note, earlier, forDate);
     const fresh: MemoryPlan['fresh'] = [];
     for (const it of out.items.slice(0, 3)) {
       const quote = exactQuote(note, it.quote);
