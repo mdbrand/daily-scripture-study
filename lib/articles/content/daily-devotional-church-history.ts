@@ -38,6 +38,7 @@ const article: Article = {
     {
       heading: 'Five devotionals with Bible depth and church history',
       table: {
+        cards: true,
         head: ['Devotional', 'Format', 'Time a day', 'What it draws on'],
         rows: [
           ['Morning Lamp', 'Free daily email at 5 AM your time', 'Under 3 minutes', 'One passage with its history, plus one voice from 2,000 years of church history, with the work it comes from named.'],

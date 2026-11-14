@@ -19,7 +19,8 @@ export type Section = {
   paragraphs?: string[];
   list?: string[]; // bulleted
   steps?: { name: string; text: string }[]; // numbered steps (also emitted as HowTo schema when howTo is set)
-  table?: { head: string[]; rows: string[][] };
+  // cards: show each row as its own block (first cell is the heading). Use it when the cells are full sentences.
+  table?: { head: string[]; rows: string[][]; cards?: boolean };
 };
 
 export type Faq = { q: string; a: string }; // a: 40–80 words, answer first

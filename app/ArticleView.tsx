@@ -3,7 +3,7 @@ import Crest from './Crest';
 import SignupForm from './SignupForm';
 import { SiteFooter } from './LegalShell';
 import BackToTop from './BackToTop';
-import type { Article } from '@/lib/articles/types';
+import type { Article, Section } from '@/lib/articles/types';
 import {
   SECTION_NAMES,
   TRANSLATION_NOTICES,
@@ -64,6 +64,65 @@ export function TopBar() {
         </div>
       </nav>
     </header>
+  );
+}
+
+// A section's table. Short cells (a date, a chapter range, "NIV") stay on one line; anything longer wraps,
+// so a table never has to scroll sideways on a desktop. Comparisons made of full sentences set `cards`
+// and are shown as one block per row instead, which reads far better than four narrow columns of prose.
+const SHORT_CELL = 18;
+function DataTable({ table }: { table: NonNullable<Section['table']> }) {
+  if (table.cards) {
+    return (
+      <ul className="compare-cards">
+        {table.rows.map((r, i) => (
+          <li key={i}>
+            <h3>{r[0]}</h3>
+            <dl>
+              {table.head.slice(1).map((h, j) => (
+                <div key={h}>
+                  <dt>{h}</dt>
+                  <dd>{r[j + 1]}</dd>
+                </div>
+              ))}
+            </dl>
+          </li>
+        ))}
+      </ul>
+    );
+  }
+  const nw = (c: string) => (c.length <= SHORT_CELL ? 'nw' : undefined);
+  return (
+    <div className="table-wrap">
+      <table className="data-table">
+        <thead>
+          <tr>
+            {table.head.map((h) => (
+              <th key={h} scope="col">
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {table.rows.map((r, i) => (
+            <tr key={i}>
+              {r.map((c, j) =>
+                j === 0 ? (
+                  <th key={j} scope="row" className={nw(c)}>
+                    {c}
+                  </th>
+                ) : (
+                  <td key={j} className={nw(c)}>
+                    {c}
+                  </td>
+                ),
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
@@ -175,28 +234,7 @@ export default function ArticleView({ a }: { a: Article }) {
                 ))}
               </ol>
             )}
-            {s.table && (
-              <div className="table-wrap">
-                <table className="data-table">
-                  <thead>
-                    <tr>
-                      {s.table.head.map((h) => (
-                        <th key={h} scope="col">
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {s.table.rows.map((r, i) => (
-                      <tr key={i}>
-                        {r.map((c, j) => (j === 0 ? <th key={j} scope="row">{c}</th> : <td key={j}>{c}</td>))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+            {s.table && <DataTable table={s.table} />}
           </section>
         ))}
 
@@ -279,28 +317,7 @@ export default function ArticleView({ a }: { a: Article }) {
                 ))}
               </ol>
             )}
-            {s.table && (
-              <div className="table-wrap">
-                <table className="data-table">
-                  <thead>
-                    <tr>
-                      {s.table.head.map((h) => (
-                        <th key={h} scope="col">
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {s.table.rows.map((r, i) => (
-                      <tr key={i}>
-                        {r.map((c, j) => (j === 0 ? <th key={j} scope="row">{c}</th> : <td key={j}>{c}</td>))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+            {s.table && <DataTable table={s.table} />}
           </section>
         ))}
 

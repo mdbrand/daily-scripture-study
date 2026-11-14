@@ -736,7 +736,16 @@ details p { color: var(--muted); font-size: 19px; margin: -4px 0 24px; max-width
 .data-table { width: 100%; border-collapse: collapse; font-family: var(--ui); font-size: 15px; }
 .data-table th, .data-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
 .data-table thead th { font-weight: 600; color: var(--navy); border-bottom: 2px solid var(--brass-light); }
-.data-table tbody th { font-weight: 600; color: var(--navy); white-space: nowrap; }
+.data-table tbody th { font-weight: 600; color: var(--navy); }
+.data-table .nw { white-space: nowrap; }
+.compare-cards { list-style: none; padding: 0 !important; margin: 0 0 22px !important; display: grid; gap: 14px; }
+.compare-cards li { background: #fff; border: 1px solid var(--rule); border-radius: 8px; padding: 20px 22px; margin: 0 !important; }
+.compare-cards h3 { margin: 0 0 12px; font-size: 22px; }
+.compare-cards dl { margin: 0; display: grid; gap: 10px; }
+.compare-cards dl > div { display: grid; grid-template-columns: 132px 1fr; gap: 4px 18px; align-items: baseline; }
+.compare-cards dt { font-family: var(--ui); font-size: 12.5px; letter-spacing: 0.07em; text-transform: uppercase; font-weight: 600; color: var(--brass-dark); }
+.compare-cards dd { margin: 0; font-family: var(--ui); font-size: 16px; line-height: 1.55; color: var(--ink); }
+@media (max-width: 600px) { .compare-cards dl > div { grid-template-columns: 1fr; } }
 .index-list { list-style: none; padding: 0 !important; }
 .index-list li { border-top: 1px solid var(--rule); padding: 18px 0 6px; }
 .index-list a { font-family: var(--book); font-size: 24px; color: var(--navy); text-decoration: none; }
@@ -785,7 +794,6 @@ details p { color: var(--muted); font-size: 19px; margin: -4px 0 24px; max-width
   .letter-open p { font-size: 19px; }
   .letter-close p { font-size: 18px; }
 }
-.data-table td:nth-child(2) { white-space: nowrap; }
 .letter-from { display: inline-flex; align-items: center; gap: 14px; margin: 0 0 26px; text-decoration: none; color: var(--ink); }
 .letter-from span { display: flex; flex-direction: column; font-family: var(--ui); font-size: 15px; line-height: 1.35; }
 .letter-from strong { color: var(--navy); font-weight: 600; }

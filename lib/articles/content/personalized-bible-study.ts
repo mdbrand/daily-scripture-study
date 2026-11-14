@@ -28,6 +28,7 @@ const article: Article = {
     {
       heading: 'Four ways to get a Bible study that fits your situation',
       table: {
+        cards: true,
         head: ['Option', 'How it works', 'Best for', 'Watch out for'],
         rows: [
           ['A topic reading plan', 'Bible apps such as YouVersion offer free reading plans, many on a single subject like anxiety, grief or marriage.', 'A quick start on a common struggle.', 'It is written for everyone with that struggle. It doesn’t know your story.'],

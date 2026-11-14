@@ -44,6 +44,7 @@ const article: Article = {
         'These five take history seriously. They differ mostly in format and in how much time they ask of you.',
       ],
       table: {
+        cards: true,
         head: ['Study', 'Format', 'Time', 'What you get'],
         rows: [
           ['Morning Lamp', 'Email, every morning at 5 AM your time', 'Under 3 minutes', 'One passage, the history behind it, one detail readers often miss, and one voice from church history. Free.'],
