@@ -137,23 +137,39 @@ export default function PrivacyPage() {
       <h2>7. Emails and unsubscribing</h2>
       <p>
         Every email includes a way to unsubscribe. You can also email {mail} and we will remove you.
-        Canceling Premium does not delete your account automatically; ask us if you want everything
-        deleted.
+        Unsubscribing stops the emails. It does not delete your information, and neither does
+        canceling Premium. The next section explains how to delete it.
       </p>
 
       <h2>8. How long we keep information</h2>
       <p>
-        We keep your information while you are subscribed. If you unsubscribe or ask us to delete
-        your data, we delete it, except for what we must keep, such as a record that you
-        unsubscribed (so we don’t email you again) and payment and tax records the law requires.
+        We keep your information until you delete it or ask us to. That includes after you
+        unsubscribe: we stop emailing you, but your email address, the date you unsubscribed, any
+        notes you sent, and the record of emails we sent you stay on file. We keep the unsubscribe
+        record so we don’t email you again.
+      </p>
+      <p>
+        Premium readers can delete their own notes, and what is remembered from them, at any time on
+        the <a href="/my-lamp">My Lamp page</a>.
+      </p>
+      <p>
+        When you ask us to delete your data, we delete your subscriber record and what is stored with
+        it: your notes and the studies written from them, what is remembered from them, and the
+        records of emails sent to you and whether they were opened or clicked. If you have an active
+        paid membership, it has to be canceled first. We keep the payment, partner payout and tax
+        records the law requires, and our payment processor, Stripe, keeps its own records.
+      </p>
+      <p>
+        Emails you send us also reach our team inbox. Deleting notes on the My Lamp page does not
+        remove those emails. Ask us and we will delete them too.
       </p>
 
       <h2>9. Your rights and choices</h2>
       <p>
         You can ask to access, correct, download, or delete your personal information, and to stop
         receiving emails, by writing to {mail}. Premium readers can also see, download and delete
-        their own notes at any time on the <a href="/my-lamp">My Lamp page</a>. We will verify the request comes from you and respond
-        within the time the law allows. We will not treat you differently for using these rights.
+        their own notes at any time on the <a href="/my-lamp">My Lamp page</a>. We will verify the
+        request comes from you and respond within the time the law allows. We will not treat you differently for using these rights.
       </p>
       <p>
         <strong>California residents</strong> have these rights under the California Consumer Privacy
@@ -179,8 +195,7 @@ export default function PrivacyPage() {
 
       <h2>12. Changes to this policy</h2>
       <p>
-        If we make important changes, we will update the date above and let subscribers know by
-        email before the changes take effect.
+        When we change this policy, we update the date at the top of this page.
       </p>
 
       <h2>13. Contact</h2>
