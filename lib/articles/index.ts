@@ -45,6 +45,9 @@ import humility from './content/humility';
 import perseverance from './content/perseverance';
 import anger from './content/anger';
 import brokenHeart from './content/broken-heart';
+import dailyStudyContext from './content/daily-bible-study-history-context';
+import devotionalChurchHistory from './content/daily-devotional-church-history';
+import personalizedStudy from './content/personalized-bible-study';
 
 // Every published article. Add new ones here (one file per article in ./content).
 export const ARTICLES: Article[] = [
@@ -94,6 +97,9 @@ export const ARTICLES: Article[] = [
   perseverance,
   anger,
   brokenHeart,
+  dailyStudyContext,
+  devotionalChurchHistory,
+  personalizedStudy,
 ];
 
 export const SITE = 'https://morninglamp.study';

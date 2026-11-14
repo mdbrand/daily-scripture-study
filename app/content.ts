@@ -29,7 +29,7 @@ export const lampSteps = [
 export const faqs = [
   {
     q: 'What is Morning Lamp?',
-    a: 'Morning Lamp is a free daily Bible study by email. Every morning at 5 AM your time, you get one short passage, the story behind it (who wrote it, when, and why), one detail you might miss, and a voice from church history. It takes under three minutes to read.',
+    a: 'Morning Lamp is a free daily Bible study by email. Every morning at 5 AM your time, you get one short passage, the history and context behind it (who wrote it, when, and why), one detail you might miss, and a voice from church history. It takes under three minutes to read.',
   },
   {
     q: 'Is it a devotional or a Bible study?',
