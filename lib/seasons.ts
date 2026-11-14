@@ -116,6 +116,9 @@ export function seasonsForEmail(date: string, seed: string, current?: string | n
 }
 
 // How a Lamp came about. Kept with the Lamp so the email can introduce it the right way.
+// 'reply' appears only when a Lamp written from last night's note also picked up something the reader told us
+// on an earlier night: `recall` holds their stored words and the morning that note was written for.
 export type LampMeta =
   | { source: 'season'; season: string }
-  | { source: 'followup'; from_date: string };
+  | { source: 'followup'; from_date: string }
+  | { source: 'reply'; recall: { id: string; quote: string; date: string } };

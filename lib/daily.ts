@@ -1,7 +1,7 @@
 import { rpc } from './supabaseRpc';
 import { gate } from './partners';
 import { resendKey } from './email/send';
-import { renderCheckinEmail, renderDailyEmail, renderWelcomeEmail, type DailyStudy, type MailFooter, renderLamplighterAccepted } from './email/templates';
+import { renderCheckinEmail, renderDailyEmail, renderWelcomeEmail, type CheckinAsk, type DailyStudy, type MailFooter, renderLamplighterAccepted } from './email/templates';
 import { PILLARS, writeStudy, type RecentStudy, type StudyContent } from './studyWriter';
 import { recordSent, withTracking, type TrackRef } from './emailEvents';
 
@@ -161,7 +161,7 @@ export async function sendCheckins(budgetMs = 60_000) {
   const started = Date.now();
   let sent = 0;
   while (Date.now() - started < budgetMs) {
-    const batch = await rpc<{ email: string; unsub_token: string; local_date: string }[]>('dss_due_checkins', {
+    const batch = await rpc<{ email: string; unsub_token: string; local_date: string; ask?: (CheckinAsk & { id: string }) | null }[]>('dss_due_checkins', {
       p_gate: gate(),
       p_limit: 100,
     });
@@ -173,7 +173,7 @@ export async function sendCheckins(budgetMs = 60_000) {
       const nextDate = new Date((dayIndex + 1) * 86400000 + 43200000).toISOString().slice(0, 10);
       return {
         to: r.email,
-        ...renderCheckinEmail({ footer, dayIndex, nextDate }),
+        ...renderCheckinEmail({ footer, dayIndex, nextDate, ask: r.ask ?? null }),
         unsubscribeUrl: oneClickUrl(r.unsub_token),
         track: { token: r.unsub_token, kind: 'checkin' as const, date: r.local_date },
       };
@@ -181,7 +181,8 @@ export async function sendCheckins(budgetMs = 60_000) {
     const ids = await sendBatch(emails);
     await rpc('dss_record_checkins', {
       p_gate: gate(),
-      p_rows: batch.map((r, i) => ({ email: r.email, local_date: r.local_date, resend_id: ids[i] ?? null })),
+      // memory_id marks the follow-up question as asked, so it is never asked twice.
+      p_rows: batch.map((r, i) => ({ email: r.email, local_date: r.local_date, resend_id: ids[i] ?? null, memory_id: r.ask?.id ?? null })),
     });
     sent += batch.length;
     await new Promise((r) => setTimeout(r, 600));
@@ -189,10 +190,19 @@ export async function sendCheckins(budgetMs = 60_000) {
   return sent;
 }
 
-export async function sendCheckinPreview(to: string) {
+// What a check-in looks like when it follows up on something the reader wrote earlier (previews only).
+export const sampleAsk = (): CheckinAsk => ({
+  quote: '(Sample) I finally have to talk to my brother on Saturday about Dad’s house, and I’m dreading it.',
+  question: 'How did the conversation with your brother go?',
+  source_date: pacificDate(-4),
+});
+
+// followUp: show the follow-up question block with sample words.
+export async function sendCheckinPreview(to: string, followUp = false) {
   const footer = footerFor('preview', postalAddress() ?? '(mailing address not set yet)');
   const dayIndex = Math.floor(Date.now() / 86400000);
-  await sendBatch([{ to, ...renderCheckinEmail({ footer, dayIndex, nextDate: pacificDate(1), isTest: true }), unsubscribeUrl: footer.unsubscribeUrl }]);
+  const m = renderCheckinEmail({ footer, dayIndex, nextDate: pacificDate(1), isTest: true, ask: followUp ? sampleAsk() : null });
+  await sendBatch([{ to, ...m, subject: followUp ? m.subject.replace('[Preview]', '[Preview · follow-up]') : m.subject, unsubscribeUrl: footer.unsubscribeUrl }]);
 }
 
 // Welcome emails for people who joined but haven't been welcomed yet.
@@ -239,12 +249,28 @@ export const SAMPLE_YESTERDAY: NonNullable<DailyStudy['yesterday']> = {
 };
 
 // A single preview copy (admin test sends). Not logged as a subscriber send.
-export async function sendPreview(date: string, to: string, premium: boolean) {
+// What Last Night's Lamp looks like when it picks up something the reader wrote on an earlier night (previews only).
+export const sampleRecall = (): NonNullable<DailyStudy['yesterday']> => ({
+  ...SAMPLE_YESTERDAY,
+  reply: '(Sample) Talked to my brother today. It went better than I feared, but I’m still wound up about it.',
+  body: [
+    SAMPLE_YESTERDAY.body[0],
+    '(Sample) A few days ago you were dreading this conversation, and today you had it. Mercy that is new every morning was there on the morning you were afraid, and it is here on the morning after.',
+    'Today, you might thank God for one thing that went better than you expected.',
+  ],
+  meta: {
+    source: 'reply',
+    recall: { id: 'sample', quote: sampleAsk().quote, date: pacificDate(-4) },
+  },
+});
+
+// recall: show the Premium Lamp with a sample line recalled from an earlier note.
+export async function sendPreview(date: string, to: string, premium: boolean, recall = false) {
   const study = await getStudy(date);
   if (!study) throw new Error('No study for that date yet.');
   const footer = footerFor('preview', postalAddress() ?? '(mailing address not set yet)');
-  const m = renderDailyEmail({ ...toDailyStudy(date, study.content, premium, premium ? SAMPLE_YESTERDAY : null), isTest: true }, footer);
-  await sendBatch([{ to, ...m, subject: `[Preview · ${premium ? 'Premium' : 'Free'}] ${m.subject}`, unsubscribeUrl: footer.unsubscribeUrl }]);
+  const m = renderDailyEmail({ ...toDailyStudy(date, study.content, premium, premium ? (recall ? sampleRecall() : SAMPLE_YESTERDAY) : null), isTest: true }, footer);
+  await sendBatch([{ to, ...m, subject: `[Preview · ${premium ? (recall ? 'Premium · memory' : 'Premium') : 'Free'}] ${m.subject}`, unsubscribeUrl: footer.unsubscribeUrl }]);
 }
 
 // ---------- one person, today (joined after the 5 AM run) ----------

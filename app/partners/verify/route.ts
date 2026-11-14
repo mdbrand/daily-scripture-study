@@ -12,9 +12,11 @@ export async function GET(req: Request) {
   const next = nextParam.startsWith('/') && !nextParam.startsWith('//') ? nextParam : '/partners';
   const gate = process.env.DSS_DB_GATE;
 
-  if (!token || !gate) return NextResponse.redirect(new URL('/partners?signin=invalid', url.origin));
+  // A reader signing in to their own page goes back there when the link is no good, not to the partners page.
+  const home = next.startsWith('/my-lamp') ? '/my-lamp' : '/partners';
+  if (!token || !gate) return NextResponse.redirect(new URL(`${home}?signin=invalid`, url.origin));
   const email = await rpc<string | null>('dss_consume_login_token', { p_gate: gate, p_token_hash: hashToken(token) });
-  if (!email) return NextResponse.redirect(new URL('/partners?signin=expired', url.origin));
+  if (!email) return NextResponse.redirect(new URL(`${home}?signin=expired`, url.origin));
 
   await setSession(email);
   return NextResponse.redirect(new URL(next, url.origin));

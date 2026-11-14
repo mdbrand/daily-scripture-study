@@ -58,6 +58,18 @@ const SEASON_HINT = 'One tap, and tomorrow’s Last Night’s Lamp is written fo
 const OWN_WORDS =
   'Tonight around 8 PM your time, we’ll check in. Reply with a line about your day, and tomorrow’s study will be written from your own words.';
 
+// Where a reader sees and deletes what Morning Lamp remembers from their notes.
+const MY_LAMP_URL = 'https://morninglamp.study/my-lamp';
+const REMEMBERED = 'Morning Lamp remembered that from your earlier note.';
+const REMEMBERED_LINK = 'See or delete what it remembers';
+
+// The evening a note was written, from the morning it was written for ("2026-11-06" -> "Thursday, November 5").
+function eveningOf(forDate: string): string {
+  const d = new Date(`${forDate}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - 1);
+  return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' });
+}
+
 // The night before a for_date ("2026-11-10" -> "Monday").
 function nightBefore(forDate: string): string {
   const d = new Date(`${forDate}T12:00:00Z`);
@@ -254,18 +266,24 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
   const seasonList = isPremium ? seasonsFor(s, footer?.seasonBase) : [];
   const chips = (size: 'big' | 'small') => seasonChipsHtml(footer?.seasonBase, size, seasonList);
   const intro = s.yesterday ? lampIntro(s.yesterday) : null;
-  const fromNote = !!s.yesterday && !s.yesterday.meta;
+  const lampSource = s.yesterday?.meta?.source;
+  const fromNote = !!s.yesterday && lampSource !== 'season' && lampSource !== 'followup';
+  // Something the reader told us on an earlier night that this Lamp picks back up: their stored words and date.
+  const recall = s.yesterday?.meta?.source === 'reply' ? s.yesterday.meta.recall : null;
+  const recallLine = recall ? `On ${eveningOf(recall.date)}, you wrote: “${shorten(recall.quote, 240)}”` : '';
   const yesterday = !isPremium
     ? ''
     : s.yesterday && intro
       ? `${lampBand(intro.subtitle)}
       <tr><td style="background:${C.ivory};padding:26px 32px 12px;">
         ${p(`<em>${esc(intro.line)}</em>`, `color:${C.muted};`)}
+        ${recall ? p(`<em>${esc(recallLine)}</em>`, `color:${C.muted};`) : ''}
         ${intro.care ? p(esc(intro.care), `font-size:15px;color:${C.muted};`) : ''}
         ${quote(s.yesterday.passage, false)}
         ${h('Behind the Verse')}
         ${s.yesterday.body.slice(0, 3).map((b) => p(rich(b))).join('')}
         ${s.yesterday.voice ? `${h('Voices Through History')}${voicesHtml([s.yesterday.voice])}` : ''}
+        ${recall ? `<p style="margin:0 0 14px;font-family:${SANS};font-size:13px;line-height:1.6;color:${C.muted};">${esc(REMEMBERED)} <a href="${MY_LAMP_URL}" style="color:${C.goldDark};">${esc(REMEMBERED_LINK)}</a>.</p>` : ''}
         ${fromNote ? '' : `<div style="border-top:1px solid ${C.line};margin:10px 0 18px;"></div>
         ${p(esc(OWN_WORDS), `color:${C.muted};font-size:16px;`)}
         ${chips('small')}`}
@@ -344,6 +362,7 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
             'LAST NIGHT’S LAMP',
             intro.subtitle,
             intro.line,
+            ...(recall ? [recallLine] : []),
             ...(intro.care ? [intro.care] : []),
             `"${s.yesterday.passage.text}" (${s.yesterday.passage.ref})`,
             '',
@@ -353,6 +372,7 @@ export function renderDailyEmail(s: DailyStudy, footer?: MailFooter): { subject:
               ? ['', 'VOICES THROUGH HISTORY', `${s.yesterday.voice.name} (${s.yesterday.voice.dates}), ${s.yesterday.voice.kind}: ${s.yesterday.voice.body} Source: ${s.yesterday.voice.source}`]
               : []),
             '',
+            ...(recall ? [`${REMEMBERED} ${REMEMBERED_LINK}: ${MY_LAMP_URL}`, ''] : []),
             ...(fromNote ? [] : [OWN_WORDS, ...seasonChipsText(footer?.seasonBase, seasonList), '']),
           ]
         : [
@@ -486,7 +506,11 @@ const CHECKIN_SEASONS = 'Too busy to write tonight? Tap the season you’re in, 
 // `dayIndex` is the reader's local date as days since 1970-01-01 (picks the headline). `nextDate`
 // (YYYY-MM-DD) is the morning the reply or a season tap writes for; the season buttons rotate on it,
 // same as that morning's email. Defaults to the day after `dayIndex`.
-export function renderCheckinEmail(o: { footer: MailFooter; dayIndex: number; nextDate?: string; isTest?: boolean }): { subject: string; html: string; text: string } {
+// `ask` is one follow-up on something the reader wrote on an earlier night: their stored words (quote), the
+// morning that note was written for (source_date), and a short question. The subject line never carries it,
+// so nothing private shows on a lock screen.
+export type CheckinAsk = { quote: string; question: string; source_date: string };
+export function renderCheckinEmail(o: { footer: MailFooter; dayIndex: number; nextDate?: string; isTest?: boolean; ask?: CheckinAsk | null }): { subject: string; html: string; text: string } {
   const subject = CHECKIN_SUBJECTS[((o.dayIndex % CHECKIN_SUBJECTS.length) + CHECKIN_SUBJECTS.length) % CHECKIN_SUBJECTS.length];
   const nextDate = o.nextDate ?? new Date((o.dayIndex + 1) * 86_400_000 + 43_200_000).toISOString().slice(0, 10);
   const base = o.footer.seasonBase;
@@ -494,9 +518,21 @@ export function renderCheckinEmail(o: { footer: MailFooter; dayIndex: number; ne
   const seasonsHtml = seasonList.length ? `${p(esc(CHECKIN_SEASONS))}${seasonChipsHtml(base, 'big', seasonList)}` : '';
   const seasonsText = seasonList.length ? [CHECKIN_SEASONS, ...seasonChipsText(base, seasonList), ''] : [];
   const verse: Passage = { text: 'Your word is a lamp for my feet, a light on my path.', ref: 'Psalm 119:105 (NIV)' };
-  const ask = 'Hit reply and tell us how today went, in a sentence or two: a win, a worry, a hard conversation, something you’re grateful for.';
+  const invite = 'Hit reply and tell us how today went, in a sentence or two: a win, a worry, a hard conversation, something you’re grateful for.';
   const why = 'We read what you share, find Scripture for it, and write tomorrow morning’s Last Night’s Lamp just for you: your own words, a passage for how you felt, the story behind it, and a voice from Christian history who walked through the same thing.';
   const quiet = 'Nothing to share tonight? No need to reply. Your daily study still arrives at 5 AM.';
+  const ask = o.ask?.question && o.ask.quote ? o.ask : null;
+  const askWhen = ask ? `On ${eveningOf(ask.source_date)}, you wrote:` : '';
+  const askElse = 'Or tell us about anything else from today.';
+  const askHtml = ask
+    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 22px;background:#ffffff;border:1px solid ${C.line};border-left:4px solid ${C.gold};border-radius:10px;"><tr><td style="padding:18px 20px;">
+        <p style="margin:0 0 8px;font-family:${SANS};font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:bold;color:${C.goldDark};">Picking up where you left off</p>
+        <p style="margin:0 0 10px;font-family:${SERIF};font-size:16px;line-height:1.6;font-style:italic;color:${C.muted};">${esc(askWhen)} “${esc(shorten(ask.quote, 240))}”</p>
+        <p style="margin:0 0 10px;font-family:${SERIF};font-size:20px;line-height:1.4;color:${C.navy};">${esc(ask.question)}</p>
+        <p style="margin:0;font-family:${SANS};font-size:13px;line-height:1.6;color:${C.muted};">${esc(askElse)} <a href="${MY_LAMP_URL}" style="color:${C.goldDark};">${esc(REMEMBERED_LINK)}</a>.</p>
+      </td></tr></table>`
+    : '';
+  const askText = ask ? ['PICKING UP WHERE YOU LEFT OFF', `${askWhen} "${shorten(ask.quote, 240)}"`, ask.question, askElse, `${REMEMBERED_LINK}: ${MY_LAMP_URL}`, ''] : [];
   const steps: { when: string; what: string; now: boolean }[] = [
     { when: 'Tonight', what: 'Reply and tell us how your day went', now: true },
     { when: 'Overnight', what: 'We find Scripture for what you shared', now: false },
@@ -519,7 +555,8 @@ export function renderCheckinEmail(o: { footer: MailFooter; dayIndex: number; ne
   <tr><td style="background:${C.ivory};padding:30px 32px 18px;">
     ${label('Last Night’s Lamp · Evening check-in')}
     <h1 style="margin:0 0 16px;font-family:${SERIF};font-size:28px;line-height:1.25;color:${C.navy};">${esc(subject)}</h1>
-    ${p(esc(ask))}
+    ${askHtml}
+    ${p(esc(invite))}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 22px;"><tr>
       ${steps.map(step).join('')}
     </tr></table>
@@ -538,7 +575,8 @@ export function renderCheckinEmail(o: { footer: MailFooter; dayIndex: number; ne
       'LAST NIGHT’S LAMP · EVENING CHECK-IN',
       subject,
       '',
-      ask,
+      ...askText,
+      invite,
       '',
       ...steps.map((st, i) => `${i + 1}. ${st.when}: ${st.what}`),
       '',

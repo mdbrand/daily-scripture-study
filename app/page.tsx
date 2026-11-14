@@ -298,7 +298,9 @@ export default async function Home() {
             </p>
             <p>
               And so you know how it’s made: Last Night’s Lamp is written overnight with the help of AI, from the note
-              you send. Your note is used only to write your studies. It is never sold and never shared.
+              you send. Your note is used only to write your studies. It is never sold and never shared. Morning Lamp
+              keeps your notes so a later study can pick up where you left off, and you can see or delete them any
+              time.
             </p>
             <p>
               And it doesn’t replace prayer, your pastor, or your own time with God. It’s simply another way to spend

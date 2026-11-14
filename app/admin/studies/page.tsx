@@ -83,7 +83,9 @@ export default async function AdminStudies({ searchParams }: { searchParams: Pro
           {study.sent_count === 0 && <Action action="write" date={date} label="Rewrite it" kind="link-button" />}
           <Action action="test-free" date={date} label="Email me the free version" kind="link-button" />
           <Action action="test-premium" date={date} label="Email me the Premium version" kind="link-button" />
+          <Action action="test-premium-memory" date={date} label="Email me Premium with a remembered note" kind="link-button" />
           <Action action="test-checkin" label="Email me the evening check-in" kind="link-button" />
+          <Action action="test-checkin-followup" label="Email me the check-in with a follow-up question" kind="link-button" />
           <p className="admin-filters" style={{ marginTop: 8 }}>
             <Link href={`/admin/studies?date=${date}`} aria-current={!premiumView ? 'page' : undefined}>Free version</Link>
             <Link href={`/admin/studies?date=${date}&edition=premium`} aria-current={premiumView ? 'page' : undefined}>Premium version</Link>

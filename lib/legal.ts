@@ -6,5 +6,5 @@ export const LEGAL = {
   email: 'hello@morninglamp.study',
   state: 'California',
   venue: 'Los Angeles County, California',
-  effective: 'November 8, 2026',
+  effective: 'November 13, 2026',
 };

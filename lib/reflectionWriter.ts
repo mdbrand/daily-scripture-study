@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
 import { z } from 'zod';
 import { anthropicKey, VoiceSchema } from './studyWriter';
+import { noteNight, type MemoryItem } from './memory';
 
 // The Premium "Yesterday" study: one passage for what the reader shared, Behind the Verse, one voice.
 export const ReflectionSchema = z.object({
@@ -24,6 +25,10 @@ export const ReflectionSchema = z.object({
   voice: VoiceSchema.nullable().describe(
     'When kind is reflection: exactly one voice from church history who wrote about or lived through this same feeling. Otherwise null.',
   ),
+  recall: z
+    .string()
+    .nullable()
+    .describe('The id of the one earlier item this study picks back up. Null when no earlier items are given, or none of them is about the same thing as tonight’s note.'),
 });
 type Written = z.infer<typeof ReflectionSchema>;
 export type Reflection = Omit<Written, 'behind'> & { body: string[] };
@@ -64,12 +69,31 @@ function userMessage(reply: string, mode: LampMode): string {
   return `The reader wrote:\n\n<reply>\n${reply}\n</reply>`;
 }
 
+// Things this reader told us on earlier nights, in their own words. Only offered with a note they wrote
+// last night. The writer may pick up at most one, and only by its id: the email then shows the reader's
+// stored words and the date, so nothing recalled is ever the AI's paraphrase passed off as a quote.
+function earlierItems(items: MemoryItem[]): string {
+  if (!items.length) return '\n\nNo earlier items are given for this reader. Set recall to null.';
+  return `\n\nOn earlier nights, this reader told us about the things below. Each is in their own words, with the evening they wrote it. Most nights these have nothing to do with tonight's note: then ignore them completely and set recall to null. If tonight's note is clearly about the same thing as one of them (the same person, the same worry, the outcome of the same event), you may pick up that one: set recall to its id, and add one sentence to Behind the Verse that connects tonight to it.
+
+Rules for that sentence:
+- Refer only to what their earlier words actually say. Don't quote them; the email shows their words and the date just above the study.
+- Never say or guess how something turned out unless tonight's note says so.
+- Never mention more than one earlier item, and never bring one up just because it is there. When in doubt, leave it out.
+
+<earlier>
+${items.map((m) => `<item id="${m.id}" written="${noteNight(m.source_date)}">${m.quote}</item>`).join('\n')}
+</earlier>`;
+}
+
 export async function writeReflection(
   reply: string,
-  opts: { avoidVoice?: string | null; mode?: LampMode } = {},
+  opts: { avoidVoice?: string | null; mode?: LampMode; earlier?: MemoryItem[] } = {},
 ): Promise<Reflection> {
   const key = anthropicKey();
   const client = key ? new Anthropic({ apiKey: key }) : new Anthropic();
+  const mode = opts.mode ?? { kind: 'reply' as const };
+  const earlier = mode.kind === 'reply' ? (opts.earlier ?? []) : [];
   const avoid = opts.avoidVoice
     ? `\n\nThe main study in the same email already features ${opts.avoidVoice}. Choose a different person for Voices Through History.`
     : '';
@@ -79,13 +103,15 @@ export async function writeReflection(
     thinking: { type: 'adaptive' },
     output_config: { effort: 'high', format: zodOutputFormat(ReflectionSchema) },
     system: SYSTEM,
-    messages: [{ role: 'user', content: `${userMessage(reply, opts.mode ?? { kind: 'reply' })}${avoid}` }],
+    messages: [{ role: 'user', content: `${userMessage(reply, mode)}${mode.kind === 'reply' ? earlierItems(earlier) : '\n\nSet recall to null.'}${avoid}` }],
   });
-  if (response.stop_reason === 'refusal') return { kind: 'care', passage: null, body: [], voice: null };
+  if (response.stop_reason === 'refusal') return { kind: 'care', passage: null, body: [], voice: null, recall: null };
   const out = response.parsed_output;
   if (!out) throw new Error('The reflection writer returned an unreadable result.');
   const { behind, ...rest } = out;
-  const r: Reflection = { ...rest, body: behind.slice(0, 3) };
+  // Only an id we handed over counts; anything else is dropped.
+  const recall = rest.recall && earlier.some((m) => m.id === rest.recall) ? rest.recall : null;
+  const r: Reflection = { ...rest, recall, body: behind.slice(0, 3) };
   if (r.kind === 'reflection' && (!r.passage || r.body.length === 0 || !r.voice)) throw new Error('Reflection was incomplete.');
   return r;
 }

@@ -5,7 +5,7 @@ import { verifyResendWebhook } from '@/lib/webhookVerify';
 import { LEGAL } from '@/lib/legal';
 
 export const runtime = 'nodejs';
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 type ReceivedEvent = { type: string; data: { email_id: string; from: string; to: string[]; subject: string } };
 

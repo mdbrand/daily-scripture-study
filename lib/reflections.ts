@@ -4,6 +4,7 @@ import { sendEmail } from './email/send';
 import { writeReflection, type LampMode } from './reflectionWriter';
 import { seasonByKey, type LampMeta } from './seasons';
 import { anthropicKey } from './studyWriter';
+import { markRecalled, memoryContext, planMemory, saveMemory } from './memory';
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://morninglamp.study';
 
@@ -66,17 +67,31 @@ export async function writeLampFor(
       p_gate: gate(),
       p_date: forDate,
     }).catch(() => null);
-    const r = await writeReflection(merged, { avoidVoice: study?.content?.voices?.[0]?.name ?? null, mode: opts.mode });
+    // Memory only applies to a note the reader wrote (not a season tap or a follow-up we wrote ourselves).
+    const fromNote = !opts.mode || opts.mode.kind === 'reply';
+    const memory = fromNote ? await memoryContext(email, forDate) : { on: false, items: [] };
+    // Deciding what to remember runs alongside writing the study, so the reader's Lamp isn't slowed down.
+    const [r, plan] = await Promise.all([
+      writeReflection(merged, { avoidVoice: study?.content?.voices?.[0]?.name ?? null, mode: opts.mode, earlier: memory.on ? memory.items : [] }),
+      memory.on ? planMemory(merged, memory.items) : Promise.resolve(null),
+    ]);
     const ready = r.kind === 'reflection' && r.passage;
+    const recalled = ready && r.recall ? memory.items.find((m) => m.id === r.recall) : undefined;
+    const meta: LampMeta | undefined = recalled
+      ? { source: 'reply', recall: { id: recalled.id, quote: recalled.quote, date: recalled.source_date } }
+      : opts.meta;
     await rpc('dss_reflection_save', {
       p_gate: gate(),
       p_email: email,
       p_for_date: forDate,
       p_reply: merged,
-      p_content: ready ? { passage: r.passage, body: r.body, voice: r.voice, ...(opts.meta ? { meta: opts.meta } : {}) } : null,
+      p_content: ready ? { passage: r.passage, body: r.body, voice: r.voice, ...(meta ? { meta } : {}) } : null,
       p_status: ready ? 'ready' : 'skipped',
       p_note: r.kind,
     });
+    // Remember only from a note that became a study: never from a crisis note, a Bible question or feedback.
+    if (ready && plan) await saveMemory(email, forDate, plan);
+    if (recalled) await markRecalled(email, recalled.id, forDate);
     if (r.kind === 'care') await alertCare(email, merged);
     return { handled: true, kind: r.kind, for_date: forDate };
   } catch (e) {

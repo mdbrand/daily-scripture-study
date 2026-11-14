@@ -97,6 +97,14 @@ export default function PrivacyPage() {
         our inbox and can be read by the Morning Lamp team. When needed to write your email or answer, the
         relevant parts of what you shared are sent to those services for that purpose only.
       </p>
+      <p>
+        <strong>Memory for Premium readers.</strong> So that Last Night’s Lamp can pick up something
+        you shared before, we keep the notes you send about your day and a short list of things from
+        them that were still going on, in your own words with the date you wrote them. A later study
+        may refer to one of these, and an evening check-in may ask you one follow-up question about
+        it. On your <a href="/my-lamp">My Lamp page</a> you can see everything we hold from your
+        notes, download it, keep a note out of memory, pause memory, or delete any of it.
+      </p>
 
       <h2>5. Who we share information with</h2>
       <p>We share information only with service providers that help us run Morning Lamp:</p>
@@ -143,7 +151,8 @@ export default function PrivacyPage() {
       <h2>9. Your rights and choices</h2>
       <p>
         You can ask to access, correct, download, or delete your personal information, and to stop
-        receiving emails, by writing to {mail}. We will verify the request comes from you and respond
+        receiving emails, by writing to {mail}. Premium readers can also see, download and delete
+        their own notes at any time on the <a href="/my-lamp">My Lamp page</a>. We will verify the request comes from you and respond
         within the time the law allows. We will not treat you differently for using these rights.
       </p>
       <p>

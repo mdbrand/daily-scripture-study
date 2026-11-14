@@ -32,11 +32,13 @@ export async function POST(req: Request) {
         return back('written');
       case 'test-free':
       case 'test-premium':
+      case 'test-premium-memory':
         if (!DATE.test(date)) return back('bad-date');
-        await sendPreview(date, email!, action === 'test-premium');
+        await sendPreview(date, email!, action !== 'test-free', action === 'test-premium-memory');
         return back('test-sent');
       case 'test-checkin':
-        await sendCheckinPreview(email!);
+      case 'test-checkin-followup':
+        await sendCheckinPreview(email!, action === 'test-checkin-followup');
         return back('test-sent');
       case 'sending-on':
         if (!postalAddress()) return back('need-address');

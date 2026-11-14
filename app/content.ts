@@ -48,6 +48,10 @@ export const faqs = [
     a: 'Yes, and I’d rather say so plainly. Each daily study is drafted with the help of AI, then reviewed before it’s sent. Last Night’s Lamp, the Premium study, is written overnight by AI from the note you send. Your note is used only to write your studies and is never sold or shared. If a note sounds like someone is in crisis, a person writes back instead.',
   },
   {
+    q: 'Does Morning Lamp remember what I write?',
+    a: 'If you’re a Premium reader, yes. Morning Lamp keeps the notes you send and a short list of things from them that were still going on, in your own words. A later study may pick one up, and an evening check-in may ask how it went. You can see all of it, pause it, or delete it any time on your My Lamp page at morninglamp.study/my-lamp.',
+  },
+  {
     q: 'Is it really free?',
     a: 'Yes. The daily study is free, and it always will be. Premium adds Last Night’s Lamp, a short study written for what you shared the night before. The first 100 Lamplighters get Premium free for life; after that it’s $7 a month or $47 a year.',
   },

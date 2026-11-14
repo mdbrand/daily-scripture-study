@@ -19,6 +19,7 @@ Sections 1–5 above (no Premium box), then **Last Night's Lamp**:
 
 - Navy divider: **LAST NIGHT'S LAMP**, italic subtitle *Written for what you shared last night*.
 - "Last night you wrote: '…'"
+- **When the Lamp picks up an earlier note** (added Nov 13, 2026): one more italic line under it, "On Thursday, November 5, you wrote: '…'", and a small grey line at the end of the section: "Morning Lamp remembered that from your earlier note. See or delete what it remembers." linking to morninglamp.study/my-lamp. The quoted words are the reader's own, stored with the date; code checks them against the note they sent. At most one earlier note per Lamp.
 - **One passage** that speaks to the feeling behind what they shared.
 - **Behind the Verse**: no more than 3 paragraphs, unpacking that passage and connecting it to their day.
 - **Voices Through History**: **one voice** who wrote about or lived through the same feeling. Must be a different person from the voice in the main study.
@@ -43,6 +44,7 @@ One small centered line after the "Have a Bible question?" box, above the footer
 - The ask: hit reply and tell us how today went.
 - Three-step path, "Tonight" lit: 1 Tonight: reply and tell us how your day went · 2 Overnight: we find Scripture for what you shared · 3 5 AM: Last Night's Lamp, written for you.
 - Says plainly that what they share becomes tomorrow morning's Last Night's Lamp.
+- **Follow-up question** (added Nov 13, 2026): when the reader has one waiting, a white box under the headline, gold bar on the left: small label "Picking up where you left off", their own words in italics with the date ("On Thursday, November 5, you wrote: '…'"), one short question in large type, then "Or tell us about anything else from today." and the link "See or delete what it remembers". One question per check-in, each question asked once. The subject line never carries the question.
 - **7 one-tap season buttons** (approved by the owner Nov 10, 2026), for readers too busy to reply: "Too busy to write tonight? Tap the season you're in, and tomorrow's Last Night's Lamp will be written for it." then the same 7 rotating buttons (4 hard, 3 good) and styling as the morning email. They rotate on the next morning's date and the reader's token, the same rotation that morning's email uses. Listed as links in the plain-text version too. Same tap behavior as the morning buttons: a tap at 8 PM writes the next morning's Lamp, and a real reply still wins.
 - "Nothing to share tonight? No need to reply. Your daily study still arrives at 5 AM." Then "Rest well, Morning Lamp".
 - Not sent if they already shared something that day.
