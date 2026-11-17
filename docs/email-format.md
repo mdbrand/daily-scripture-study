@@ -26,7 +26,7 @@ Sections 1–5 above (no Premium box), then **Last Night's Lamp**:
 
 **When the reader didn't reply last night** (approved by the owner Nov 10, 2026), the section is never wasted:
 - **Season** (they tapped a season more recently than their last note): subtitle *Written for the season you're in*, "You told us you're in a season of waiting. This study is written for it.", then the same passage / Behind the Verse / one voice, written for that season. Written as soon as they tap, or overnight.
-- **Follow-up** (they shared a note in the last 21 days): subtitle *Picking up where you left off*, "On Saturday night you wrote: '…'", then a fresh study that picks up from that note (different passage, asks how things have moved, one next step, one voice). Written overnight, 2–4 AM their time.
+- **Follow-up** (they shared a note in the last 21 days): subtitle *Picking up where you left off*, "On Saturday night you wrote: '…'", then a fresh study that picks up from that note (different passage, asks how things have moved, one next step, one voice). Written overnight, 2–4 AM their time. At most **two** follow-ups per note (Nov 17, 2026); after that the morning uses their season, or the season buttons.
 - Both end with a line inviting tonight's reply and the 7 season buttons, smaller ("Or tap the season you're in").
 - **Nothing to go on** (never shared, no season): subtitle *A study written in response to your day*, heading "What season are you in?" with the **7 one-tap season buttons** (Anxious, Waiting, Grieving, Stretched thin, Starting over, Far from God, Grateful), then "Or tell us about your day" and the invitation to reply to tonight's check-in.
 - A season button opens morninglamp.study/s/<token>/<season>, which saves the season and writes tomorrow's Lamp for it (unless they already shared something for tomorrow). A real reply always wins over a season.
@@ -56,3 +56,4 @@ One small centered line after the "Have a Bible question?" box, above the footer
 - Replies that sound like a crisis get no automated reflection; admins are emailed to follow up personally.
 - Every subscriber email has the unsubscribe link and mailing address in the footer.
 - Before shipping any change to these emails, send test copies of the free, Premium, and check-in emails from `/admin/studies` and check them against this page.
+- **No two Lamps alike** (Nov 17, 2026): a Lamp never uses a chapter already used that morning by another reader's Lamp or the main study, or one given to the same reader in the last 30 days (checked after writing; one rewrite if it collides). Each Lamp gets its own way to open and close Behind the Verse (still 2–3 paragraphs, ending in one step or prayer). The quoted note drops the email's "On … wrote:" line and tracking marks.

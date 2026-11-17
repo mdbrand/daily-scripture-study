@@ -1,6 +1,7 @@
 // APPROVED FORMAT: see docs/email-format.md. Don't add, remove, or rename sections without the owner's sign-off.
 // Email templates for Morning Lamp. Email-safe HTML: tables + inline styles only.
 import { CARE_NOTE, seasonByKey, seasonsForEmail, type LampMeta, type Season } from '../seasons';
+import { stripQuoted } from '../replyText';
 
 export type Passage = { text: string; ref: string }; // ref includes translation, e.g. "Psalm 46:10 (NIV)"
 export type Voice = { name: string; dates: string; kind: 'Direct commentary' | 'Thematic connection'; body: string; source: string };
@@ -91,10 +92,10 @@ function lampIntro(y: NonNullable<DailyStudy['yesterday']>): { subtitle: string;
   if (m?.source === 'followup') {
     return {
       subtitle: 'Picking up where you left off',
-      line: `On ${nightBefore(m.from_date)} night you wrote: “${shorten(y.reply, 320)}”`,
+      line: `On ${nightBefore(m.from_date)} night you wrote: “${shorten(stripQuoted(y.reply), 320)}”`,
     };
   }
-  return { subtitle: 'Written for what you shared last night', line: `Last night you wrote: “${shorten(y.reply, 320)}”` };
+  return { subtitle: 'Written for what you shared last night', line: `Last night you wrote: “${shorten(stripQuoted(y.reply), 320)}”` };
 }
 
 function shorten(s: string, n: number): string {

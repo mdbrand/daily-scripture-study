@@ -4,6 +4,7 @@ import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
 import { z } from 'zod';
 import { anthropicKey, VoiceSchema } from './studyWriter';
 import { noteNight, type MemoryItem } from './memory';
+import { chapterKey, type UsedPassages } from './lampVariety';
 
 // The Premium "Yesterday" study: one passage for what the reader shared, Behind the Verse, one voice.
 export const ReflectionSchema = z.object({
@@ -48,6 +49,10 @@ Accuracy and tone:
 - You are not a counselor or pastor. Don't diagnose, give medical, legal, or financial advice, or tell them what decision to make. Never shame or scold.
 - Mainstream, historically orthodox Christian teaching.
 
+Every Lamp is written for one person, so it should never read like a template:
+- Don't open with "<Book> <chapter> opens..." or "<Book> was written to...". Each Lamp is told how to open and close below; follow that.
+- Avoid stock lines: "That desire is a good one", "But notice", "Notice that", "For today, try one small thing", "God sees it", "You are not alone". Say it in words that fit this reader.
+
 Classify first:
 - If the reply mainly asks a Bible question, use kind "question" (a separate answer service handles those).
 - If there is any sign of crisis, self-harm, suicidal thoughts, abuse, or danger, use kind "care" and write nothing else; a person on our team will follow up.
@@ -86,17 +91,39 @@ ${items.map((m) => `<item id="${m.id}" written="${noteNight(m.source_date)}">${m
 </earlier>`;
 }
 
+// Chapters this Lamp must not use: other readers' Lamps that morning, the main study, and this reader's
+// own Lamps from the last 30 days. Named as chapters, never with anyone's note or study text.
+function takenChapters(used?: UsedPassages, alsoAvoid: string[] = []): string {
+  if (!used) return '';
+  const today = [...new Set([...used.today, ...alsoAvoid])];
+  const lines: string[] = [];
+  if (today.length) lines.push(`Already used in other Lamps or the main study this morning (do not use any verse from these chapters): ${today.slice(0, 80).join('; ')}.`);
+  if (used.mine.length) lines.push(`Already given to this same reader in the last 30 days (do not use these chapters again): ${used.mine.slice(0, 40).join('; ')}.`);
+  if (!lines.length) return '';
+  return `\n\nChoose a passage from a chapter that is not listed below. Many passages speak to the same feeling; look past the first one that comes to mind.\n${lines.join('\n')}`;
+}
+
 export async function writeReflection(
   reply: string,
-  opts: { avoidVoice?: string | null; mode?: LampMode; earlier?: MemoryItem[] } = {},
+  opts: {
+    avoidVoice?: string | null;
+    mode?: LampMode;
+    earlier?: MemoryItem[];
+    used?: UsedPassages;
+    alsoAvoid?: string[];
+    shape?: { opening: string; closing: string };
+  } = {},
 ): Promise<Reflection> {
   const key = anthropicKey();
   const client = key ? new Anthropic({ apiKey: key }) : new Anthropic();
   const mode = opts.mode ?? { kind: 'reply' as const };
   const earlier = mode.kind === 'reply' ? (opts.earlier ?? []) : [];
-  const avoid = opts.avoidVoice
-    ? `\n\nThe main study in the same email already features ${opts.avoidVoice}. Choose a different person for Voices Through History.`
-    : '';
+  const avoid =
+    (opts.avoidVoice
+      ? `\n\nThe main study in the same email already features ${opts.avoidVoice}. Choose a different person for Voices Through History.`
+      : '') +
+    takenChapters(opts.used, (opts.alsoAvoid ?? []).map((r) => chapterKey(r) ?? r)) +
+    (opts.shape ? `\n\nShape of this Lamp: ${opts.shape.opening} ${opts.shape.closing}` : '');
   const response = await client.messages.parse({
     model: 'claude-opus-5-5',
     max_tokens: 12000,

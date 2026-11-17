@@ -5,21 +5,12 @@ import { writeReflection, type LampMode } from './reflectionWriter';
 import { seasonByKey, type LampMeta } from './seasons';
 import { anthropicKey } from './studyWriter';
 import { markRecalled, memoryContext, planMemory, saveMemory } from './memory';
+import { stripQuoted } from './replyText';
+import { chapterKey, claimChapter, forceClaim, passagesUsed, shapeFor } from './lampVariety';
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://morninglamp.study';
 
-// Keeps only what the reader wrote: drops quoted history ("> ..." and "On ... wrote:") and signatures.
-export function stripQuoted(text: string): string {
-  const lines = text.replace(/\r\n/g, '\n').split('\n');
-  const out: string[] = [];
-  for (const line of lines) {
-    const t = line.trim();
-    if (/^On .+wrote:$/i.test(t) || /^-{2,}\s*Original Message/i.test(t) || /^From: .+/i.test(t) || t === '--' || /^Sent from my /i.test(t)) break;
-    if (t.startsWith('>')) continue;
-    out.push(line);
-  }
-  return out.join('\n').replace(/\n{3,}/g, '\n\n').trim();
-}
+export { stripQuoted };
 
 export function senderAddress(from: string): string {
   const m = from.match(/<([^>]+)>/);
@@ -63,18 +54,40 @@ export async function writeLampFor(
 
   try {
     // Use a different historical voice from the one in that morning's main study, if it's written yet.
-    const study = await rpc<{ content?: { voices?: { name: string }[] } } | null>('dss_study_get', {
+    const study = await rpc<{ content?: { voices?: { name: string }[]; passage?: { ref?: string } } } | null>('dss_study_get', {
       p_gate: gate(),
       p_date: forDate,
     }).catch(() => null);
     // Memory only applies to a note the reader wrote (not a season tap or a follow-up we wrote ourselves).
     const fromNote = !opts.mode || opts.mode.kind === 'reply';
     const memory = fromNote ? await memoryContext(email, forDate) : { on: false, items: [] };
+    // No two Lamps the same morning share a chapter, and a reader doesn't get the same chapter twice in 30 days.
+    const used = await passagesUsed(email, forDate, study?.content?.passage?.ref ?? null);
+    const write = (alsoAvoid: string[] = []) =>
+      writeReflection(merged, {
+        avoidVoice: study?.content?.voices?.[0]?.name ?? null,
+        mode: opts.mode,
+        earlier: memory.on ? memory.items : [],
+        used,
+        alsoAvoid,
+        shape: shapeFor(),
+      });
     // Deciding what to remember runs alongside writing the study, so the reader's Lamp isn't slowed down.
-    const [r, plan] = await Promise.all([
-      writeReflection(merged, { avoidVoice: study?.content?.voices?.[0]?.name ?? null, mode: opts.mode, earlier: memory.on ? memory.items : [] }),
-      memory.on ? planMemory(merged, memory.items, forDate) : Promise.resolve(null),
-    ]);
+    const [first, plan] = await Promise.all([write(), memory.on ? planMemory(merged, memory.items, forDate) : Promise.resolve(null)]);
+    let r = first;
+    // Checked after writing too: the writer can ignore the list, and Lamps written at the same moment can't
+    // see each other in the database. One rewrite; if that collides too, it goes out rather than no Lamp.
+    if (r.kind === 'reflection' && r.passage && !claimChapter(forDate, r.passage.ref, used)) {
+      console.warn('lamp chapter taken, rewriting', chapterKey(r.passage.ref));
+      const again = await write([r.passage.ref]).catch((e) => {
+        console.error('lamp rewrite', e);
+        return null;
+      });
+      if (again?.kind === 'reflection' && again.passage) {
+        r = again;
+        if (!claimChapter(forDate, r.passage!.ref, used)) forceClaim(forDate, r.passage!.ref);
+      }
+    }
     const ready = r.kind === 'reflection' && r.passage;
     const recalled = ready && r.recall ? memory.items.find((m) => m.id === r.recall) : undefined;
     const meta: LampMeta | undefined = recalled
@@ -160,7 +173,7 @@ export async function writeFallbacks(budgetMs = 150_000) {
         }
         if (c.last_note && c.last_note_date) {
           const daysAgo = Math.round((Date.parse(c.for_date) - Date.parse(c.last_note_date)) / 86400000);
-          return writeLampFor(c.email, c.last_note, c.for_date, {
+          return writeLampFor(c.email, stripQuoted(c.last_note), c.for_date, {
             replace: true,
             mode: { kind: 'followup', daysAgo },
             meta: { source: 'followup', from_date: c.last_note_date },
