@@ -38,7 +38,9 @@ One small centered line after the "Have a Bible question?" box, above the footer
 - Free edition: "Know one person who'd like this? Forward this email, or send them today's study."
 - Premium edition: "Know one person who'd like this? Send them today's study." Premium is never asked to forward the email, because it holds their own Last Night's Lamp.
 
-## Evening check-in: Premium only (8 PM in the reader's time zone)
+## Nightly Lamp (evening check-in): Premium only, 6 PM Pacific for everyone
+Changed by the owner Nov 18, 2026: the evening email is branded **Nightly Lamp** (inbox sender name "Nightly Lamp", header wordmark "Nightly Lamp", label "Nightly Lamp · Reflect on your day", sign-off "Rest well, Nightly Lamp") and goes out at **6 PM Pacific** regardless of the reader's time zone (was 8 PM local). The morning email stays **Morning Lamp**, and its Premium section stays **Last Night's Lamp**.
+
 - Night look so it reads as the evening half of the loop: under the "Morning Lamp" header, a night-sky picture with a glowing clay oil lamp (`public/email/evening-header.png`, drawn from `scripts/evening-header.svg`), then a dark band: "Evening · A lamp for your feet" and Psalm 119:105 (NIV).
 - Small label: "Last Night's Lamp · Evening check-in". Rotating headline ("How did today go?", "Before you rest: how was today?", ...).
 - The ask: hit reply and tell us how today went.

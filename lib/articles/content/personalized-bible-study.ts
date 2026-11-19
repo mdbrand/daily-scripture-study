@@ -41,7 +41,7 @@ const article: Article = {
     {
       heading: 'How Last Night’s Lamp works',
       steps: [
-        { name: 'Around 8 PM, a check-in arrives', text: 'A short email asks how today went. Reply with a sentence or two: a win, a worry, a hard conversation, something you’re thankful for.' },
+        { name: 'At 6 PM Pacific, the Nightly Lamp arrives', text: 'A short email asks how today went. Reply with a sentence or two: a win, a worry, a hard conversation, something you’re thankful for.' },
         { name: 'Too tired to write? Tap a season', text: 'The email also has one-tap buttons such as Anxious, Waiting, Grieving and Grateful. One tap is enough.' },
         { name: 'Overnight, your study is written', text: 'Scripture is chosen for how you felt, and a short study is written around it.' },
         { name: 'At 5 AM, it is in your inbox', text: 'It sits under the regular morning study: your own words, one passage, the story behind that passage, and one voice from church history who walked through the same thing.' },

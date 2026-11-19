@@ -10,7 +10,7 @@ export const maxDuration = 300;
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://morninglamp.study';
 
 // Every hour (Vercel Cron, see vercel.json): send the study to everyone for whom it's now 5 AM,
-// and the evening check-in to Premium readers for whom it's now 8 PM.
+// and the Nightly Lamp (evening check-in) to Premium readers at 6 PM Pacific, wherever they live.
 // Does nothing until sending is switched on (dss_config.daily_send_open = 'true').
 export async function GET(req: Request) {
   const secret = process.env.CRON_SECRET;
@@ -27,7 +27,7 @@ export async function GET(req: Request) {
     if (anthropicKey() && !(await getStudy(today))) await generateStudy(today).catch((e) => console.error('fallback writer', e));
     const result = await sendDue();
     if (!result.done) await alert(`The ${new Date().toISOString().slice(11, 13)}:00 UTC send didn’t finish: ${result.reason}. Sent ${result.sent}.`);
-    // Premium readers for whom it's now 8 PM get tonight's check-in.
+    // Nightly Lamp: Premium readers get tonight's check-in from 6 PM Pacific.
     const checkins = await sendCheckins().catch((e) => {
       console.error('checkins', e);
       return 0;

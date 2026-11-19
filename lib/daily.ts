@@ -1,7 +1,7 @@
 import { rpc } from './supabaseRpc';
 import { gate } from './partners';
 import { resendKey } from './email/send';
-import { renderCheckinEmail, renderDailyEmail, renderWelcomeEmail, type CheckinAsk, type DailyStudy, type MailFooter, renderLamplighterAccepted } from './email/templates';
+import { NIGHTLY_NAME, renderCheckinEmail, renderDailyEmail, renderWelcomeEmail, type CheckinAsk, type DailyStudy, type MailFooter, renderLamplighterAccepted } from './email/templates';
 import { PILLARS, writeStudy, type RecentStudy, type StudyContent } from './studyWriter';
 import { recordSent, withTracking, type TrackRef } from './emailEvents';
 
@@ -86,7 +86,15 @@ export function toDailyStudy(date: string, c: StudyContent, premium: boolean, ye
 
 // ---------- sending (Resend batch API: up to 100 emails per call) ----------
 // track: set on real subscriber emails so opens and clicks can be measured. Previews and test copies leave it off.
-type Outgoing = { to: string; subject: string; html: string; text: string; unsubscribeUrl: string; track?: TrackRef };
+// fromName: the sender name shown in the inbox (the evening check-in comes from "Nightly Lamp"). Same address.
+type Outgoing = { to: string; subject: string; html: string; text: string; unsubscribeUrl: string; track?: TrackRef; fromName?: string };
+
+// "Morning Lamp <study@morninglamp.study>" -> "Nightly Lamp <study@morninglamp.study>"
+function withSenderName(from: string, name?: string): string {
+  if (!name) return from;
+  const m = from.match(/<([^>]+)>/);
+  return `${name} <${m ? m[1] : from.trim()}>`;
+}
 
 export async function sendBatch(emails: Outgoing[]): Promise<string[]> {
   const key = resendKey();
@@ -98,7 +106,7 @@ export async function sendBatch(emails: Outgoing[]): Promise<string[]> {
     headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
     body: JSON.stringify(
       emails.map((e) => ({
-        from,
+        from: withSenderName(from, e.fromName),
         to: [e.to],
         subject: e.subject,
         html: e.track ? withTracking(e.html, e.track) : e.html,
@@ -154,7 +162,7 @@ export async function sendDue(budgetMs = 240_000) {
   return { sent, done: false, reason: 'time budget used; the next hourly run continues' };
 }
 
-// Evening check-ins for Premium readers (8 PM their time). Their reply shapes tomorrow's study.
+// Nightly Lamp: the evening check-in for Premium readers, 6 PM Pacific for everyone. Their reply shapes tomorrow's study.
 export async function sendCheckins(budgetMs = 60_000) {
   const postal = postalAddress();
   if (!postal) return 0;
@@ -175,6 +183,7 @@ export async function sendCheckins(budgetMs = 60_000) {
         to: r.email,
         ...renderCheckinEmail({ footer, dayIndex, nextDate, ask: r.ask ?? null }),
         unsubscribeUrl: oneClickUrl(r.unsub_token),
+        fromName: NIGHTLY_NAME,
         track: { token: r.unsub_token, kind: 'checkin' as const, date: r.local_date },
       };
     });
@@ -308,7 +317,7 @@ export async function sendTodayTo(email: string, manual = false): Promise<TodayR
 }
 
 // Right after someone confirms (or is started by an admin): welcome first, then today's study if they
-// joined after their 5 AM and it's before 8 PM their time. Does nothing while daily sending is off.
+// joined after their 5 AM and it's before 8 PM their time (the window for sending today's study late). Does nothing while daily sending is off.
 // A brand-new Founding Lamplighter: their welcome IS the Lamplighter welcome (Premium for life),
 // then today's study if it's still today's window. Marks them welcomed so the generic welcome doesn't follow.
 export async function welcomeFounding(email: string) {

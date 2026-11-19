@@ -21,7 +21,7 @@ export const promises = ['Real history, with real dates.', 'Voices with sources.
 
 // Premium: Last Night's Lamp, as three moments.
 export const lampSteps = [
-  { time: '8 PM', title: 'I ask how your day went.', text: 'A short check-in, every evening.' },
+  { time: '6 PM', title: 'The Nightly Lamp asks how your day went.', text: 'A short check-in, every evening at 6 PM Pacific.' },
   { time: 'Tonight', title: 'You reply with one line.', text: 'A win, a worry, a hard conversation. One line is enough.' },
   { time: '5 AM', title: 'A study written for your day.', text: 'A passage for how you felt, the story behind it, and a voice who walked through the same thing.' },
 ];

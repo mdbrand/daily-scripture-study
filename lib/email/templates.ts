@@ -52,12 +52,12 @@ const C = {
 export const PREMIUM_URL = 'https://morninglamp.study/?utm_source=email&utm_medium=free-daily&utm_campaign=premium-teaser#premium';
 
 const YESTERDAY_INVITE =
-  'Last Night’s Lamp is written in response to what you share the evening before. Tonight around 8 PM your time, we’ll check in to ask how your day went. Reply with a line or two, and tomorrow morning this section will be a study written for your day.';
+  'Last Night’s Lamp is written in response to what you share the evening before. Tonight at 6 PM Pacific, the Nightly Lamp will ask how your day went. Reply with a line or two, and tomorrow morning this section will be a study written for your day.';
 const YESTERDAY_INVITE_2 = 'You can also reply to this email anytime today.';
 const SEASON_ASK = 'What season are you in?';
 const SEASON_HINT = 'One tap, and tomorrow’s Last Night’s Lamp is written for it.';
 const OWN_WORDS =
-  'Tonight around 8 PM your time, we’ll check in. Reply with a line about your day, and tomorrow’s study will be written from your own words.';
+  'Tonight at 6 PM Pacific, the Nightly Lamp checks in. Reply with a line about your day, and tomorrow’s study will be written from your own words.';
 
 // Where a reader sees and deletes what Morning Lamp remembers from their notes.
 const MY_LAMP_URL = 'https://morninglamp.study/my-lamp';
@@ -217,8 +217,11 @@ function badgeHtml(edition?: Edition): string {
   return '';
 }
 
-function shell(inner: string, preheader: string, isTest?: boolean, footerHtml = '', edition?: Edition): string {
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Morning Lamp</title></head>
+// The evening check-in is branded Nightly Lamp; everything else is Morning Lamp.
+export const NIGHTLY_NAME = 'Nightly Lamp';
+
+function shell(inner: string, preheader: string, isTest?: boolean, footerHtml = '', edition?: Edition, brand = 'Morning Lamp'): string {
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>${esc(brand)}</title></head>
 <body style="margin:0;padding:0;background:${C.page};">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${esc(preheader)}</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${C.page};"><tr><td align="center" style="padding:24px 12px;">
@@ -226,7 +229,7 @@ function shell(inner: string, preheader: string, isTest?: boolean, footerHtml = 
 ${isTest ? `<tr><td style="padding:0 0 10px;font-family:${SANS};font-size:12px;color:${C.muted};text-align:center;">TEST SEND · not a live subscription email</td></tr>` : ''}
 <tr><td style="background:${C.navy};padding:22px 32px;border-radius:12px 12px 0 0;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-    <td style="vertical-align:middle;"><p style="margin:0;font-family:${SERIF};font-size:20px;color:${C.gold};">Morning Lamp</p></td>
+    <td style="vertical-align:middle;"><p style="margin:0;font-family:${SERIF};font-size:20px;color:${C.gold};">${esc(brand)}</p></td>
     <td align="right" style="vertical-align:middle;">${badgeHtml(edition)}</td>
   </tr></table>
 </td></tr>
@@ -474,7 +477,7 @@ export function renderWelcomeEmail(o: { premium: boolean; footer: MailFooter; to
     'Each morning you’ll get one short Bible study: a passage, the history behind it, one detail most people miss, and a voice from church history. It takes about three minutes.',
     `${when} If you don’t see it, check your Promotions or Spam folder and move it to your inbox, so the rest find you.`,
     o.premium
-      ? 'Each evening around 8 PM, we’ll check in to ask how your day went. Reply with a line or two, and the next morning’s study includes a short study written for what you shared.'
+      ? 'Each evening at 6 PM Pacific, the Nightly Lamp checks in to ask how your day went. Reply with a line or two, and the next morning’s study includes a short study written for what you shared.'
       : 'Have a Bible question? Reply to any study and ask, one question a day.',
   ];
   const verse: Passage = { text: 'Your word is a lamp for my feet, a light on my path.', ref: 'Psalm 119:105 (NIV)' };
@@ -502,7 +505,7 @@ const EVENING_IMAGE = 'https://morninglamp.study/email/evening-header.png';
 
 const CHECKIN_SEASONS = 'Too busy to write tonight? Tap the season you’re in, and tomorrow’s Last Night’s Lamp will be written for it.';
 
-// Evening check-in (Premium, 8 PM local). Night look so it reads as the evening half of the loop:
+// Nightly Lamp: the evening check-in (Premium, 6 PM Pacific for everyone). Night look so it reads as the evening half of the loop:
 // tonight you reply -> overnight we find Scripture -> 5 AM Last Night's Lamp.
 // `dayIndex` is the reader's local date as days since 1970-01-01 (picks the headline). `nextDate`
 // (YYYY-MM-DD) is the morning the reply or a season tap writes for; the season buttons rotate on it,
@@ -554,7 +557,7 @@ export function renderCheckinEmail(o: { footer: MailFooter; dayIndex: number; ne
     <p style="margin:8px 0 0;font-family:${SANS};font-size:13px;color:#9fb0b8;">${esc(verse.ref)}</p>
   </td></tr>
   <tr><td style="background:${C.ivory};padding:30px 32px 18px;">
-    ${label('Last Night’s Lamp · Evening check-in')}
+    ${label('Nightly Lamp · Reflect on your day')}
     <h1 style="margin:0 0 16px;font-family:${SERIF};font-size:28px;line-height:1.25;color:${C.navy};">${esc(subject)}</h1>
     ${askHtml}
     ${p(esc(invite))}
@@ -564,16 +567,16 @@ export function renderCheckinEmail(o: { footer: MailFooter; dayIndex: number; ne
     ${p(esc(why))}
     ${seasonsHtml}
     ${p(esc(quiet), `color:${C.muted};font-size:16px;`)}
-    ${p('Rest well,<br>Morning Lamp')}
+    ${p(`Rest well,<br>${NIGHTLY_NAME}`)}
   </td></tr>`;
   return {
     subject: o.isTest ? `[Preview] ${subject}` : subject,
-    html: shell(inner, 'Reply with a line about your day. Tomorrow’s Last Night’s Lamp will be written in response to it.', o.isTest, footerHtml(o.footer), 'premium'),
+    html: shell(inner, 'Reply with a line about your day. Tomorrow’s Last Night’s Lamp will be written in response to it.', o.isTest, footerHtml(o.footer), 'premium', NIGHTLY_NAME),
     text: [
-      'MORNING LAMP · EVENING: A LAMP FOR YOUR FEET',
+      'NIGHTLY LAMP · A LAMP FOR YOUR FEET',
       `"${verse.text}" (${verse.ref.replace(/ \((\w+)\)$/, ', $1')})`,
       '',
-      'LAST NIGHT’S LAMP · EVENING CHECK-IN',
+      'NIGHTLY LAMP · REFLECT ON YOUR DAY',
       subject,
       '',
       ...askText,
@@ -587,7 +590,7 @@ export function renderCheckinEmail(o: { footer: MailFooter; dayIndex: number; ne
       quiet,
       '',
       'Rest well,',
-      'Morning Lamp',
+      NIGHTLY_NAME,
       ...footerText(o.footer),
     ].join('\n'),
   };
@@ -648,7 +651,7 @@ export function renderLamplighterAccepted(o: { footer: MailFooter; todayNext?: b
       lines: [
         'You’re one of the first Lamplighters. Premium is on for you, free, for life. As long as Morning Lamp is running, you’ll never pay for it.',
         ...(o.todayNext ? ['Today’s study is in the next email.'] : []),
-        'Each morning at 5 AM your time, your study arrives. Each evening around 8 PM, we’ll check in to ask how your day went. Reply with a line or two, and the next morning brings Last Night’s Lamp: a study written in response to your day.',
+        'Each morning at 5 AM your time, your study arrives. Each evening at 6 PM Pacific, the Nightly Lamp checks in to ask how your day went. Reply with a line or two, and the next morning brings Last Night’s Lamp: a study written in response to your day.',
         'One small favor: hit reply and tell us in a line why you joined. We read every answer.',
         'Once a week we’ll send you one short question about how it’s going. Honest answers, good and bad, are the whole point. Just hit reply.',
         'If you ever share your experience publicly, please mention that you received Premium free as a beta tester. If we ever quote you, we’ll ask first and note the same.',

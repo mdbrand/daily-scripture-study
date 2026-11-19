@@ -43,7 +43,7 @@ export default async function Confirm({
           free, for life.
         </p>
         <p>
-          Your study arrives each morning at 5 AM your time. Around 8 PM we’ll check in to ask how your day went; reply
+          Your study arrives each morning at 5 AM your time. At 6 PM Pacific, the Nightly Lamp checks in to ask how your day went; reply
           with a line, and the next morning brings Last Night’s Lamp, a short study written for your day.
         </p>
         <p className="form-note" style={{ textAlign: 'left' }}>
