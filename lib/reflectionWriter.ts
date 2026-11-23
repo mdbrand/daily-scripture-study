@@ -4,7 +4,7 @@ import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
 import { z } from 'zod';
 import { anthropicKey, VoiceSchema } from './studyWriter';
 import { noteNight, type MemoryItem } from './memory';
-import { chapterKey, type UsedPassages } from './lampVariety';
+import { chapterKey, distinctVoices, type RecentLamp, type UsedPassages } from './lampVariety';
 
 // The Premium "Yesterday" study: one passage for what the reader shared, Behind the Verse, one voice.
 export const ReflectionSchema = z.object({
@@ -62,14 +62,21 @@ Classify first:
 // - reply: they wrote back last night (the normal case).
 // - season: they didn't write last night, but tapped a "season" button (e.g. Waiting). Write for that season.
 // - followup: they didn't write last night or pick a season; pick up the last note they shared a few days ago.
-export type LampMode = { kind: 'reply' } | { kind: 'season'; season: string } | { kind: 'followup'; daysAgo: number };
+//   round 1 = the first morning with no reply; round 2 = the second in a row (Nov 23 2026: no carbon copies).
+export type LampMode = { kind: 'reply' } | { kind: 'season'; season: string } | { kind: 'followup'; daysAgo: number; round?: number };
 
-function userMessage(reply: string, mode: LampMode): string {
+export function userMessage(reply: string, mode: LampMode): string {
   if (mode.kind === 'season') {
     return `This reader did not reply last night. Earlier, they tapped a button in their email to tell us they are ${mode.season}. That is all they shared; there is no note. Write a reflection (kind "reflection") for someone in that season: find the feeling underneath it, choose the passage and the voice for that feeling, and in Behind the Verse speak to the season kindly and specifically without inventing details about their life.`;
   }
   if (mode.kind === 'followup') {
-    return `This reader did not reply last night. ${mode.daysAgo <= 1 ? 'Two nights ago' : `About ${mode.daysAgo + 1} nights ago`}, they shared the note below, and we already wrote them one study for it. Write a fresh follow-up (kind "reflection") that picks up where that left off: a different passage than the obvious one, Behind the Verse that gently asks how things have moved since then (without assuming how it turned out) and offers one next step, and one voice from history for that next step.\n\n<earlier_note>\n${reply}\n</earlier_note>`;
+    const when = mode.daysAgo <= 1 ? 'Two nights ago' : `About ${mode.daysAgo + 1} nights ago`;
+    if ((mode.round ?? 1) >= 2) {
+      return `This reader did not reply last night, or the night before. ${when}, they shared the note below. They have already read a study about it and a follow-up that asked how things had moved since (both are shown further down). Don't ask that again, don't retell their situation, and don't reuse those studies' passage, voice, stories, or steps. Mention the note in one short clause at most.
+
+Write a fresh Lamp (kind "reflection") that still fits where this person is today: go underneath the situation to what it touches in a life with God (for example trust, provision, identity, rest, courage, waiting) and speak to that. It must read as new to someone who read the last two mornings. Choose a passage and a voice that open a different door, and end with a next step they haven't been given.\n\n<earlier_note>\n${reply}\n</earlier_note>`;
+    }
+    return `This reader did not reply last night. ${when}, they shared the note below, and we already wrote them one study for it (shown further down). Write a fresh follow-up (kind "reflection") that picks up where that left off and moves it forward: they wrote this note and already read a study about it, so refer to their situation in a sentence at most instead of retelling it. Use a different passage than the obvious one and a different voice than that study's, let Behind the Verse gently ask how things have moved since then (without assuming how it turned out), and offer one next step that is different from the step they were already given.\n\n<earlier_note>\n${reply}\n</earlier_note>`;
   }
   return `The reader wrote:\n\n<reply>\n${reply}\n</reply>`;
 }
@@ -89,6 +96,26 @@ Rules for that sentence:
 <earlier>
 ${items.map((m) => `<item id="${m.id}" written="${noteNight(m.source_date)}">${m.quote}</item>`).join('\n')}
 </earlier>`;
+}
+
+// What this reader was already sent (Nov 23 2026). Voices are never repeated within 30 days. On a morning
+// with no new note (follow-up or season), the writer also sees the last few Lamps themselves, so it can move
+// forward instead of retelling the same story, asking the same question, or giving the same step.
+export function alreadySent(recent: RecentLamp[], mode: LampMode): string {
+  if (!recent.length) return '';
+  const voices = distinctVoices(recent);
+  let out = voices.length
+    ? `\n\nVoices this reader has already been given in the last 30 days (choose a different person for Voices Through History): ${voices.slice(0, 30).join('; ')}.`
+    : '';
+  if (mode.kind !== 'reply') {
+    const last = recent.slice(0, 3).filter((l) => l.body?.length);
+    if (last.length) {
+      out += `\n\nWhat this reader already read on recent mornings, newest first. Today's Lamp must read as new next to these: don't retell their stories, don't ask a question they already asked, don't repeat a step, image, or phrasing.\n<already_sent>\n${last
+        .map((l) => `<lamp morning="${l.for_date}" passage="${l.ref ?? ''}" voice="${l.voice ?? ''}">\n${(l.body ?? []).join('\n\n').slice(0, 1800)}\n</lamp>`)
+        .join('\n')}\n</already_sent>`;
+    }
+  }
+  return out;
 }
 
 // Chapters this Lamp must not use: other readers' Lamps that morning, the main study, and this reader's
@@ -111,6 +138,9 @@ export async function writeReflection(
     earlier?: MemoryItem[];
     used?: UsedPassages;
     alsoAvoid?: string[];
+    // This reader's Lamps from the last 30 days, newest first, and any voice a rewrite must also skip.
+    recent?: RecentLamp[];
+    alsoAvoidVoices?: string[];
     shape?: { opening: string; closing: string };
   } = {},
 ): Promise<Reflection> {
@@ -123,6 +153,8 @@ export async function writeReflection(
       ? `\n\nThe main study in the same email already features ${opts.avoidVoice}. Choose a different person for Voices Through History.`
       : '') +
     takenChapters(opts.used, (opts.alsoAvoid ?? []).map((r) => chapterKey(r) ?? r)) +
+    alreadySent(opts.recent ?? [], mode) +
+    (opts.alsoAvoidVoices?.length ? `\n\nAlso do not use: ${opts.alsoAvoidVoices.join('; ')}.` : '') +
     (opts.shape ? `\n\nShape of this Lamp: ${opts.shape.opening} ${opts.shape.closing}` : '');
   const response = await client.messages.parse({
     model: 'claude-opus-5-5',

@@ -83,3 +83,61 @@ export function shapeFor(): { opening: string; closing: string } {
     closing: CLOSINGS[Math.floor(Math.random() * CLOSINGS.length)],
   };
 }
+
+// ---------- this reader's own recent Lamps (Nov 23 2026) ----------
+// A reader who stops replying used to get follow-ups that retold the same story, asked the same question and
+// brought back the same voice (rpene310@, Nov 21-23). The writer now sees what this reader was already sent.
+
+export type RecentLamp = {
+  for_date: string;
+  source: string; // reply | followup | season
+  from_date: string | null; // for a follow-up: the morning of the note it picked up
+  voice: string | null;
+  ref: string | null;
+  body: string[] | null;
+};
+
+export async function recentLamps(email: string, forDate: string): Promise<RecentLamp[]> {
+  return rpc<RecentLamp[]>('dss_lamp_recent', { p_gate: gate(), p_email: email, p_for_date: forDate }).catch((e) => {
+    console.error('recent lamps', e);
+    return [];
+  });
+}
+
+// Voice names come back spelled many ways ("Brother Lawrence of the Resurrection (Nicolas Herman)",
+// "Brother Lawrence (Nicholas Herman)", "Wesley, John"). Two names are the same person when the words of one
+// (ignoring parentheses, titles and small words) all appear in the other.
+function voiceWords(name: string | null | undefined): Set<string> {
+  if (!name) return new Set();
+  return new Set(
+    name
+      .toLowerCase()
+      .replace(/\(.*?\)/g, ' ')
+      .replace(/[^a-z\s]/g, ' ')
+      .split(/\s+/)
+      .filter((w) => w.length > 1 && !['st', 'saint', 'the', 'of', 'blessed', 'rev', 'dr', 'de', 'von', 'van'].includes(w)),
+  );
+}
+
+const FIRST_NAMES = new Set(['john', 'charles', 'thomas', 'william', 'james', 'george', 'martin', 'francis', 'mary', 'catherine', 'teresa', 'elizabeth', 'joseph', 'peter', 'paul', 'richard', 'robert', 'henry', 'samuel', 'david', 'andrew', 'jonathan', 'anne', 'margaret']);
+
+export function sameVoice(a: string | null | undefined, b: string | null | undefined): boolean {
+  const x = voiceWords(a);
+  const y = voiceWords(b);
+  if (!x.size || !y.size) return false;
+  const [small, big] = x.size <= y.size ? [x, y] : [y, x];
+  // A single word only counts when it isn't a common first name ("Spurgeon" or "Augustine" yes, "John" no).
+  if (small.size === 1 && FIRST_NAMES.has([...small][0])) return x.size === y.size;
+  return [...small].every((w) => big.has(w));
+}
+
+export function voiceUsed(name: string | null | undefined, recent: RecentLamp[], alsoAvoid: (string | null | undefined)[] = []): boolean {
+  return [...recent.map((l) => l.voice), ...alsoAvoid].some((v) => sameVoice(name, v));
+}
+
+// One entry per person, for the writer's "already given" list.
+export function distinctVoices(recent: RecentLamp[]): string[] {
+  const out: string[] = [];
+  for (const v of recent.map((l) => l.voice)) if (v && !out.some((o) => sameVoice(o, v))) out.push(v);
+  return out;
+}

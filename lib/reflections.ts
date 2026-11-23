@@ -6,7 +6,7 @@ import { seasonByKey, type LampMeta } from './seasons';
 import { anthropicKey } from './studyWriter';
 import { markRecalled, memoryContext, planMemory, saveMemory } from './memory';
 import { stripQuoted } from './replyText';
-import { chapterKey, claimChapter, forceClaim, passagesUsed, shapeFor } from './lampVariety';
+import { chapterKey, claimChapter, forceClaim, passagesUsed, recentLamps, shapeFor, voiceUsed } from './lampVariety';
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://morninglamp.study';
 
@@ -63,13 +63,24 @@ export async function writeLampFor(
     const memory = fromNote ? await memoryContext(email, forDate) : { on: false, items: [] };
     // No two Lamps the same morning share a chapter, and a reader doesn't get the same chapter twice in 30 days.
     const used = await passagesUsed(email, forDate, study?.content?.passage?.ref ?? null);
-    const write = (alsoAvoid: string[] = []) =>
+    // What this reader was already sent, so a no-reply morning moves forward instead of repeating (Nov 23 2026).
+    const recent = await recentLamps(email, forDate);
+    let mode = opts.mode;
+    if (mode?.kind === 'followup') {
+      const fromDate = opts.meta?.source === 'followup' ? opts.meta.from_date : undefined;
+      const before = fromDate ? recent.filter((l) => l.source === 'followup' && l.from_date === fromDate).length : 0;
+      mode = { ...mode, round: before + 1 };
+    }
+    const mainVoice = study?.content?.voices?.[0]?.name ?? null;
+    const write = (alsoAvoid: string[] = [], alsoAvoidVoices: string[] = []) =>
       writeReflection(merged, {
-        avoidVoice: study?.content?.voices?.[0]?.name ?? null,
-        mode: opts.mode,
+        avoidVoice: mainVoice,
+        mode,
         earlier: memory.on ? memory.items : [],
         used,
         alsoAvoid,
+        recent,
+        alsoAvoidVoices,
         shape: shapeFor(),
       });
     // Deciding what to remember runs alongside writing the study, so the reader's Lamp isn't slowed down.
@@ -77,9 +88,12 @@ export async function writeLampFor(
     let r = first;
     // Checked after writing too: the writer can ignore the list, and Lamps written at the same moment can't
     // see each other in the database. One rewrite; if that collides too, it goes out rather than no Lamp.
-    if (r.kind === 'reflection' && r.passage && !claimChapter(forDate, r.passage.ref, used)) {
-      console.warn('lamp chapter taken, rewriting', chapterKey(r.passage.ref));
-      const again = await write([r.passage.ref]).catch((e) => {
+    // Same for the voice: never one this reader had in the last 30 days, or the main study's.
+    const voiceTaken = (x: typeof r) => x.kind === 'reflection' && voiceUsed(x.voice?.name, recent, [mainVoice]);
+    const chapterTaken = r.kind === 'reflection' && r.passage && !claimChapter(forDate, r.passage.ref, used);
+    if (r.kind === 'reflection' && r.passage && (chapterTaken || voiceTaken(r))) {
+      console.warn('lamp repeats, rewriting', chapterTaken ? chapterKey(r.passage.ref) : r.voice?.name);
+      const again = await write(chapterTaken ? [r.passage.ref] : [], voiceTaken(r) && r.voice?.name ? [r.voice.name] : []).catch((e) => {
         console.error('lamp rewrite', e);
         return null;
       });
