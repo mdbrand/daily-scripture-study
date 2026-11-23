@@ -3,6 +3,8 @@ import { handleReply, senderAddress } from '@/lib/reflections';
 import { recordReply, recordWebhook } from '@/lib/emailEvents';
 import { verifyResendWebhook } from '@/lib/webhookVerify';
 import { LEGAL } from '@/lib/legal';
+import { rpc } from '@/lib/supabaseRpc';
+import { gate } from '@/lib/partners';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
@@ -56,8 +58,18 @@ export async function POST(req: Request) {
   };
 
   const sender = email.reply_to?.[0] || email.from;
+
+  // A Premium reader's reply to the Nightly Lamp stays in Morning Lamp: it is saved as a note (admin
+  // "Premium replies") and becomes their Last Night's Lamp. Rob asked (Nov 22 2026) that these no
+  // longer be copied to the owner's Gmail. Everything else (contact, partners, strangers) still is.
+  const reader = await rpc<{ premium: boolean; mailable: boolean } | null>('dss_reader_lookup', {
+    p_gate: gate(),
+    p_email: senderAddress(sender),
+  }).catch(() => null);
+  const readerReply = !!(reader?.premium && reader.mailable);
+
   const banner = `From: ${email.from}\nTo: ${email.to.join(', ')}\n\n`;
-  const res = await fetch('https://api.resend.com/emails', {
+  const res = readerReply ? null : await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { ...H, 'Idempotency-Key': `inbound-${event.data.email_id}` },
     body: JSON.stringify({
@@ -71,7 +83,7 @@ export async function POST(req: Request) {
         : undefined,
     }),
   });
-  if (!res.ok) {
+  if (res && !res.ok) {
     console.error('inbound: forward failed', res.status, await res.text());
     return NextResponse.json({ error: 'forward failed' }, { status: 502 });
   }
@@ -86,5 +98,5 @@ export async function POST(req: Request) {
       console.error('inbound: reflection', e);
     }
   });
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, forwarded: !readerReply });
 }
