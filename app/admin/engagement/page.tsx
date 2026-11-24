@@ -16,7 +16,7 @@ type Engagement = {
   people: Partial<Record<Win, People>>;
   days: { date: string; title: string | null; sent: number; opened: number; apple_only: number; clicked: number }[];
   links: { link: string; clicks: number; people: number }[];
-  readers: { email: string; sent: number; opened: number; apple_only: number; clicked: number; replies: number; last_seen: string | null }[];
+  readers: { email: string; sent: number; opened: number; times_opened?: number; apple_only: number; clicked: number; replies: number; last_seen: string | null }[];
 };
 
 const WINDOWS: { key: Win; label: string }[] = [
@@ -244,6 +244,7 @@ export default async function AdminEngagement({ searchParams }: { searchParams: 
                 <th>Reader</th>
                 <th>Emails</th>
                 <th>Opened</th>
+                <th>Times opened</th>
                 <th>Apple auto-open only</th>
                 <th>Clicked</th>
                 <th>Replies</th>
@@ -258,6 +259,7 @@ export default async function AdminEngagement({ searchParams }: { searchParams: 
                   </td>
                   <td>{r.sent}</td>
                   <td>{r.opened}</td>
+                  <td>{r.times_opened ?? r.opened}</td>
                   <td>{r.apple_only}</td>
                   <td>{r.clicked}</td>
                   <td>{r.replies}</td>
@@ -275,6 +277,10 @@ export default async function AdminEngagement({ searchParams }: { searchParams: 
           <strong>Opened</strong> means a real mail app loaded the email, or the reader clicked a link in it. Apple Mail
           loads every email by itself the moment it arrives, read or not, so those are counted separately and left out
           of the open rate.
+        </li>
+        <li>
+          <strong>Times opened</strong> counts every real open, so a reader who comes back to the same email three
+          times adds 3. Gmail sometimes keeps a copy of the images, so a quick reopen in Gmail may not show up.
         </li>
         <li>
           <strong>Open rate</strong> is opens divided by the emails we can measure (everything except Apple auto-opens).
